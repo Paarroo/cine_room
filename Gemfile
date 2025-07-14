@@ -19,9 +19,9 @@ gem "jbuilder"
 gem "devise"
 gem "cancancan"
 
-gem "activeadmin"
-gem "activeadmin_addons"
-gem "arctic_admin"
+# gem "activeadmin"
+# gem "activeadmin_addons"
+# gem "arctic_admin"
 
 gem "stripe"
 gem "stripe_event"

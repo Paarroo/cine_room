@@ -5,6 +5,20 @@ class PagesController < ApplicationController
     @stats = home_stats
   end
 
+
+
+  def contact
+  end
+
+  def legal
+  end
+
+  def privacy
+  end
+
+  def terms
+  end
+
   private
 
   def featured_creators

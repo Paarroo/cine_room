@@ -23,5 +23,15 @@ export default class extends Controller {
       default:
         break
     }
+    
+    if (window.innerWidth < 1024) {
+      this.toggleMenu()
+    }
   }
+  
+
+  toggleMenu() {
+  this.mobileMenuTarget.classList.toggle("hidden")
+}
+
 }

@@ -9,6 +9,7 @@ class User < ApplicationRecord
 
   validates :first_name, :last_name, presence: true
 
+
   ROLES = %w[user admin].freeze
 
   validates :role, inclusion: { in: ROLES }
@@ -28,4 +29,5 @@ class User < ApplicationRecord
   def set_default_role
     self.role ||= 'user'
   end
+
 end

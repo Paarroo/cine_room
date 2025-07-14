@@ -10,9 +10,7 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
+    <%# Icons %>
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
@@ -20,15 +18,16 @@
     <%# Font Awesome %>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%# CSS %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body class="bg-gray-900 text-white min-h-screen">
     <%= render 'shared/navbar' %>
-    <main class="w-full">
+    <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <%= yield %>
     </main>
+    <%= render 'shared/footer' %>
   </body>
 </html>

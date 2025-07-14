@@ -3,6 +3,12 @@ Rails.application.routes.draw do
 
   root 'pages#home'
 
+
+  get '/contact', to: 'pages#contact', as: :contact
+  get '/legal',   to: 'pages#legal',   as: :legal
+  get '/privacy', to: 'pages#privacy', as: :privacy
+  get '/terms',   to: 'pages#terms',   as: :terms
+  
   get 'about', to: 'pages#about'
   get 'contact', to: 'pages#contact'
 

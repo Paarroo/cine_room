@@ -1,4 +1,4 @@
-<nav class="fixed top-0 w-full z-50 nav-blur border-b border-white/10">
+<nav data-controller="navigation" class="fixed top-0 w-full z-50 nav-blur border-b border-white/10">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
@@ -12,34 +12,69 @@
         </div>
       <% end %>
 
-      <!-- Navigation Desktop -->
+      <!-- Desktop navigation links -->
       <div class="hidden lg:flex items-center space-x-8">
-        <button class="nav-btn text-gray-300 hover:text-gold-500 transition-colors duration-200 font-medium" data-target="home">Accueil</button>
-        <button class="nav-btn text-gray-300 hover:text-gold-500 transition-colors duration-200 font-medium" data-target="creators">Créateurs</button>
-        <button class="nav-btn text-gray-300 hover:text-cinema-blue transition-colors duration-200 font-medium" data-target="venues">Lieux</button>
-        <button class="nav-btn text-gray-300 hover:text-gold-500 transition-colors duration-200 font-medium" data-target="events">Événements</button>
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="home">
+          Accueil
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="creators">
+          Créateurs
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-cinema-blue"
+                data-action="click->navigation#navigate"
+                data-target="venues">
+          Lieux
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-cinema-blue transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="events">
+          Événements
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
       </div>
 
-      <!-- User Actions -->
+      <!-- User account actions -->
       <div class="hidden lg:flex items-center space-x-4">
         <%= link_to "Connexion", new_user_session_path, class: "nav-btn px-4 py-2 text-gray-300 hover:text-white transition-colors duration-200 font-medium" %>
         <%= link_to "Rejoindre", new_user_registration_path, class: "nav-btn px-6 py-2 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-full font-medium transition-all duration-200 hover:scale-105" %>
       </div>
 
-      <!-- Mobile Menu Button -->
-      <button class="lg:hidden w-10 h-10 bg-white/10 rounded-full flex items-center justify-center" id="mobile-toggle">
+      <!-- Mobile menu toggle button -->
+      <button class="lg:hidden w-10 h-10 bg-white/10 rounded-full flex items-center justify-center"
+              data-action="click->navigation#toggleMenu">
         <i class="fas fa-bars text-gray-300"></i>
       </button>
     </div>
   </div>
 
-  <!-- Mobile Menu -->
-  <div id="mobile-menu" class="lg:hidden hidden nav-blur border-t border-white/10">
+  <!-- Mobile menu section -->
+  <div data-navigation-target="mobileMenu" class="lg:hidden hidden nav-blur border-t border-white/10">
     <div class="px-4 py-6 space-y-4">
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 hover:text-gold-500 transition-colors" data-target="home">Accueil</button>
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 hover:text-gold-500 transition-colors" data-target="creators">Créateurs</button>
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 hover:text-cinema-blue transition-colors" data-target="venues">Lieux</button>
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 hover:text-gold-500 transition-colors" data-target="events">Événements</button>
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="home">Accueil</button>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="creators">Créateurs</button>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-cinema-blue cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="venues">Lieux</button>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="events">Événements</button>
     </div>
   </div>
 </nav>

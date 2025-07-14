@@ -13,6 +13,8 @@ class User < ApplicationRecord
 
   validates :role, inclusion: { in: ROLES }
 
+  before_validation :set_default_role
+
   def admin?
     role == 'admin'
   end

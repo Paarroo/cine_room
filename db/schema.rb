@@ -10,9 +10,65 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_14_081920) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_14_090008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "events", force: :cascade do |t|
+    t.bigint "movie_id", null: false
+    t.string "title"
+    t.text "description"
+    t.string "venue_name"
+    t.string "venue_address"
+    t.date "event_date"
+    t.time "start_time"
+    t.integer "max_capacity"
+    t.integer "price_cents"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "latitude"
+    t.decimal "longitude"
+    t.index ["movie_id"], name: "index_events_on_movie_id"
+  end
+
+  create_table "movies", force: :cascade do |t|
+    t.string "title"
+    t.text "synopsis"
+    t.string "director"
+    t.integer "duration"
+    t.string "genre"
+    t.string "language"
+    t.integer "year"
+    t.string "trailer_url"
+    t.string "poster_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "participations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "event_id", null: false
+    t.string "stripe_payment_id"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_participations_on_event_id"
+    t.index ["user_id"], name: "index_participations_on_user_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "movie_id", null: false
+    t.bigint "event_id", null: false
+    t.integer "rating"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_reviews_on_event_id"
+    t.index ["movie_id"], name: "index_reviews_on_movie_id"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -28,4 +84,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_081920) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "events", "movies"
+  add_foreign_key "participations", "events"
+  add_foreign_key "participations", "users"
+  add_foreign_key "reviews", "events"
+  add_foreign_key "reviews", "movies"
+  add_foreign_key "reviews", "users"
 end

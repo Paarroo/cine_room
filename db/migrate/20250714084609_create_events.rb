@@ -10,9 +10,13 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.time :start_time
       t.integer :max_capacity
       t.integer :price_cents
-      t.string :status
+      t.integer :status, default: 0
 
       t.timestamps
     end
+
+    add_index :events, :movie_id
+    add_index :events, :status
+    add_index :events, :event_date
   end
 end

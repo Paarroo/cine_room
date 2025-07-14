@@ -2,11 +2,14 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations
 
-  enum role: { user: 0, admin: 1 }
+
+  enum role: { user: "user", admin: "admin" }
+
 
   validates :first_name, :last_name, presence: true
 end

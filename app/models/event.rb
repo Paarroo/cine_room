@@ -4,16 +4,17 @@ class Event < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :users, through: :participations
 
-  validates :title, :venue_name, :venue_address, :event_date, :start_time,
-              :max_capacity, :price_cents, presence: true
-    validates :max_capacity, numericality: { greater_than: 0 }
-    validates :price_cents, numericality: { greater_than: 0 }
-    validates :status, inclusion: { in: %w[upcoming sold_out completed cancelled] }
+  enum status: {
+    upcoming: "upcoming",
+    sold_out: "sold_out",
+    completed: "completed",
+    cancelled: "cancelled"
+  }
 
-    scope :upcoming, -> { where(status: 'upcoming') }
-    scope :sold_out, -> { where(status: 'sold_out') }
-    scope :completed, -> { where(status: 'completed') }
-    scope :cancelled, -> { where(status: 'cancelled') }
+  validates :title, :venue_name, :venue_address, :event_date, :start_time,
+            :max_capacity, :price_cents, presence: true
+  validates :max_capacity, numericality: { greater_than: 0 }
+  validates :price_cents, numericality: { greater_than: 0 }
 
   def available_spots
     max_capacity - participations.confirmed.count

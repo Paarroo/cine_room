@@ -17,14 +17,17 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <%# Font Awesome %>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="bg-gray-900 text-white min-h-screen">
     <%= render 'shared/navbar' %>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <main class="w-full">
       <%= yield %>
     </main>
   </body>

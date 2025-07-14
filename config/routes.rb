@@ -7,6 +7,11 @@ Rails.application.routes.draw do
   resources :participations
   resources :events
   resources :movies
+
+  get '/contact', to: 'pages#contact', as: :contact
+  get '/legal',   to: 'pages#legal',   as: :legal
+  get '/privacy', to: 'pages#privacy', as: :privacy
+  get '/terms',   to: 'pages#terms',   as: :terms
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -27,6 +27,20 @@ class PagesController < ApplicationController
     @venues_count = Event.select(:venue_name, :venue_address).distinct.count
   end
 
+
+
+  def contact
+  end
+
+  def legal
+  end
+
+  def privacy
+  end
+
+  def terms
+  end
+
   private
 
   def icon_label_for_venue(name)

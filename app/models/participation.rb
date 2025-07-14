@@ -3,9 +3,24 @@ class Participation < ApplicationRecord
   belongs_to :event
 
   validates :user_id, uniqueness: { scope: :event_id, message: "User already registered for this event" }
-  validates :status, inclusion: { in: %w[pending confirmed cancelled] }
+
+  STATUSES = %w[pending confirmed cancelled].freeze
+
+  validates :status, inclusion: { in: STATUSES }
 
   after_initialize :set_default_status, if: :new_record?
+
+  def pending?
+    status == 'pending'
+  end
+
+  def confirmed?
+    status == 'confirmed'
+  end
+
+  def cancelled?
+    status == 'cancelled'
+  end
 
   private
 

@@ -32,15 +32,15 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-          <%#= render 'shared/stat', number: "85+", label: "Réalisateurs", style: "gradient-text" %>
-          <%#= render 'shared/stat', number: "24", label: "Lieux partenaires", style: "text-cinema-blue" %>
-          <%#= render 'shared/stat', number: "150+", label: "Films présentés", style: "gradient-text" %>
-          <%#= render 'shared/stat', number: "95%", label: "Avec Q&A", style: "text-cinema-blue" %>
+          <%= render 'shared/stat', number: "#{@directors_count}+", label: "Réalisateurs", style: "gradient-text" %>
+          <%= render 'shared/stat', number: "#{@venues_count}", label: "Lieux partenaires", style: "text-cinema-blue" %>
+          <%= render 'shared/stat', number: "#{@movies_count}+", label: "Films présentés", style: "gradient-text" %>
+          <%= render 'shared/stat', number: "95%", label: "Avec Q&A", style: "text-cinema-blue" %>
         </div>
       </div>
     </div>
   </section>
 
-  <%#= render 'pages/creators_section' %>
-  <%#= render 'pages/venues_section' %>
+  <%= render 'pages/creators_section' %>
+  <%= render 'pages/venues_section' %>
 </div>

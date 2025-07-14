@@ -7,4 +7,5 @@ class User < ApplicationRecord
   has_many :events, through: :participations
 
   validates :first_name, :last_name, presence: true
+  bio :users, :bio, :text, after: :role
 end

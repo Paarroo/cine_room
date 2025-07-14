@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root "pages#home"
+  root 'events#index'
 
   resources :reviews
   resources :participations

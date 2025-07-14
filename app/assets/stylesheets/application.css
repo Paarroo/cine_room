@@ -8,3 +8,58 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+ .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.9);
+        }
+        
+        .creator-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .creator-card:hover {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            transform: translateY(-4px);
+        }
+        
+        .venue-card {
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.02));
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .venue-card:hover {
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.05));
+            border: 1px solid rgba(37, 99, 235, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }

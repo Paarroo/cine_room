@@ -1,70 +1,44 @@
 class ParticipationsController < ApplicationController
-  before_action :set_participation, only: %i[ show edit update destroy ]
+  before_action :set_participation, only: [ :show, :destroy ]
+  before_action :set_event, only: [ :create ]
 
-  # GET /participations or /participations.json
   def index
-    @participations = Participation.all
+    @participations = current_user.participations
+                                  .includes(event: :movie)
+                                  .order(created_at: :desc)
   end
 
-  # GET /participations/1 or /participations/1.json
   def show
   end
 
-  # GET /participations/new
-  def new
-    @participation = Participation.new
-  end
-
-  # GET /participations/1/edit
-  def edit
-  end
-
-  # POST /participations or /participations.json
   def create
-    @participation = Participation.new(participation_params)
+    @participation = current_user.participations.build(event: @event)
 
-    respond_to do |format|
+    if @event.available_spots > 0
       if @participation.save
-        format.html { redirect_to @participation, notice: "Participation was successfully created." }
-        format.json { render :show, status: :created, location: @participation }
+        ParticipationMailer.confirmation_email(@participation).deliver_later
+        redirect_to @event, notice: 'Reservation successful!'
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @participation.errors, status: :unprocessable_entity }
+        redirect_to @event, alert: @participation.errors.full_messages.join(', ')
       end
+    else
+      redirect_to @event, alert: 'No spots available.'
     end
   end
 
-  # PATCH/PUT /participations/1 or /participations/1.json
-  def update
-    respond_to do |format|
-      if @participation.update(participation_params)
-        format.html { redirect_to @participation, notice: "Participation was successfully updated." }
-        format.json { render :show, status: :ok, location: @participation }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @participation.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /participations/1 or /participations/1.json
   def destroy
+    event = @participation.event
     @participation.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to participations_path, status: :see_other, notice: "Participation was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to event, notice: 'Reservation cancelled.'
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_participation
-      @participation = Participation.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def participation_params
-      params.expect(participation: [ :user_id, :event_id, :stripe_payment_id, :status ])
-    end
+  def set_participation
+    @participation = current_user.participations.find(params[:id])
+  end
+
+  def set_event
+    @event = Event.find(params[:event_id])
+  end
 end

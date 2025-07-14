@@ -5,7 +5,27 @@ class User < ApplicationRecord
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations
+  has_one :creator, dependent: :destroy
 
   validates :first_name, :last_name, presence: true
-  bio :users, :bio, :text, after: :role
+
+  ROLES = %w[user admin].freeze
+
+  validates :role, inclusion: { in: ROLES }
+
+  before_validation :set_default_role
+
+  def admin?
+    role == 'admin'
+  end
+
+  def user?
+    role == 'user' || role.blank?
+  end
+
+  private
+
+  def set_default_role
+    self.role ||= 'user'
+  end
 end

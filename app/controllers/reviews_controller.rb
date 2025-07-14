@@ -1,70 +1,58 @@
 class ReviewsController < ApplicationController
-  before_action :set_review, only: %i[ show edit update destroy ]
+  before_action :set_review, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_event, only: [ :new, :create ]
 
-  # GET /reviews or /reviews.json
   def index
-    @reviews = Review.all
+    @reviews = Review.includes(:user, :movie, :event)
+                     .order(created_at: :desc)
+                     .page(params[:page])
   end
 
-  # GET /reviews/1 or /reviews/1.json
   def show
   end
 
-  # GET /reviews/new
   def new
-    @review = Review.new
+    @review = current_user.reviews.build(event: @event, movie: @event.movie)
   end
 
-  # GET /reviews/1/edit
+  def create
+    @review = current_user.reviews.build(review_params.merge(event: @event, movie: @event.movie))
+
+    if @review.save
+      redirect_to @event, notice: 'Thank you for your review!'
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
   def edit
   end
 
-  # POST /reviews or /reviews.json
-  def create
-    @review = Review.new(review_params)
-
-    respond_to do |format|
-      if @review.save
-        format.html { redirect_to @review, notice: "Review was successfully created." }
-        format.json { render :show, status: :created, location: @review }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @review.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /reviews/1 or /reviews/1.json
   def update
-    respond_to do |format|
-      if @review.update(review_params)
-        format.html { redirect_to @review, notice: "Review was successfully updated." }
-        format.json { render :show, status: :ok, location: @review }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @review.errors, status: :unprocessable_entity }
-      end
+    if @review.update(review_params)
+      redirect_to @review.event, notice: 'Review updated successfully.'
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
-  # DELETE /reviews/1 or /reviews/1.json
   def destroy
+    event = @review.event
     @review.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to reviews_path, status: :see_other, notice: "Review was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to event, notice: 'Review deleted.'
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_review
-      @review = Review.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def review_params
-      params.expect(review: [ :user_id, :movie_id, :event_id, :rating, :comment ])
-    end
+  def set_review
+    @review = current_user.reviews.find(params[:id])
+  end
+
+  def set_event
+    @event = Event.find(params[:event_id])
+  end
+
+  def review_params
+    params.require(:review).permit(:rating, :comment)
+  end
 end

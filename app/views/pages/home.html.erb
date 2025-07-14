@@ -1,24 +1,32 @@
 <div id="home" class="page-content active">
-  <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <section class="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    
+    <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="mb-8">
+    <!-- Centered content wrapper -->
+    <div class="relative z-10 flex flex-col items-center justify-center text-center w-full px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 max-w-6xl mx-auto">
+        
+        <!-- Top badge -->
         <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-8">
           <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
           <span class="text-gold-400 font-medium">Plateforme dédiée aux créateurs</span>
         </div>
 
+        <!-- Main title -->
         <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
           <span class="block">Cinéma</span>
           <span class="gradient-text">Indépendant</span>
           <span class="block text-3xl md:text-4xl lg:text-5xl mt-4 text-gray-300">& Créateurs</span>
         </h1>
 
-        <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-          Rencontrez les réalisateurs, découvrez leurs univers créatifs et vivez le cinéma dans des lieux d'exception
+        <!-- Subtitle -->
+        <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+          Rencontrez les réalisateurs, explorez leurs univers créatifs et vivez le cinéma dans des lieux d’exception.
         </p>
 
+        <!-- Call-to-action buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <%= link_to "#creators", class: "cta-btn group px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105" do %>
             <i class="fas fa-users mr-3 group-hover:rotate-12 transition-transform"></i>
@@ -31,6 +39,7 @@
           <% end %>
         </div>
 
+        <!-- Statistics section -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
           <%= render 'shared/stat', number: "#{@directors_count}+", label: "Réalisateurs", style: "gradient-text" %>
           <%= render 'shared/stat', number: "#{@venues_count}", label: "Lieux partenaires", style: "text-cinema-blue" %>
@@ -41,6 +50,9 @@
     </div>
   </section>
 
+  <!-- Featured creators -->
   <%= render 'pages/creators_section' %>
+
+  <!-- Featured venues -->
   <%= render 'pages/venues_section' %>
 </div>

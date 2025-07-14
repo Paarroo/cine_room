@@ -3,7 +3,7 @@ FactoryBot.define do
     title { Faker::Movie.title }
     synopsis { Faker::Lorem.paragraph(sentence_count: 4) }
     director { "#{Faker::Name.first_name} #{Faker::Name.last_name}" }
-    duration { rand(85..180) } # 1h25 à 3h
+    duration { rand(85..180) }
     genre { [ "Drame", "Comédie", "Thriller", "Documentaire", "Romance", "Science-fiction" ].sample }
     language { [ "Français", "Anglais", "Italien", "Espagnol" ].sample }
     year { rand(2018..2024) }

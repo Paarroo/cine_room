@@ -4,7 +4,6 @@ class Movie < ApplicationRecord
   has_many :participations, through: :events
   has_many :users, through: :participations
 
-
   validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
   validates :duration, numericality: { greater_than: 0 }
   validates :year, numericality: {

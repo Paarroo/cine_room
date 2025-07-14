@@ -4,10 +4,10 @@ FactoryBot.define do
     last_name { Faker::Name.last_name }
     email { Faker::Internet.unique.email }
     password { "password123" }
-
+    role { "user" }
 
     trait :admin do
-      role { 1 }
+      role { "admin" }
       email { "admin@cineroom.com" }
     end
   end

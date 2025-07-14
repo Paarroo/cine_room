@@ -1,29 +1,53 @@
-<% content_for :title, "Events" %>
+<!-- app/views/pages/events.html.erb -->
+<div id="events" class="page-content active mt-24">
+  <section class="py-8 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+      <!-- Header -->
+      <div class="mb-12 text-center">
+        <h1 class="text-4xl lg:text-6xl font-bold mb-4">
+          Tous nos <span class="gradient-text">Événements</span>
+        </h1>
+        <p class="text-xl text-gray-400">Découvrez notre programmation complète</p>
+      </div>
 
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Events</h1>
-    <%= link_to "New event", new_event_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
-  </div>
-
-  <div id="events" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @events.any? %>
-      <% @events.each do |event| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render event %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", event, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_event_path(event), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", event, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+      <!-- Filters -->
+      <div class="glass-effect rounded-2xl p-6 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div class="relative">
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input type="text" placeholder="Rechercher un film..." class="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-gold-500 focus:border-transparent text-white placeholder-gray-400">
           </div>
+          <select class="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-gold-500">
+            <option class="bg-dark-300">🗓️ Toutes les dates</option>
+            <option class="bg-dark-300">Cette semaine</option>
+            <option class="bg-dark-300">Ce mois</option>
+          </select>
+          <select class="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-gold-500">
+            <option class="bg-dark-300">🎭 Tous les genres</option>
+            <option class="bg-dark-300">Drame</option>
+            <option class="bg-dark-300">Thriller</option>
+            <option class="bg-dark-300">Comédie</option>
+          </select>
+          <select class="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-gold-500">
+            <option class="bg-dark-300">📍 Tous les lieux</option>
+            <option class="bg-dark-300">Marais</option>
+            <option class="bg-dark-300">République</option>
+            <option class="bg-dark-300">16e arr.</option>
+          </select>
         </div>
-      <% end %>
-    <% else %>
-      <p class="text-center my-10">No events found.</p>
-    <% end %>
-  </div>
+      </div>
+
+      <!-- Event Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <%= render partial: "event_card", collection: @events, as: :event %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center mt-16">
+        <%#= paginate @events, theme: "tailwind" %>
+      </div>
+
+    </div>
+  </section>
 </div>

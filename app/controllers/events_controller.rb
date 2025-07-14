@@ -62,4 +62,5 @@ class EventsController < ApplicationController
                                    :venue_address, :event_date, :start_time,
                                    :max_capacity, :price_cents, :latitude, :longitude)
   end
+
 end

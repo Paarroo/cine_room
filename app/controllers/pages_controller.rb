@@ -16,7 +16,15 @@ class PagesController < ApplicationController
       "COUNT(*) AS events_count"
     )
     .map { |venue| venue.attributes.symbolize_keys.merge(icon_label_for_venue(venue[:name])) }
-      
+     
+    # Directors count
+    @directors_count = Movie.where.not(director: [nil, ""]).distinct.count(:director)
+
+    # Movies count
+    @movies_count = Movie.count
+
+    # Venues count
+    @venues_count = Event.select(:venue_name, :venue_address).distinct.count
   end
 
   private

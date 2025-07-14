@@ -4,19 +4,16 @@ class Review < ApplicationRecord
   belongs_to :event
 
   validates :rating, inclusion: { in: 1..5 }
-  validates :user_id, uniqueness: {
-    scope: [ :movie_id, :event_id ],
-    message: "You have already reviewed this event"
-  }
+  validates :user_id, uniqueness: { scope: [ :movie_id, :event_id ], message: "You already reviewed this event" }
   validates :comment, length: { minimum: 10, maximum: 1000 }
 
-  validate :user_must_have_attended_event
+  validate :movie_matches_event
 
   private
 
-  def user_must_have_attended_event
-    unless event.users.include?(user)
-      errors.add(:user, "must have attended the event to leave a review")
-    end
+  def movie_matches_event
+    return unless movie && event
+
+    errors.add(:movie, "must match the event's movie") if movie != event.movie
   end
 end

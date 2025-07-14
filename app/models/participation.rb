@@ -2,25 +2,14 @@ class Participation < ApplicationRecord
   belongs_to :user
   belongs_to :event
 
-  enum status: {
-    pending: "pending",
-    confirmed: "confirmed",
-    cancelled: "cancelled"
-  }
+  validates :user_id, uniqueness: { scope: :event_id, message: "User already registered for this event" }
+  validates :status, inclusion: { in: %w[pending confirmed cancelled] }
 
-  validates :user_id, uniqueness: {
-    scope: :event_id,
-    message: "You have already registered for this event"
-  }
-
-  before_create :check_event_capacity
+  after_initialize :set_default_status, if: :new_record?
 
   private
 
-  def check_event_capacity
-    if event.available_spots <= 0
-      errors.add(:event, "is sold out")
-      throw(:abort)
-    end
+  def set_default_status
+    self.status ||= 'pending'
   end
 end

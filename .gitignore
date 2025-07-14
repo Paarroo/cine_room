@@ -204,3 +204,6 @@ ehthumbs.db
 # Ignore local configuration files
 config/local.yml
 config/local_env.yml
+
+/app/assets/builds/*
+!/app/assets/builds/.keep

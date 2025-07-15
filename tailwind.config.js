@@ -5,6 +5,7 @@ module.exports = {
     './app/assets/stylesheets/**/*.css',
     './app/javascript/**/*.js'
   ],
+
   theme: {
     extend: {
       // COLORS - STRICT 5 COLORS MAX (jury requirement)
@@ -16,11 +17,11 @@ module.exports = {
         accent: '#2563eb'        // Blue - links and secondary actions
       },
 
-      // FONTS - MAX 3 FONTS (jury requirement)
+      // FONTS - MAX 3 FONTS (jury requirement) - SYLEXIAD ONLY
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],     // Primary font
-        display: ['Inter', 'system-ui', 'sans-serif'],  // Display font (same family)
-        mono: ['JetBrains Mono', 'monospace']           // Optional for prices/code
+        sans: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+        display: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
       },
 
       // RESPONSIVE BREAKPOINTS - Mobile first approach
@@ -97,10 +98,6 @@ module.exports = {
     }
   },
 
-  // PLUGINS - Extended functionality iw we need for later implement
-  plugins: [
-    // Add any additional Tailwind plugins here
-    // require('@tailwindcss/forms'),
-    // require('@tailwindcss/typography')
-  ]
+  // PLUGINS - No additional plugins to keep it simple
+  plugins: []
 }

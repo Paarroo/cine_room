@@ -1,4 +1,3 @@
-// app/javascript/controllers/navigation_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -28,10 +27,16 @@ export default class extends Controller {
       this.toggleMenu()
     }
   }
-  
-
   toggleMenu() {
-  this.mobileMenuTarget.classList.toggle("hidden")
-}
+    this.mobileMenuTarget.classList.toggle("hidden")
+  }
 
+  // Fermer le menu mobile quand on clique sur un lien
+  connect() {
+    this.element.addEventListener('click', (e) => {
+      if (e.target.closest('a') && !this.mobileMenuTarget.classList.contains('hidden')) {
+        this.mobileMenuTarget.classList.add('hidden')
+      }
+    })
+  }
 }

@@ -1,8 +1,5 @@
 class Creator < ApplicationRecord
   belongs_to :user
-end
-class Creator < ApplicationRecord
-  belongs_to :user
   has_many :movies, dependent: :destroy
 
   validates :user_id, uniqueness: true

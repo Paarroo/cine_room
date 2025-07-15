@@ -4,9 +4,11 @@ class CreateParticipations < ActiveRecord::Migration[8.0]
       t.references :user, null: false, foreign_key: true
       t.references :event, null: false, foreign_key: true
       t.string :stripe_payment_id
-      t.integer :status
-
+      t.integer :status, default: 0, null: false
       t.timestamps
     end
+
+    add_index :participations, [ :user_id, :event_id ], unique: true
+    add_index :participations, :status
   end
 end

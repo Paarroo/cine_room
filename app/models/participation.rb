@@ -1,10 +1,6 @@
 class Participation < ApplicationRecord
   belongs_to :user
   belongs_to :event
-end
-class Participation < ApplicationRecord
-  belongs_to :user
-  belongs_to :event
 
   validates :user_id, uniqueness: { scope: :event_id, message: "User already registered for this event" }
 

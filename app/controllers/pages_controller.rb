@@ -11,7 +11,9 @@ class PagesController < ApplicationController
     @events_count    = stats[:events_count]
   end
 
-
+  def about
+    
+  end
 
 
   def contact

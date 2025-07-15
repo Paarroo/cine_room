@@ -29,28 +29,9 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-surface text-content min-h-screen flex flex-col font-sans">
+  <body class="bg-gray-900 text-white min-h-screen flex flex-col">
     <%= render 'shared/navbar' %>
-
     <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-grow">
-      <%# Flash messages - styled with CinéRoom theme %>
-      <% if notice %>
-        <div class="glass-effect border-l-4 border-primary text-content p-4 mb-6 rounded-xl animate-fade-in">
-          <div class="flex items-center">
-            <i class="fas fa-check-circle text-primary mr-3"></i>
-            <span class="font-medium"><%= notice %></span>
-          </div>
-        </div>
-      <% end %>
-
-      <% if alert %>
-        <div class="glass-effect border-l-4 border-red-500 text-content p-4 mb-6 rounded-xl animate-fade-in">
-          <div class="flex items-center">
-            <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
-            <span class="font-medium"><%= alert %></span>
-          </div>
-        </div>
-      <% end %>
 
       <%= yield %>
     </main>

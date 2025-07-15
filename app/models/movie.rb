@@ -1,5 +1,6 @@
 class Movie < ApplicationRecord
   belongs_to :creator
+  belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
   has_many :reviews, dependent: :destroy
 
@@ -10,27 +11,7 @@ class Movie < ApplicationRecord
     less_than_or_equal_to: Date.current.year + 2
   }
 
-  VALIDATION_STATUSES = %w[pending approved rejected].freeze
+  enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
-  validates :validation_status, inclusion: { in: VALIDATION_STATUSES }
-
-  after_initialize :set_default_validation_status, if: :new_record?
-
-  def pending?
-    validation_status == 'pending'
-  end
-
-  def approved?
-    validation_status == 'approved'
-  end
-
-  def rejected?
-    validation_status == 'rejected'
-  end
-
-  private
-
-  def set_default_validation_status
-    self.validation_status ||= 'pending'
-  end
+  scope :approved, -> { where(validation_status: :approved) }
 end

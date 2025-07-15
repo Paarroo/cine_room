@@ -10,13 +10,14 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.time :start_time, null: false
       t.integer :max_capacity, null: false
       t.integer :price_cents, null: false
-      t.string :status, default: 'upcoming'
-
+      t.integer :status, default: 0, null: false
+      t.decimal :latitude, precision: 10, scale: 6
+      t.decimal :longitude, precision: 10, scale: 6
       t.timestamps
     end
 
-    add_index :events, :movie_id
     add_index :events, :status
     add_index :events, :event_date
+    add_index :events, [ :latitude, :longitude ]
   end
 end

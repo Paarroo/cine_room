@@ -6,7 +6,6 @@ class CreateReviews < ActiveRecord::Migration[8.0]
       t.references :event, null: false, foreign_key: true
       t.integer :rating
       t.text :comment
-
       t.timestamps
     end
 

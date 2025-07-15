@@ -61,8 +61,17 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
   gem "dotenv-rails"
 
-  gem "rspec-rails"
-  gem "faker"
+
+  group :development, :test do
+    gem "rspec-rails"
+    gem 'factory_bot_rails', '~> 6.4'
+    gem 'faker', '~> 3.2'
+  end
+
+  group :test do
+    gem 'shoulda-matchers', '~> 6.0'
+    gem 'nyan-cat-formatter', '~> 0.12'
+  end
 
   gem "pry-rails"
   gem "pry-byebug"
@@ -110,7 +119,6 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
   gem "simplecov", require: false
-  gem "shoulda-matchers"
   gem "database_cleaner-active_record"
   gem "webmock"
   gem "vcr"

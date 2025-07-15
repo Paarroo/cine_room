@@ -12,6 +12,11 @@ class ParticipationsController < ApplicationController
   def show
   end
 
+  def new
+  @event = Event.find(params[:event_id])
+  @participation = Participation.new
+  end
+
   def create
     @participation = current_user.participations.build(
       event: @event,

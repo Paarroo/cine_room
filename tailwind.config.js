@@ -19,9 +19,9 @@ module.exports = {
 
       // FONTS - MAX 3 FONTS (jury requirement) - SYLEXIAD ONLY
       fontFamily: {
-        sans: ['Sylexiad', 'system-ui', 'sans-serif'],     // Primary font - Sylexiad
-        display: ['Sylexiad', 'system-ui', 'sans-serif'],  // Display font - Same family
-        mono: ['Sylexiad', 'monospace']                     // Monospace - Sylexiad variant
+        sans: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+        display: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
       },
 
       // RESPONSIVE BREAKPOINTS - Mobile first approach

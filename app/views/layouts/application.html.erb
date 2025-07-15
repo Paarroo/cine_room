@@ -1,33 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" class="scroll-smooth">
   <head>
-    <title><%= content_for(:title) || "Cine Room" %></title>
+    <title><%= content_for(:title) || "CinéRoom - Cinéma Indépendant" %></title>
+    <meta name="description" content="<%= content_for(:description) || 'Découvrez le cinéma indépendant dans des lieux d\'exception avec rencontres exclusives des équipes créatives' %>">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Icons %>
+    <%# Favicon and icons %>
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <%# Google Fonts - Dyslexia friendly %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+
     <%# Font Awesome %>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <%# CSS %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%# CSS - Tailwind included %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <%# JavaScript %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-900 text-white min-h-screen">
+  <body class="bg-surface text-content min-h-screen font-sans antialiased">
+    <%# Skip to main content for accessibility %>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-surface px-4 py-2 rounded-lg z-50">
+      Aller au contenu principal
+    </a>
+
+    <%# Flash messages %>
+    <% if notice %>
+      <div class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in" data-controller="flash" data-flash-auto-dismiss-value="5000">
+        <div class="flex items-center justify-between">
+          <span><%= notice %></span>
+          <button data-action="click->flash#dismiss" class="ml-4 text-white hover:text-gray-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in" data-controller="flash" data-flash-auto-dismiss-value="5000">
+        <div class="flex items-center justify-between">
+          <span><%= alert %></span>
+          <button data-action="click->flash#dismiss" class="ml-4 text-white hover:text-gray-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Navigation %>
     <%= render 'shared/navbar' %>
-    <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+
+    <%# Main content %>
+    <main id="main-content" class="min-h-screen pt-16">
       <%= yield %>
     </main>
+
+    <%# Footer %>
     <%= render 'shared/footer' %>
+
+    <%# Loading spinner for Turbo %>
+    <div id="loading-spinner" class="hidden fixed inset-0 bg-surface/80 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div class="glass-effect rounded-2xl p-8 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p class="text-muted">Chargement...</p>
+      </div>
+    </div>
   </body>
 </html>

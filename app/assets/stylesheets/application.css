@@ -65,11 +65,10 @@ h2,
 h3,
 h4,
 h5,
-h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+h6 fontFamily: {
+  sans: ['Atkinson Hyperlegible', 'system-ui'],    // main
+  display: ['Atkinson Hyperlegible', 'system-ui'],
+  mono: ['Atkinson Hyperlegible', 'monospace']     // Prices
 }
 
 /* GLASS EFFECTS - Modern UI components */

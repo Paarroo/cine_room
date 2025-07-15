@@ -18,10 +18,10 @@ module.exports = {
 
       // FONTS - MAX 3 FONTS (jury requirement)
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],     // Primary font
-        display: ['Inter', 'system-ui', 'sans-serif'],  // Display font (same family)
-        mono: ['JetBrains Mono', 'monospace']           // Optional for prices/code
-      },
+        sans: ['Atkinson Hyperlegible', 'system-ui'],    // Texte principal
+        display: ['Atkinson Hyperlegible', 'system-ui'], // Titres cohérents
+        mono: ['Atkinson Hyperlegible', 'monospace']     // Prix aussi lisibles
+      }
 
       // RESPONSIVE BREAKPOINTS - Mobile first approach
       screens: {

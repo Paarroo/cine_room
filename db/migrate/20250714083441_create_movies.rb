@@ -10,7 +10,7 @@ class CreateMovies < ActiveRecord::Migration[8.0]
       t.integer :year, null: false
       t.string :trailer_url
       t.string :poster_url
-      t.string :validation_status, default: 'pending', null: false  # String
+      t.integer :validation_status, default: 0, null: false
       t.references :validated_by, foreign_key: { to_table: :users }, null: true
       t.datetime :validated_at
 

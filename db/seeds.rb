@@ -5,214 +5,126 @@ Movie.destroy_all
 Creator.destroy_all
 User.destroy_all
 
-# Create test user (role sera automatiquement 0 = 'user')
-test_user = User.create!(
-  email: 'test@cineroom.com',
-  password: 'password123',
-  first_name: 'Test',
-  last_name: 'User'
-)
-
-# Create creators with creator role
-creators_data = [
-  {
-    email: 'claire.martin@example.com',
-    first_name: 'Claire',
-    last_name: 'Martin',
-    bio: 'Réalisatrice primée au Festival de Cannes 2024.',
-    role: 'creator'
-  },
-  {
-    email: 'marc.dubois@example.com',
-    first_name: 'Marc',
-    last_name: 'Dubois',
-    bio: 'Documentariste de la nouvelle génération.',
-    role: 'creator'
-  },
-  {
-    email: 'sophie.leroy@example.com',
-    first_name: 'Sophie',
-    last_name: 'Leroy',
-    bio: 'Réalisatrice fiction multi-primée.',
-    role: 'creator'
-  },
-  {
-    email: 'antoine.rousseau@example.com',
-    first_name: 'Antoine',
-    last_name: 'Rousseau',
-    bio: 'Jeune prodige du cinéma indépendant.',
-    role: 'creator'
-  }
-]
-
-creators = []
-creators_data.each do |creator_data|
-  user = User.create!(
-    email: creator_data[:email],
-    password: 'password123',
-    first_name: creator_data[:first_name],
-    last_name: creator_data[:last_name],
-    role: creator_data[:role]
-  )
-
-  creator = Creator.create!(
-    user: user,
-    bio: creator_data[:bio],
-    status: 'verified',
-    verified_at: 1.year.ago
-  )
-  creators << creator
-end
-
-# Create regular users
-regular_users = []
-10.times do
-  user = User.create!(
-    email: Faker::Internet.unique.email,
-    password: 'password123',
-    first_name: Faker::Name.first_name,
-    last_name: Faker::Name.last_name
-  )
-  regular_users << user
-end
-
-# Create admin user
-admin = User.create!(
+admin_user = User.create!(
   email: 'admin@cineroom.com',
   password: 'password123',
   first_name: 'Admin',
   last_name: 'CinéRoom',
-  role: 'admin'
+  role: :admin
 )
 
-# Create movies
-movies_data = [
-  {
-    creator: creators[0],
-    title: 'Le Souffle',
-    synopsis: 'Dans une petite ville de province, Emma, jeune kinésithérapeute, découvre que sa patiente âgée cache un lourd secret familial.',
-    director: 'Claire Martin',
-    duration: 95,
-    genre: 'Drame',
-    language: 'Français',
-    year: 2024,
-    trailer_url: 'https://youtube.com/watch?v=example1',
-    poster_url: 'https://via.placeholder.com/400x600/dc2626/ffffff?text=Le+Souffle',
-    validation_status: 'approved'
-  },
-  {
-    creator: creators[1],
-    title: 'Fragments',
-    synopsis: 'Un documentaire bouleversant qui suit trois familles pendant une année difficile.',
-    director: 'Marc Dubois',
-    duration: 108,
-    genre: 'Documentaire',
-    language: 'Français',
-    year: 2024,
-    trailer_url: 'https://youtube.com/watch?v=example2',
-    poster_url: 'https://via.placeholder.com/400x600/7c3aed/ffffff?text=Fragments',
-    validation_status: 'approved'
-  },
-  {
-    creator: creators[2],
-    title: 'L\'Aube',
-    synopsis: 'Comédie douce-amère sur trois trentenaires qui se retrouvent pour organiser l\'enterrement de leur ami d\'enfance.',
-    director: 'Sophie Leroy',
-    duration: 87,
-    genre: 'Comédie dramatique',
-    language: 'Français',
-    year: 2024,
-    trailer_url: 'https://youtube.com/watch?v=example3',
-    poster_url: 'https://via.placeholder.com/400x600/059669/ffffff?text=L\'Aube',
-    validation_status: 'approved'
-  },
-  {
-    creator: creators[3],
-    title: 'Marées',
-    synopsis: 'Thriller psychologique sophistiqué. Un architecte découvre que les plans qu\'il dessine influencent mystérieusement la réalité.',
-    director: 'Antoine Rousseau',
-    duration: 103,
-    genre: 'Thriller',
-    language: 'Français',
-    year: 2024,
-    trailer_url: 'https://youtube.com/watch?v=example4',
-    poster_url: 'https://via.placeholder.com/400x600/dc2626/ffffff?text=Marées',
-    validation_status: 'approved'
-  }
-]
+test_user = User.create!(
+  email: 'test@cineroom.com',
+  password: 'password123',
+  first_name: 'Test',
+  last_name: 'User',
+  role: :user
+)
 
-movies = []
-movies_data.each do |movie_data|
-  movie = Movie.create!(movie_data)
-  movies << movie
+creator_users = 5.times.map do
+  User.create!(
+    email: Faker::Internet.unique.email,
+    password: 'password123',
+    first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    role: :creator
+  )
 end
 
-# Create events
-venues_data = [
-  {
-    name: 'Galerie Marais',
-    address: '15 rue des Rosiers, 75004 Paris',
-    latitude: 48.8566,
-    longitude: 2.3522
-  },
-  {
-    name: 'Rooftop République',
-    address: 'Place de la République, 75011 Paris',
-    latitude: 48.8676,
-    longitude: 2.3631
-  },
-  {
-    name: 'Hôtel Particulier Mansion',
-    address: 'Avenue Foch, 75016 Paris',
-    latitude: 48.8738,
-    longitude: 2.2832
-  },
-  {
-    name: 'Loft Belleville',
-    address: 'Rue de Belleville, 75020 Paris',
-    latitude: 48.8720,
-    longitude: 2.3810
-  }
-]
+creators = creator_users.map do |user|
+  Creator.create!(
+    user: user,
+    bio: Faker::Lorem.paragraph(sentence_count: 3),
+    status: :verified,
+    verified_at: Faker::Time.between(from: 2.years.ago, to: 1.year.ago)
+  )
+end
 
-events = []
-movies.each_with_index do |movie, index|
-  venue = venues_data[index % venues_data.length]
+regular_users = 15.times.map do
+  User.create!(
+    email: Faker::Internet.unique.email,
+    password: 'password123',
+    first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    role: :user
+  )
+end
 
-  2.times do |i|
-    event_date = Date.current + (7 + i * 14).days
-
-    event = Event.create!(
-      movie: movie,
-      title: "#{movie.title} - Rencontre avec #{movie.director}",
-      description: "Projection exclusive suivie d'une rencontre avec #{movie.director}.",
-      venue_name: venue[:name],
-      venue_address: venue[:address],
-      event_date: event_date,
-      start_time: '20:00',
-      max_capacity: 20,
-      price_cents: 2500,
-      latitude: venue[:latitude],
-      longitude: venue[:longitude],
-      status: 'upcoming'
+movies = creators.flat_map do |creator|
+  rand(2..4).times.map do
+    Movie.create!(
+      creator: creator,
+      title: Faker::Movie.title,
+      synopsis: Faker::Lorem.paragraph(sentence_count: 4),
+      director: "#{creator.user.first_name} #{creator.user.last_name}",
+      duration: rand(80..180),
+      genre: [ 'Drame', 'Comédie', 'Thriller', 'Documentaire', 'Romance' ].sample,
+      language: 'Français',
+      year: rand(2020..2024),
+      trailer_url: "https://youtube.com/watch?v=#{Faker::Alphanumeric.alphanumeric(number: 11)}",
+      poster_url: "https://via.placeholder.com/400x600/#{Faker::Color.hex_color.delete('#')}/ffffff?text=#{URI.encode_www_form_component(Faker::Movie.title)}",
+      validation_status: :approved,
+      validated_by: admin_user,
+      validated_at: Faker::Time.between(from: 1.year.ago, to: 6.months.ago)
     )
-    events << event
   end
 end
 
-# Create participations
-events.each do |event|
-  5.times do
-    user = regular_users.sample
-    next if Participation.exists?(user: user, event: event)
+venues = [
+  { name: 'Galerie Marais', address: '15 rue des Rosiers, 75004 Paris', lat: 48.8566, lng: 2.3522 },
+  { name: 'Rooftop République', address: 'Place de la République, 75011 Paris', lat: 48.8676, lng: 2.3631 },
+  { name: 'Hôtel Particulier', address: 'Avenue Foch, 75016 Paris', lat: 48.8738, lng: 2.2832 },
+  { name: 'Loft Belleville', address: 'Rue de Belleville, 75020 Paris', lat: 48.8720, lng: 2.3810 },
+  { name: 'Studio Bastille', address: 'Rue de la Bastille, 75011 Paris', lat: 48.8532, lng: 2.3698 }
+]
 
+events = movies.flat_map do |movie|
+  rand(1..3).times.map do |i|
+    venue = venues.sample
+    Event.create!(
+      movie: movie,
+      title: "#{movie.title} - Rencontre avec #{movie.director}",
+      description: Faker::Lorem.paragraph(sentence_count: 2),
+      venue_name: venue[:name],
+      venue_address: venue[:address],
+      event_date: Faker::Date.between(from: 1.week.from_now, to: 3.months.from_now),
+      start_time: [ '19:00', '19:30', '20:00', '20:30', '21:00' ].sample,
+      max_capacity: rand(15..30),
+      price_cents: rand(20..40) * 100,
+      latitude: venue[:lat],
+      longitude: venue[:lng],
+      status: :upcoming
+    )
+  end
+end
+
+events.each do |event|
+  participants_count = rand(5..15)
+  available_users = (regular_users + [ test_user ]).sample(participants_count)
+
+  available_users.each do |user|
     Participation.create!(
       user: user,
       event: event,
-      status: 'confirmed',
-      stripe_payment_id: "pi_#{SecureRandom.alphanumeric(24)}"
+      status: :confirmed,
+      stripe_payment_id: "pi_#{Faker::Alphanumeric.alphanumeric(number: 24)}"
     )
   end
 end
 
-puts "Seed completed: #{User.count} users, #{Movie.count} movies, #{Event.count} events"
+completed_events = Event.where('event_date < ?', 1.week.ago).limit(5)
+completed_events.update_all(status: :completed)
+
+completed_events.each do |event|
+  event.participations.confirmed.sample(rand(2..5)).each do |participation|
+    Review.create!(
+      user: participation.user,
+      movie: event.movie,
+      event: event,
+      rating: rand(3..5),
+      comment: Faker::Lorem.paragraph(sentence_count: rand(2..4))
+    )
+  end
+end
+
+puts "Created #{User.count} users, #{Creator.count} creators, #{Movie.count} movies, #{Event.count} events, #{Participation.count} participations, #{Review.count} reviews"

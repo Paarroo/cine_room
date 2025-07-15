@@ -10,7 +10,7 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.time :start_time, null: false
       t.integer :max_capacity, null: false
       t.integer :price_cents, null: false
-      t.string :status, default: 'upcoming'
+      t.integer :status, default: 0
 
       t.timestamps
     end

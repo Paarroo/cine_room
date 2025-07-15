@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   def home
-    @featured_creators = featured_creators
-    @featured_venues = featured_venues
+    @creators = featured_creators
+    @venues = featured_venues
     @stats = home_stats
   end
 

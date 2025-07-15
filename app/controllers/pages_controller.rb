@@ -2,8 +2,15 @@ class PagesController < ApplicationController
   def home
     @creators = featured_creators
     @venues = featured_venues
-    @stats = home_stats
+
+    # Extracted stats in separated instance variables
+    stats = home_stats
+    @directors_count = stats[:directors_count]
+    @movies_count    = stats[:movies_count]
+    @venues_count    = stats[:venues_count]
+    @events_count    = stats[:events_count]
   end
+
 
 
 
@@ -23,13 +30,13 @@ class PagesController < ApplicationController
 
   def featured_creators
     Creator.joins(:movies, :user)
-           .where(status: 'verified')
-           .where(movies: { validation_status: 'approved' })
-           .group('creators.id, users.first_name, users.last_name')
-           .select('creators.*, users.first_name, users.last_name, COUNT(movies.id) as movies_count')
-           .order('movies_count DESC')
-           .limit(3)
+          .where(movies: { validation_status: 'approved' })
+          .group('creators.id', 'users.first_name', 'users.last_name')
+          .select('creators.*, users.first_name, users.last_name, COUNT(movies.id) AS movies_count')
+          .order('movies_count DESC')
+          .limit(3)
   end
+
 
   def featured_venues
     Event.group(:venue_name, :venue_address)

@@ -19,10 +19,12 @@
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
-        <%= link_to "#", class: "group relative nav-btn text-muted font-medium cursor-pointer transition duration-300 hover:text-primary" do %>
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="creators">
           Créateurs
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-        <% end %>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
 
         <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
                 data-action="click->navigation#navigate"
@@ -42,14 +44,14 @@
       <!-- User account actions -->
       <div class="hidden lg:flex items-center space-x-4">
         <% if user_signed_in? %>
-          <!-- User connecté -->
+          <!-- User connected -->
           <div class="flex items-center space-x-4">
             <%= link_to "Dashboard", "#", class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
-            <%= link_to "Déconnexion", destroy_user_session_path, method: :delete,
-                class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
+            <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
           </div>
         <% else %>
-          <!-- User non connecté -->
+          <!-- User non connected -->
           <%= link_to "Connexion", new_user_session_path,
               class: "px-4 py-2 text-muted hover:text-content transition-colors duration-200 font-medium" %>
           <%= link_to "Rejoindre", new_user_registration_path,

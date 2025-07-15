@@ -14,8 +14,8 @@ export default class extends Controller {
       case "creators":
         window.location.href = "/creators"
         break
-      case "venues":
-        window.location.href = "/venues"
+      case "about":
+        window.location.href = "/about"
         break
       case "events":
         window.location.href = "/events"

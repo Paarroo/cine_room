@@ -28,18 +28,18 @@
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
         </button>
 
-        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-cinema-blue"
-                data-action="click->navigation#navigate"
-                data-target="venues">
-          Lieux
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-cinema-blue transition-all duration-300 group-hover:w-full"></span>
-        </button>
-
         <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
                 data-action="click->navigation#navigate"
                 data-target="events">
           Événements
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-cinema-blue"
+                data-action="click->navigation#navigate"
+                data-target="about">
+          À propos
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-cinema-blue transition-all duration-300 group-hover:w-full"></span>
         </button>
       </div>
 
@@ -68,13 +68,13 @@
               data-action="click->navigation#navigate"
               data-target="creators">Créateurs</button>
 
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-cinema-blue cursor-pointer"
-              data-action="click->navigation#navigate"
-              data-target="venues">Lieux</button>
-
       <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
               data-action="click->navigation#navigate"
               data-target="events">Événements</button>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-cinema-blue cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="about">À propos</button>
     </div>
   </div>
 </nav>

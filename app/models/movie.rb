@@ -1,16 +1,4 @@
 class Movie < ApplicationRecord
   belongs_to :creator
-  has_many :events, dependent: :destroy
-  has_many :reviews, dependent: :destroy
-
-  validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
-  validates :duration, numericality: { greater_than: 0, less_than: 300 }
-  validates :year, numericality: {
-    greater_than: 1900,
-    less_than_or_equal_to: Date.current.year + 2
-  }
-
-  enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
-
-  scope :approved, -> { where(validation_status: :approved) }
+  belongs_to :validated_by
 end

@@ -6,7 +6,7 @@ FactoryBot.define do
     venue_name { "MyString" }
     venue_address { "MyString" }
     event_date { "2025-07-15" }
-    start_time { "2025-07-15 11:10:26" }
+    start_time { "2025-07-15 11:26:53" }
     max_capacity { 1 }
     price_cents { 1 }
     status { 1 }

@@ -3,6 +3,6 @@ FactoryBot.define do
     user { nil }
     bio { "MyText" }
     status { 1 }
-    verified_at { "2025-07-15 11:10:03" }
+    verified_at { "2025-07-15 11:26:39" }
   end
 end

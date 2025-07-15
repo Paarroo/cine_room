@@ -12,6 +12,6 @@ FactoryBot.define do
     poster_url { "MyString" }
     validation_status { 1 }
     validated_by { nil }
-    validated_at { "2025-07-15 11:10:15" }
+    validated_at { "2025-07-15 11:26:48" }
   end
 end

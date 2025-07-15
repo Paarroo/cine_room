@@ -1,166 +1,33 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html>
   <head>
-    <meta charset="utf-8">
+    <title><%= content_for(:title) || "Cine Room" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-
-    <!-- SEO Meta Tags -->
-    <title><%= content_for?(:title) ? yield(:title) + " | CinéRoom" : "CinéRoom - Cinéma Indépendant Privé" %></title>
-    <meta name="description" content="<%= content_for?(:description) ? yield(:description) : "Découvrez le cinéma indépendant dans des lieux d'exception avec rencontres exclusives des équipes créatives" %>">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) + " | CinéRoom" : "CinéRoom - Cinéma Indépendant Privé" %>">
-    <meta property="og:description" content="<%= content_for?(:description) ? yield(:description) : "Découvrez le cinéma indépendant dans des lieux d'exception avec rencontres exclusives des équipes créatives" %>">
-    <meta property="og:image" content="<%= asset_url('cineroom-og-image.jpg') %>">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="<%= content_for?(:title) ? yield(:title) + " | CinéRoom" : "CinéRoom - Cinéma Indépendant Privé" %>">
-    <meta property="twitter:description" content="<%= content_for?(:description) ? yield(:description) : "Découvrez le cinéma indépendant dans des lieux d'exception avec rencontres exclusives des équipes créatives" %>">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<%= asset_path('favicon.ico') %>">
-    <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('apple-touch-icon.png') %>">
-
-    <!-- Fonts - Inter family (max 3 fonts requirement) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- CSRF Protection -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <!-- Rails Assets -->
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <%= yield :head %>
 
-    <!-- Additional CSS for specific pages -->
-    <%= yield(:additional_css) if content_for?(:additional_css) %>
+    <%# Icons %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Font Awesome %>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <%# CSS %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-surface text-content font-sans antialiased overflow-x-hidden">
-    <!-- Skip to main content - Accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-surface px-4 py-2 rounded-md z-50">
-      Aller au contenu principal
-    </a>
-
-    <!-- Navigation Component -->
-    <%= render 'shared/navigation' %>
-
-    <!-- Flash Messages -->
-    <% if notice %>
-      <div class="flash-notice fixed top-20 right-4 z-40 glass-effect rounded-xl p-4 max-w-sm animate-slide-in">
-        <div class="flex items-center space-x-3">
-          <i class="fas fa-check-circle text-green-400"></i>
-          <span class="text-content"><%= notice %></span>
-          <button onclick="this.parentElement.parentElement.remove()" class="text-muted hover:text-content">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-    <% end %>
-
-    <% if alert %>
-      <div class="flash-alert fixed top-20 right-4 z-40 glass-effect rounded-xl p-4 max-w-sm animate-slide-in">
-        <div class="flex items-center space-x-3">
-          <i class="fas fa-exclamation-triangle text-primary"></i>
-          <span class="text-content"><%= alert %></span>
-          <button onclick="this.parentElement.parentElement.remove()" class="text-muted hover:text-content">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- Main Content Area -->
-    <main id="main-content" class="pt-16 min-h-screen">
+  <body class="bg-gray-900 text-white min-h-screen">
+    <%= render 'shared/navbar' %>
+    <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <%= yield %>
     </main>
-
-    <!-- Footer Component -->
     <%= render 'shared/footer' %>
-
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-surface/90 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-      <div class="glass-effect rounded-2xl p-8 text-center">
-        <div class="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p class="text-content">Chargement...</p>
-      </div>
-    </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-surface/80 backdrop-blur-sm z-40 lg:hidden hidden" onclick="toggleMobileMenu()"></div>
-
-    <!-- JavaScript for Mobile Menu -->
-    <script>
-      // Toggle mobile menu function
-      function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const isOpen = !menu.classList.contains('hidden');
-
-        if (isOpen) {
-          menu.classList.add('hidden');
-          overlay.classList.add('hidden');
-          document.body.classList.remove('overflow-hidden');
-        } else {
-          menu.classList.remove('hidden');
-          overlay.classList.remove('hidden');
-          document.body.classList.add('overflow-hidden');
-        }
-      }
-
-      // Close mobile menu on window resize
-      window.addEventListener('resize', function() {
-        if (window.innerWidth >= 1024) { // lg breakpoint
-          document.getElementById('mobile-menu').classList.add('hidden');
-          document.getElementById('mobile-menu-overlay').classList.add('hidden');
-          document.body.classList.remove('overflow-hidden');
-        }
-      });
-
-      // Auto-hide flash messages after 5 seconds
-      document.addEventListener('DOMContentLoaded', function() {
-        const flashMessages = document.querySelectorAll('.flash-notice, .flash-alert');
-        flashMessages.forEach(function(message) {
-          setTimeout(function() {
-            message.style.opacity = '0';
-            setTimeout(function() {
-              message.remove();
-            }, 300);
-          }, 5000);
-        });
-      });
-
-      // Smooth scroll for anchor links
-      document.addEventListener('DOMContentLoaded', function() {
-        const links = document.querySelectorAll('a[href^="#"]');
-        links.forEach(link => {
-          link.addEventListener('click', function(e) {
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-              e.preventDefault();
-              target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-              });
-            }
-          });
-        });
-      });
-    </script>
-
-    <!-- Additional JavaScript for specific pages -->
-    <%= yield(:additional_js) if content_for?(:additional_js) %>
-
-    <!-- Performance and Analytics -->
-    <% if Rails.env.production? %>
-      <!-- Add Google Analytics or other tracking here -->
-    <% end %>
   </body>
 </html>

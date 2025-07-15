@@ -1,15 +1,62 @@
-<% content_for :title, "Showing creator" %>
+<div id="creator-profile" class="page-content active">
+  <section class="py-20 lg:py-20 relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+      <!-- Back to creators link -->
+      <div class="mb-8">
+        <%= link_to creators_path, class: "text-gray-400 hover:text-white transition font-medium text-sm inline-flex items-center" do %>
+          <i class="fas fa-arrow-left mr-2"></i>
+          Retour à tous les créateurs
+        <% end %>
+      </div>
 
-  <h1 class="font-bold text-4xl">Showing creator</h1>
+      <!-- Top section -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl lg:text-6xl font-bold mb-4">
+          <%= "#{@creator.user.first_name} #{@creator.user.last_name}" %>
+        </h1>
+        <% if @creator.present? %>
+          <p class="text-xl text-gray-400 mb-3">Réalisateur</p>
+          <p class="text-sm text-gold-400"><i class="fas fa-award mr-1"></i>Award</p>
+        <% end %>
+      </div>
 
-  <%= render @creator %>
+      <!-- Bio -->
+      <% if @creator.bio.present? %>
+        <div class="max-w-3xl mx-auto mb-16 text-center">
+          <p class="text-gray-300 text-lg leading-relaxed">"<%= @creator.bio %>"</p>
+        </div>
+      <% end %>
 
-  <%= link_to "Edit this creator", edit_creator_path(@creator), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to creators", creators_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this creator", @creator, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+      <!-- Movies section -->
+      <div class="mb-12 text-center">
+        <h2 class="text-3xl font-bold mb-6">Films présentés</h2>
+        <% if @creator.movies.approved.any? %>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <% @creator.movies.approved.each do |movie| %>
+              <div class="movie-card rounded-2xl overflow-hidden card-hover">
+                <div class="relative h-72 bg-gradient-to-br from-cinema-blue/20 to-indigo-600/20">
+                  <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
+                  <% if movie.poster_url.present? %>
+                    <%= image_tag movie.poster_url, alt: movie.title, class: "absolute inset-0 object-cover w-full h-full opacity-30" %>
+                  <% end %>
+                  <div class="absolute bottom-4 left-4">
+                    <h3 class="text-2xl font-bold text-white"><%= movie.title %></h3>
+                    <p class="text-sm text-gray-300"><%= movie.year %> – <%= movie.genre %></p>
+                  </div>
+                </div>
+                <div class="p-6 text-gray-400">
+                  <p class="text-sm mb-4"><%= truncate(movie.synopsis, length: 120) %></p>
+                  <%= link_to "Voir le film", movie_path(movie), class: "text-sm font-medium text-gold-500 hover:text-gold-400 transition" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-500 italic">Aucun film publié pour le moment.</p>
+        <% end %>
+      </div>
+
+    </div>
+  </section>
 </div>

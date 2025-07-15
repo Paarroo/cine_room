@@ -1,6 +1,7 @@
 class ParticipationsController < ApplicationController
-  before_action :set_participation, only: [ :show, :destroy ]
-  before_action :set_event, only: [ :create ]
+  before_action :authenticate_user!  
+  before_action :set_participation, only: [:show, :destroy]
+  before_action :set_event, only: [:create]
 
   def index
     @participations = current_user.participations
@@ -11,10 +12,18 @@ class ParticipationsController < ApplicationController
   def show
   end
 
-  def create
-    @participation = current_user.participations.build(event: @event)
+  def new
+  @event = Event.find(params[:event_id])
+  @participation = Participation.new
+  end
 
-    if @event.available_spots > 0
+  def create
+    @participation = current_user.participations.build(
+      event: @event,
+      seats: participation_params[:seats]
+    )
+
+    if @event.available_spots >= @participation.seats.to_i
       if @participation.save
         ParticipationMailer.confirmation_email(@participation).deliver_later
         redirect_to @event, notice: 'Reservation successful!'
@@ -22,7 +31,7 @@ class ParticipationsController < ApplicationController
         redirect_to @event, alert: @participation.errors.full_messages.join(', ')
       end
     else
-      redirect_to @event, alert: 'No spots available.'
+      redirect_to @event, alert: 'Not enough spots available.'
     end
   end
 
@@ -40,5 +49,9 @@ class ParticipationsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:event_id])
+  end
+
+  def participation_params
+    params.require(:participation).permit(:seats)
   end
 end

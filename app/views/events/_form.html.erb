@@ -1,5 +1,5 @@
-<%= form_with(model: event, class: "contents") do |form| %>
-  <% if event.errors.any? %>
+<%= form_with(model: [@event, @participation], class: "contents") do |form| %>
+  <% if @participation.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(event.errors.count, "error") %> prohibited this event from being saved:</h2>
 

@@ -1,37 +1,37 @@
-<%= form_with(model: participation, class: "contents") do |form| %>
+<%= form_with(model: [@event, participation], class: "space-y-6") do |form| %>
   <% if participation.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(participation.errors.count, "error") %> prohibited this participation from being saved:</h2>
-
+    <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(participation.errors.count, "error") %> prevented the reservation:</h2>
       <ul class="list-disc ml-6">
-        <% participation.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+        <% participation.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": participation.errors[:user_id].none?, "border-red-400 focus:outline-red-600": participation.errors[:user_id].any?}] %>
+  <!-- Select field for number of seats -->
+  <div class="space-y-2">
+    <%= form.label :seats, "How many seats?", class: "block mb-2 font-medium text-white" %>
+
+    <div class="relative">
+     <%= form.select :seats,
+      options_for_select((1..[@event.available_spots, 10].min).map { |n| [pluralize(n, "seat"), n] }, selected: 1),
+      {},
+      class: "block w-full appearance-none rounded-md border px-4 py-3 pr-10 text-base bg-black text-white border-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 [&::-ms-expand]:hidden" %>
+
+
+      <!-- Chevron icon -->
+      <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
   </div>
 
-  <div class="my-5">
-    <%= form.label :event_id %>
-    <%= form.text_field :event_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": participation.errors[:event_id].none?, "border-red-400 focus:outline-red-600": participation.errors[:event_id].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :stripe_payment_id %>
-    <%= form.text_field :stripe_payment_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": participation.errors[:stripe_payment_id].none?, "border-red-400 focus:outline-red-600": participation.errors[:stripe_payment_id].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :status %>
-    <%= form.text_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": participation.errors[:status].none?, "border-red-400 focus:outline-red-600": participation.errors[:status].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <!-- Submit button -->
+  <div>
+    <%= form.submit "Book now", class: "w-full text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-black font-bold py-3 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
   </div>
 <% end %>

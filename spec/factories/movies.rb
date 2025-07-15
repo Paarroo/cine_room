@@ -1,17 +1,16 @@
 FactoryBot.define do
   factory :movie do
-    creator { nil }
-    title { "MyString" }
-    synopsis { "MyText" }
-    director { "MyString" }
-    duration { 1 }
-    genre { "MyString" }
-    language { "MyString" }
-    year { 1 }
-    trailer_url { "MyString" }
-    poster_url { "MyString" }
-    validation_status { 1 }
-    validated_by { nil }
-    validated_at { "2025-07-15 11:26:48" }
+    association :creator
+    title { Faker::Movie.title }
+    synopsis { Faker::Lorem.paragraph(sentence_count: 4) }
+    director { "#{Faker::Name.first_name} #{Faker::Name.last_name}" }
+    duration { Faker::Number.between(from: 80, to: 180) }
+    genre { [ 'Drame', 'Comédie', 'Thriller', 'Documentaire', 'Romance' ].sample }
+    language { 'Français' }
+    year { Faker::Number.between(from: 2020, to: 2024) }
+    trailer_url { "https://youtube.com/watch?v=#{Faker::Alphanumeric.alphanumeric(number: 11)}" }
+    poster_url { "https://via.placeholder.com/400x600/#{Faker::Color.hex_color.delete('#')}/ffffff" }
+    validation_status { :approved }
+    validated_at { Faker::Time.between(from: 1.year.ago, to: 6.months.ago) }
   end
 end

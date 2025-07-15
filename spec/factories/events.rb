@@ -1,16 +1,16 @@
 FactoryBot.define do
   factory :event do
-    movie { nil }
-    title { "MyString" }
-    description { "MyText" }
-    venue_name { "MyString" }
-    venue_address { "MyString" }
-    event_date { "2025-07-15" }
-    start_time { "2025-07-15 11:26:53" }
-    max_capacity { 1 }
-    price_cents { 1 }
-    status { 1 }
-    latitude { "9.99" }
-    longitude { "9.99" }
+    association :movie
+    title { "#{movie.title} - Rencontre avec #{movie.director}" }
+    description { Faker::Lorem.paragraph(sentence_count: 2) }
+    venue_name { [ 'Galerie Marais', 'Rooftop République', 'Hôtel Particulier', 'Loft Belleville' ].sample }
+    venue_address { Faker::Address.full_address }
+    event_date { Faker::Date.between(from: 1.week.from_now, to: 3.months.from_now) }
+    start_time { [ '19:00', '19:30', '20:00', '20:30', '21:00' ].sample }
+    max_capacity { Faker::Number.between(from: 15, to: 30) }
+    price_cents { Faker::Number.between(from: 20, to: 40) * 100 }
+    status { :upcoming }
+    latitude { Faker::Address.latitude }
+    longitude { Faker::Address.longitude }
   end
 end

@@ -15,7 +15,6 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :events, :movie_id
     add_index :events, :status
     add_index :events, :event_date
   end

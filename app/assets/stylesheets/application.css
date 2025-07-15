@@ -1,12 +1,10 @@
 /*
  * CinéRoom - Global Styles
  *
- * This is the main manifest file that'll be compiled into application.css.
- * Includes: Global styles, responsive utilities, component classes
- *
+ * Main manifest file compiled into application.css
  * Requirements:
  * - 5 colors max (jury requirement)
- * - 3 fonts max (jury requirement)
+ * - 3 fonts max (jury requirement) - SYLEXIAD ONLY
  * - Mobile-first responsive design
  * - Modern glass effects and animations
  */
@@ -15,19 +13,22 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+/* IMPORT SYLEXIAD FONT - Single font family requirement */
+@import url("https://fonts.googleapis.com/css2?family=Sylexiad:wght@300;400;500;600;700;800&display=swap");
+
 /* GLOBAL CSS VARIABLES - 5 colors strict limit */
 :root {
-  /* Primary brand colors */
+  /* Primary brand colors - EXACTLY 5 colors for jury */
   --color-primary: #f59e0b; /* Gold - main brand */
   --color-surface: #0a0a0a; /* Dark - backgrounds */
   --color-content: #ffffff; /* White - primary text */
   --color-muted: #6b7280; /* Gray - secondary text */
   --color-accent: #2563eb; /* Blue - links/actions */
 
-  /* Typography scale */
-  --font-primary: "Inter", system-ui, sans-serif;
-  --font-display: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  /* Typography scale - SYLEXIAD ONLY */
+  --font-primary: "Sylexiad", system-ui, sans-serif;
+  --font-display: "Sylexiad", system-ui, sans-serif;
+  --font-mono: "Sylexiad", monospace;
 
   /* Spacing and sizing */
   --nav-height: 4rem; /* 64px navigation height */
@@ -59,16 +60,16 @@ body {
   overflow-x: hidden;
 }
 
-/* TYPOGRAPHY IMPROVEMENTS */
+/* TYPOGRAPHY IMPROVEMENTS - Sylexiad everywhere */
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 fontFamily: {
-  sans: ['Atkinson Hyperlegible', 'system-ui'],    // main
-  display: ['Atkinson Hyperlegible', 'system-ui'],
-  mono: ['Atkinson Hyperlegible', 'monospace']     // Prices
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 /* GLASS EFFECTS - Modern UI components */
@@ -115,18 +116,21 @@ h6 fontFamily: {
   @apply bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-full;
   @apply transition-all duration-300 hover:scale-105;
   @apply focus:outline-none focus:ring-2 focus:ring-primary/50;
+  font-family: var(--font-primary);
 }
 
 .btn-secondary {
   @apply glass-effect hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-xl;
   @apply transition-all duration-300 hover:scale-105;
   @apply focus:outline-none focus:ring-2 focus:ring-white/20;
+  font-family: var(--font-primary);
 }
 
 .btn-accent {
   @apply bg-accent hover:bg-accent/90 text-white font-semibold px-6 py-3 rounded-full;
   @apply transition-all duration-300 hover:scale-105;
   @apply focus:outline-none focus:ring-2 focus:ring-accent/50;
+  font-family: var(--font-primary);
 }
 
 /* GRADIENT TEXT UTILITY */
@@ -135,6 +139,7 @@ h6 fontFamily: {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-family: var(--font-display);
 }
 
 /* FORM IMPROVEMENTS */
@@ -142,6 +147,7 @@ h6 fontFamily: {
   @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl;
   @apply focus:ring-2 focus:ring-primary focus:border-transparent;
   @apply transition-all text-content placeholder-muted;
+  font-family: var(--font-primary);
 }
 
 .form-input:focus {

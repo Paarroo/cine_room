@@ -40,7 +40,7 @@ elsif Rails.env.development?
   begin
     Rails.application.initialize! unless Rails.application.initialized?
 
-    # Vérifier que la table existe
+    # checking if the table existe
     if ActiveRecord::Base.connection.table_exists?('solid_queue_processes')
       plugin :solid_queue
       puts "vvvvv Solid Queue plugin chargé avec succès"
@@ -49,7 +49,7 @@ elsif Rails.env.development?
     end
   rescue => e
     puts "xxxx  Solid Queue non disponible : #{e.message}"
-    puts "💡 Assurez-vous d'avoir exécuté : bin/rails solid_queue:install && bin/rails db:migrate"
+    puts "ooooooooo Assurez-vous d'avoir exécuté : bin/rails solid_queue:install && bin/rails db:migrate"
   end
 end
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.

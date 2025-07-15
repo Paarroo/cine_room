@@ -9,11 +9,8 @@ class Event < ApplicationRecord
   validates :price_cents, numericality: { greater_than: 0 }
   validates :event_date, presence: true
 
-  STATUSES = %w[upcoming sold_out completed cancelled].freeze
+  enum :status, { upcoming: 0, sold_out: 1, completed: 2, cancelled: 3 }, default: :upcoming
 
-  validates :status, inclusion: { in: STATUSES }
-
-  after_initialize :set_default_status, if: :new_record?
   before_save :update_status_if_sold_out
 
   def available_spots
@@ -24,25 +21,12 @@ class Event < ApplicationRecord
     available_spots <= 0
   end
 
-  def upcoming?
-    status == 'upcoming'
-  end
-
-  def completed?
-    status == 'completed'
-  end
-
-  def cancelled?
-    status == 'cancelled'
-  end
 
   private
-
-  def set_default_status
-    self.status ||= 'upcoming'
-  end
 
   def update_status_if_sold_out
     self.status = 'sold_out' if sold_out? && upcoming?
   end
+
+  scope :upcoming, -> { where(status: :upcoming) }
 end

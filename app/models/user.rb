@@ -9,25 +9,5 @@ class User < ApplicationRecord
 
   validates :first_name, :last_name, presence: true
 
-
-  ROLES = %w[user admin].freeze
-
-  validates :role, inclusion: { in: ROLES }
-
-  before_validation :set_default_role
-
-  def admin?
-    role == 'admin'
-  end
-
-  def user?
-    role == 'user' || role.blank?
-  end
-
-  private
-
-  def set_default_role
-    self.role ||= 'user'
-  end
-
+  enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
 end

@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   end
 
   resources :events do
-    resources :participations, only: [ :create, :destroy ]
+    resources :participations, only: [:new, :create, :destroy ]
   end
 
   resources :creators

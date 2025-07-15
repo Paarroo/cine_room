@@ -1,29 +1,117 @@
-<footer class="bg-gray-950 text-gray-400 border-t border-white/10 mt-auto">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+<footer class="bg-surface border-t border-white/10 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
 
-    <!-- Contact -->
-    <div class="text-center sm:text-left">
-      <%= link_to "Contact", contact_path, class: "block hover:text-gold-500 transition mb-2" %>
+      <!-- Logo et description -->
+      <div class="md:col-span-1">
+        <%= link_to root_path,
+            class: "flex items-center space-x-3 mb-8 group",
+            data: { turbo: false } do %>
+          <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+            <i class="fas fa-film text-white text-xl"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-2xl font-bold tracking-tight text-white font-display">CinéRoom</span>
+            <span class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</span>
+          </div>
+        <% end %>
+
+        <p class="text-muted leading-relaxed">
+          Vivez le cinéma autrement avec nos projections privées exclusives dans des lieux d'exception.
+        </p>
+      </div>
+
+      <!-- Navigation -->
+      <div>
+        <h4 class="font-semibold text-white mb-8 font-display text-lg">Navigation</h4>
+        <div class="space-y-4">
+          <%= link_to "Accueil", root_path,
+              class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+              data: { turbo: false } %>
+
+          <% if defined?(creators_path) %>
+            <%= link_to "Créateurs", creators_path,
+                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                data: { turbo: false } %>
+          <% else %>
+            <%= link_to "Créateurs", "#",
+                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10" %>
+          <% end %>
+
+          <% if defined?(events_path) %>
+            <%= link_to "Événements", events_path,
+                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                data: { turbo: false } %>
+          <% else %>
+            <%= link_to "Événements", "#",
+                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Contact & Légal -->
+      <div>
+        <h4 class="font-semibold text-white mb-8 font-display text-lg">Contact & Légal</h4>
+        <div class="space-y-6">
+          <!-- Contact info -->
+          <div class="space-y-4">
+            <div class="flex items-center text-muted">
+              <i class="fas fa-envelope mr-4 text-primary w-4"></i>
+              <span>contact@cineroom.com</span>
+            </div>
+            <div class="flex items-center text-muted">
+              <i class="fas fa-phone mr-4 text-primary w-4"></i>
+              <span>01 23 45 67 89</span>
+            </div>
+            <div class="flex items-center text-muted">
+              <i class="fas fa-map-marker-alt mr-4 text-primary w-4"></i>
+              <span>Paris, France</span>
+            </div>
+          </div>
+
+          <!-- Liens légaux avec vérification routes -->
+          <div class="space-y-3">
+            <% if defined?(contact_path) %>
+              <%= link_to "Contact", contact_path,
+                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  data: { turbo: false } %>
+            <% else %>
+              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Contact</a>
+            <% end %>
+
+            <% if defined?(legal_path) %>
+              <%= link_to "Mentions légales", legal_path,
+                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  data: { turbo: false } %>
+            <% else %>
+              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Mentions légales</a>
+            <% end %>
+
+            <% if defined?(privacy_path) %>
+              <%= link_to "Politique de confidentialité", privacy_path,
+                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  data: { turbo: false } %>
+            <% else %>
+              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Politique de confidentialité</a>
+            <% end %>
+
+            <% if defined?(terms_path) %>
+              <%= link_to "CGV", terms_path,
+                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  data: { turbo: false } %>
+            <% else %>
+              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">CGV</a>
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Legal -->
-    <div class="text-center sm:text-left">
-      <%= link_to "Legal Notice", legal_path, class: "block hover:text-gold-500 transition mb-2" %>
+    <!-- Copyright simple -->
+    <div class="border-t border-white/10 mt-16 pt-8 text-center">
+      <div class="text-muted">
+        © 2025 CinéRoom. Tous droits réservés.
+      </div>
     </div>
-
-    <!-- Privacy -->
-    <div class="text-center sm:text-left">
-      <%= link_to "Privacy Policy", privacy_path, class: "block hover:text-gold-500 transition mb-2" %>
-    </div>
-
-    <!-- Terms -->
-    <div class="text-center sm:text-left">
-      <%= link_to "Terms & Conditions", terms_path, class: "block hover:text-gold-500 transition mb-2" %>
-    </div>
-  </div>
-
-  <!-- Copyright centered below -->
-  <div class="mt-6 text-center text-gray-500 text-sm">
-    &copy; 2025 CinéRoom. All rights reserved.
   </div>
 </footer>

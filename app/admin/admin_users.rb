@@ -1,28 +1,14 @@
-ActiveAdmin.register AdminUser do
-  permit_params :email, :password, :password_confirmation
+class Admin::ApplicationController < ApplicationController
+  before_action :ensure_admin!
 
-  index do
-    selectable_column
-    id_column
-    column :email
-    column :current_sign_in_at
-    column :sign_in_count
-    column :created_at
-    actions
-  end
+  layout 'admin'
 
-  filter :email
-  filter :current_sign_in_at
-  filter :sign_in_count
-  filter :created_at
+  private
 
-  form do |f|
-    f.inputs do
-      f.input :email
-      f.input :password
-      f.input :password_confirmation
+  def ensure_admin!
+    unless user_signed_in? && current_user.admin?
+
+      redirect_to admin_login_path, alert: "Accès non autorisé. Seuls les administrateurs peuvent accéder à cette zone."
     end
-    f.actions
   end
-
 end

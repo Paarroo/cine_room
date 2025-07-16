@@ -31,6 +31,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_16_124643) do
   create_table "admin_users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.integer "status", default: 3, null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -43,7 +44,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_16_124643) do
   create_table "creators", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.text "bio"
-    t.integer "status", default: 0, null: false
+    t.integer "status", default: 1, null: false
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

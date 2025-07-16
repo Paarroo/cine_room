@@ -1,82 +1,140 @@
-# frozen_string_literal: true
-
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }
 
   content title: proc { I18n.t("active_admin.dashboard") } do
-    columns do
-      column do
-        panel "Statistiques Générales" do
-          table_for [
-            { label: "Utilisateurs Total", value: User.count, icon: "👥" },
-            { label: "Films Validés", value: Movie.where(validation_status: 'validated').count, icon: "🎬" },
-            { label: "Événements Actifs", value: Event.where(status: 'upcoming').count, icon: "📅" },
-            { label: "Réservations Ce Mois", value: Participation.where(created_at: 1.month.ago..Time.current).count, icon: "🎫" }
-          ] do
-            column("") { |item| item[:icon] }
-            column("Métrique") { |item| item[:label] }
-            column("Valeur") { |item| content_tag :strong, item[:value] }
+    div class: "blank_slate_container", id: "dashboard_default_message" do
+      columns do
+        column do
+          panel "Revenue Statistics" do
+            div class: "attributes_table" do
+              table do
+                tr do
+                  th "Total Revenue"
+                  td number_to_currency(
+                    Participation.where(status: :confirmed).joins(:event).sum("events.price_cents") / 100.0
+                  )
+                end
+                tr do
+                  th "This Month Revenue"
+                  td number_to_currency(
+                    Participation.where(
+                      status: :confirmed,
+                      created_at: Time.current.beginning_of_month..Time.current.end_of_month
+                    ).joins(:event).sum("events.price_cents") / 100.0
+                  )
+                end
+                tr do
+                  th "Average Event Price"
+                  td number_to_currency(Event.average(:price_cents).to_f / 100.0)
+                end
+              end
+            end
+          end
+        end
+
+        column do
+          panel "Event Statistics" do
+            div class: "attributes_table" do
+              table do
+                tr do
+                  th "Total Events"
+                  td Event.count
+                end
+                tr do
+                  th "Upcoming Events"
+                  td Event.where(status: :upcoming).count
+                end
+                tr do
+                  th "Sold Out Events"
+                  td Event.where(status: :sold_out).count
+                end
+                tr do
+                  th "Average Capacity"
+                  td "#{Event.average(:max_capacity).to_i} seats"
+                end
+              end
+            end
           end
         end
       end
 
-      column do
-        panel "Revenus & Conversion" do
-          # Calculate revenue
-          total_revenue = Participation.joins(:event)
-                           .where(status: 'confirmed')
-                           .sum('events.price_cents') / 100.0
+      columns do
+        column do
+          panel "User Statistics" do
+            div class: "attributes_table" do
+              table do
+                tr do
+                  th "Total Users"
+                  td User.count
+                end
+                tr do
+                  th "New Users (This Month)"
+                  td User.where(
+                    created_at: Time.current.beginning_of_month..Time.current.end_of_month
+                  ).count
+                end
+                tr do
+                  th "Active Participants"
+                  td User.joins(:participations).where(participations: { status: :confirmed }).distinct.count
+                end
+              end
+            end
+          end
+        end
 
-          monthly_revenue = Participation.joins(:event)
-                             .where(status: 'confirmed', created_at: 1.month.ago..Time.current)
-                             .sum('events.price_cents') / 100.0
-
-          table_for [
-            { label: "Revenus Total", value: "#{total_revenue}€", icon: "💰" },
-            { label: "Revenus Ce Mois", value: "#{monthly_revenue}€", icon: "📊" },
-            { label: "Taux Occupation Moyen", value: "#{Event.joins(:participations).group('events.id').average('participations.seats * 100.0 / events.max_capacity').values.sum / Event.joins(:participations).count rescue 0}%", icon: "📈" },
-            { label: "Note Moyenne", value: "#{Review.average(:rating).to_f.round(1)}/5", icon: "⭐" }
-          ] do
-            column("") { |item| item[:icon] }
-            column("Métrique") { |item| item[:label] }
-            column("Valeur") { |item| content_tag :strong, item[:value] }
+        column do
+          panel "Participation Statistics" do
+            div class: "attributes_table" do
+              table do
+                tr do
+                  th "Total Participations"
+                  td Participation.count
+                end
+                tr do
+                  th "Confirmed Participations"
+                  td Participation.where(status: :confirmed).count
+                end
+                tr do
+                  th "Pending Participations"
+                  td Participation.where(status: :pending).count
+                end
+                tr do
+                  th "Average Seats per Booking"
+                  td Participation.average(:seats).to_f.round(1)
+                end
+              end
+            end
           end
         end
       end
-    end
 
-    columns do
-      column do
-        panel "Événements Récents" do
-          table_for Event.includes(:movie).order(created_at: :desc).limit(5) do
-            column("Film") { |event| link_to event.movie.title, admin_movie_path(event.movie) }
-            column("Date") { |event| event.event_date.strftime("%d/%m/%Y") }
-            column("Lieu") { |event| event.venue_name }
-            column("Places") { |event| "#{event.participations.sum(:seats)}/#{event.max_capacity}" }
-            column("Statut") { |event| status_tag(event.status) }
+      columns do
+        column do
+          panel "Recent Events" do
+            table_for Event.includes(:movie).order(created_at: :desc).limit(5) do
+              column "Title" do |event|
+                link_to event.title, admin_event_path(event)
+              end
+              column "Movie", :movie
+              column "Date", :event_date
+              column "Status" do |event|
+                status_tag event.status.humanize, class: event.status
+              end
+            end
           end
         end
-      end
 
-      column do
-        panel "Films en Attente de Validation" do
-          table_for Movie.where(validation_status: 'pending').includes(:creator).limit(5) do
-            column("Titre") { |movie| link_to movie.title, admin_movie_path(movie) }
-            column("Créateur") { |movie| movie.creator.user.first_name + " " + movie.creator.user.last_name }
-            column("Genre") { |movie| movie.genre }
-            column("Soumis") { |movie| movie.created_at.strftime("%d/%m/%Y") }
-            column("Actions") { |movie| link_to "Valider", admin_movie_path(movie), class: "button" }
-          end
-        end
-      end
-    end
-
-    columns do
-      column do
-        panel "Activité Récente" do
-          ul do
-            Participation.includes(:user, :event).order(created_at: :desc).limit(8).each do |participation|
-              li "#{participation.user.first_name} a réservé #{participation.seats} place(s) pour '#{participation.event.title}' - #{time_ago_in_words(participation.created_at)} ago"
+        column do
+          panel "Recent Participations" do
+            table_for Participation.includes(:user, :event).order(created_at: :desc).limit(5) do
+              column "User" do |participation|
+                link_to participation.user.email, admin_user_path(participation.user)
+              end
+              column "Event", :event
+              column "Seats", :seats
+              column "Status" do |participation|
+                status_tag participation.status.humanize, class: participation.status
+              end
             end
           end
         end

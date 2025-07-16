@@ -13,11 +13,19 @@ class ParticipationsController < ApplicationController
   end
 
   def new
-  @event = Event.find(params[:event_id])
-  @participation = Participation.new
+    @event = Event.find(params[:event_id])
+    @participation = Participation.new
   end
 
   def create
+    @event = Event.find(params[:event_id])
+
+    
+    if current_user.participations.exists?(event: @event)
+      redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement."
+      return
+    end
+
     @participation = current_user.participations.build(
       event: @event,
       seats: participation_params[:seats]
@@ -26,14 +34,14 @@ class ParticipationsController < ApplicationController
     if @event.available_spots >= @participation.seats.to_i
       if @participation.save
         ParticipationMailer.confirmation_email(@participation).deliver_later
-        redirect_to @event, notice: 'Reservation successful!'
+        redirect_to @event, notice: 'Réservation confirmée !'
       else
         redirect_to @event, alert: @participation.errors.full_messages.join(', ')
       end
     else
-      redirect_to @event, alert: 'Not enough spots available.'
+      redirect_to @event, alert: 'Il ne reste pas assez de places disponibles.'
     end
-  end
+  end  
 
   def destroy
     event = @participation.event

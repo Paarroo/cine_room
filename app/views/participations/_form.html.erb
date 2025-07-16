@@ -1,4 +1,5 @@
-<%= form_with(model: [@event, participation], class: "space-y-6") do |form| %>
+<%= form_with(model: [@event, participation], local: true, class: "space-y-6") do |form| %>
+
   <% if participation.errors.any? %>
     <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(participation.errors.count, "error") %> prevented the reservation:</h2>

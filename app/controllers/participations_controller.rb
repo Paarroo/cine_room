@@ -39,14 +39,12 @@ class ParticipationsController < ApplicationController
         seats: seats
       },
       mode: 'payment',
-      success_url: success_url(event_id: @event.id, seats: seats, session_id: '{CHECKOUT_SESSION_ID}'),
-      success_url: stripe_success_url + "?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: cancel_url(event_id: @event.id)
+      success_url: stripe_success_url + "?event_id=#{@event.id}&seats=#{seats}&session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: stripe_cancel_url + "?event_id=#{@event.id}"
     )
 
     redirect_to session.url, allow_other_host: true
   end
-
 
   def destroy
     event = @participation.event

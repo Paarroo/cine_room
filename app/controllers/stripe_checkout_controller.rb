@@ -2,7 +2,7 @@ class StripeCheckoutController < ApplicationController
   before_action :authenticate_user!
 
   def success
-  session_id = params[:session_id]
+    session_id = params[:session_id]
 
     begin
       stripe_session = Stripe::Checkout::Session.retrieve(session_id)
@@ -19,6 +19,7 @@ class StripeCheckoutController < ApplicationController
     end
 
     participation = current_user.participations.create!(
+      event: @event, # ✅ Association nécessaire
       seats: seats,
       stripe_payment_id: session_id,
       status: :confirmed
@@ -27,9 +28,9 @@ class StripeCheckoutController < ApplicationController
     ParticipationMailer.confirmation_email(participation).deliver_later
 
     redirect_to @event, notice: "Merci pour ta réservation ! Paiement confirmé."
-    end 
+  end
 
-    def cancel
+  def cancel
     @event = Event.find(params[:event_id])
     redirect_to @event, alert: "Le paiement a été annulé."
   end

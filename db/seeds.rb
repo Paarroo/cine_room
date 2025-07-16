@@ -41,4 +41,10 @@ completed_events.each do |event|
   end
 end
 
-puts "Created #{User.count} users, #{Creator.count} creators, #{Movie.count} movies, #{Event.count} events, #{Participation.count} participations, #{Review.count} reviews"
+AdminUser.create!(
+  email: 'admin@cineroom.com',
+  password: 'password123',
+  status: 'active'
+)
+
+puts "Created #{User.count} users, #{Creator.count} creators, #{Movie.count} movies, #{Event.count} events, #{Participation.count} participations, #{Review.count} reviews, 1 admin"

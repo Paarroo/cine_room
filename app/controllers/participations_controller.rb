@@ -19,29 +19,33 @@ class ParticipationsController < ApplicationController
 
   def create
     @event = Event.find(params[:event_id])
+    seats = participation_params[:seats].to_i
 
-    
-    if current_user.participations.exists?(event: @event)
-      redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement."
-      return
-    end
-
-    @participation = current_user.participations.build(
-      event: @event,
-      seats: participation_params[:seats]
+    session = Stripe::Checkout::Session.create(
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          unit_amount: @event.price_cents,
+          product_data: {
+            name: @event.title
+          }
+        },
+        quantity: seats
+      }],
+      metadata: {
+        user_id: current_user.id,
+        event_id: @event.id,
+        seats: seats
+      },
+      mode: 'payment',
+      success_url: success_url(event_id: @event.id, seats: seats, session_id: '{CHECKOUT_SESSION_ID}'),
+      cancel_url: cancel_url(event_id: @event.id)
     )
 
-    if @event.available_spots >= @participation.seats.to_i
-      if @participation.save
-        ParticipationMailer.confirmation_email(@participation).deliver_later
-        redirect_to @event, notice: 'Réservation confirmée !'
-      else
-        redirect_to @event, alert: @participation.errors.full_messages.join(', ')
-      end
-    else
-      redirect_to @event, alert: 'Il ne reste pas assez de places disponibles.'
-    end
-  end  
+    redirect_to session.url, allow_other_host: true
+  end
+
 
   def destroy
     event = @participation.event

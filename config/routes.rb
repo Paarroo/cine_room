@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   get '/legal',   to: 'pages#legal',   as: :legal
   get '/privacy', to: 'pages#privacy', as: :privacy
   get '/terms',   to: 'pages#terms',   as: :terms
-  
+
   get 'about', to: 'pages#about'
   get 'contact', to: 'pages#contact'
 
@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   end
 
   resources :events do
-    resources :participations, only: [:new, :create, :destroy ]
+    resources :participations, only: [ :new, :create, :destroy ]
   end
 
   resources :creators

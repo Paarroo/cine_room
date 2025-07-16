@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "stripe_checkout/success"
+  get "stripe_checkout/cancel"
   devise_for :users
 
   root 'pages#home'

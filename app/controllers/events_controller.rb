@@ -3,12 +3,12 @@ class EventsController < ApplicationController
   before_action :ensure_admin!, except: [ :index, :show ]
 
   def index
-    @events = Event.includes(:movie)
-                   .upcoming
-                   .order(:event_date)
+     @events = Event.filter_by(params).includes(:movie).order(event_date: :asc).page(params[:page])
 
-    @events = @events.joins(:movie).where(movies: { genre: params[:genre] }) if params[:genre].present?
-    @events = @events.where(venue_name: params[:venue]) if params[:venue].present?
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render partial: "events/results", formats: [:html] }
+    end
   end
 
   def show

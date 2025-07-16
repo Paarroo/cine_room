@@ -33,7 +33,9 @@
             <div class="p-8 space-y-6">
               <h2 class="text-2xl font-bold mb-4 text-white">Réserve ta place</h2>
 
-              <%= form_with(model: [@event, @participation], class: "space-y-4") do |form| %>
+             <%= form_with(model: [@event, @participation], local: true, data: { turbo: false }, class: "space-y-6") do |form| %>
+
+
                 <% if @participation.errors.any? %>
                   <div class="bg-red-500/10 text-red-400 p-4 rounded-lg">
                     <h3 class="font-bold mb-2">Erreur :</h3>

@@ -129,3 +129,7 @@ group :production do
   gem "newrelic_rpm"
   gem "sentry-ruby"
 end
+
+gem "activeadmin", "~> 3.3"
+gem "activeadmin_addons", "~> 1.10"
+gem "arctic_admin", "~> 4.3"

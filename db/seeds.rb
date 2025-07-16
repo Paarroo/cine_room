@@ -42,3 +42,4 @@ completed_events.each do |event|
 end
 
 puts "Created #{User.count} users, #{Creator.count} creators, #{Movie.count} movies, #{Event.count} events, #{Participation.count} participations, #{Review.count} reviews"
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?

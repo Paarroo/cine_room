@@ -17,9 +17,17 @@ class ParticipationsController < ApplicationController
     @participation = Participation.new
   end
 
-   def create
+  def create
   @event = Event.find(params[:event_id])
   seats = participation_params[:seats].to_i
+
+  if seats <= 0 || seats > @event.available_spots
+    redirect_to new_event_participation_path(@event), alert: "Nombre de places invalide." and return
+  end
+
+  if current_user.participations.exists?(event: @event)
+    redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
+  end
 
   session = Stripe::Checkout::Session.create(
     payment_method_types: ['card'],
@@ -49,6 +57,7 @@ class ParticipationsController < ApplicationController
 
   redirect_to session.url, allow_other_host: true
   end
+
 
   def destroy
     @participation.destroy!

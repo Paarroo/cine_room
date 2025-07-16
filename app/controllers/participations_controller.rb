@@ -17,37 +17,41 @@ class ParticipationsController < ApplicationController
     @participation = Participation.new
   end
 
-   def create
-  @event = Event.find(params[:event_id])
-  seats = participation_params[:seats].to_i
+  def create
+    @event = Event.find(params[:event_id])
+    seats = participation_params[:seats].to_i
 
-  session = Stripe::Checkout::Session.create(
-    payment_method_types: ['card'],
-    line_items: [{
-      price_data: {
-        currency: 'eur',
-        unit_amount: @event.price_cents,
-        product_data: {
-          name: @event.title
-        }
+    if seats <= 0 || seats > @event.available_spots
+      redirect_to new_event_participation_path(@event), alert: "Nombre de places invalide." and return
+    end
+
+    if current_user.participations.exists?(event: @event)
+      redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
+    end
+
+    session = Stripe::Checkout::Session.create(
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          unit_amount: @event.price_cents,
+          product_data: {
+            name: @event.title
+          }
+        },
+        quantity: seats
+      }],
+      metadata: {
+        user_id: current_user.id,
+        event_id: @event.id,
+        seats: seats
       },
-      quantity: seats
-    }],
-    metadata: {
-      user_id: current_user.id,
-      event_id: @event.id,
-      seats: seats
-    },
-    mode: 'payment',
-    success_url: stripe_success_url(
-      event_id: @event.id,
-      seats: seats,
-      session_id: '{CHECKOUT_SESSION_ID}'
-    ),
-    cancel_url: stripe_cancel_url(event_id: @event.id)
-  )
+      mode: 'payment',
+      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}",  # ✅ CORRECTION ICI
+      cancel_url: stripe_cancel_url(event_id: @event.id)
+    )
 
-  redirect_to session.url, allow_other_host: true
+    redirect_to session.url, allow_other_host: true
   end
 
   def destroy

@@ -13,7 +13,8 @@ class Event < ApplicationRecord
   before_save :update_status_if_sold_out
 
   def available_spots
-    max_capacity - participations.where(status: 'confirmed').count
+  reserved_seats = participations.where(status: 'confirmed').sum(:seats)
+  max_capacity - reserved_seats
   end
 
   def sold_out?

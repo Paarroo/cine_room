@@ -16,7 +16,7 @@
       </nav>
 
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <!-- FORM PRINCIPAL -->
+        
         <div class="xl:col-span-2">
           <div class="glass-effect rounded-3xl overflow-hidden">
 
@@ -69,7 +69,7 @@
         <div class="xl:col-span-1">
           <div class="sticky top-24 space-y-6">
 
-            <!-- Bloc Prix + Disponibilité + CTA -->
+            
             <div class="glass-effect rounded-3xl overflow-hidden">
               <div class="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-center">
                 <div class="text-4xl font-bold mb-2"><%= number_to_currency(@event.price_cents, unit: "€") %></div>
@@ -80,9 +80,9 @@
                 <div>
                   <div class="flex justify-between items-center mb-3">
                     <span class="font-medium text-gray-300">Places disponibles</span>
-                    <span class="text-lg font-bold text-green-400"><%= @event.participations.count %>/<%= @event.max_capacity %></span>
+                    <span class="text-lg font-bold text-green-400"><%= @event.max_capacity - @event.available_spots %>/<%= @event.max_capacity %></span>
                   </div>
-                  <% pourcentage = (@event.participations.count.to_f / @event.max_capacity * 100).round %>
+                  <% pourcentage = ((@event.max_capacity - @event.available_spots).to_f / @event.max_capacity * 100).round %>
                   <div class="w-full bg-white/10 rounded-full h-3">
                     <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500" style="width: <%= pourcentage %>%"></div>
                   </div>

@@ -2,21 +2,21 @@ class StripeCheckoutController < ApplicationController
   before_action :authenticate_user!
 
   def success
-    @event = Event.find(params[:event_id])
-    seats = params[:seats].to_i
-    stripe_session_id = params[:session_id]
+    session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    event_id = session.metadata.event_id
+    seats = session.metadata.seats.to_i
 
-    # Prevent duplicate participation
+    @event = Event.find(event_id)
+
     if current_user.participations.exists?(event: @event)
       redirect_to @event, alert: "You have already booked a seat for this event."
       return
     end
 
-    # Create the participation
     participation = current_user.participations.create!(
       event: @event,
       seats: seats,
-      stripe_payment_id: stripe_session_id,
+      stripe_payment_id: session.id,
       status: :paid
     )
 
@@ -26,7 +26,6 @@ class StripeCheckoutController < ApplicationController
   end
 
   def cancel
-    @event = Event.find(params[:event_id])
-    redirect_to @event, alert: "Payment was canceled. No reservation has been made."
+    redirect_to root_path, alert: "Payment was canceled. No reservation has been made."
   end
 end

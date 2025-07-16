@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  get "stripe_checkout/success", to: "stripe_checkout#success", as: :success
-  get "stripe_checkout/cancel",  to: "stripe_checkout#cancel",  as: :cancel
+  get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
+  get "stripe_checkout/cancel",  to: "stripe_checkout#cancel",  as: :stripe_cancel
   devise_for :users
 
   root 'pages#home'

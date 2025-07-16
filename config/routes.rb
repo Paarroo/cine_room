@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  ActiveAdmin.routes(self)
-  devise_for :admin_users
+  # ActiveAdmin.routes(self)
+  # devise_for :admin_users
   devise_for :users
 
   root 'pages#home'

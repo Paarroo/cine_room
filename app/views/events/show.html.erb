@@ -136,7 +136,18 @@
                 </div>
 
                 <!-- CTA -->
-                <%= link_to "Réserver maintenant", new_event_participation_path(event_id: @event.id), class: "w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+                  <% if @participation.present? %>
+                      <p class="text-center text-yellow-400 font-medium">
+                        Tu as déjà réservé ta place pour cet événement 
+                      </p>
+                    <% elsif @event.sold_out? %>
+                      <p class="text-center text-red-400 font-medium">
+                        Cet événement est complet 
+                      </p>
+                    <% else %>
+                      <%= link_to "Réserver maintenant", new_event_participation_path(event_id: @event.id),
+                        class: "w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+                   <% end %>
 
                 <!-- Guarantees -->
                 <div class="space-y-3 text-sm text-gray-400">

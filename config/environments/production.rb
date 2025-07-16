@@ -63,12 +63,6 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = {
-    host: ENV.fetch("APP_HOST", "https://kitten-lovers-d41eb669d13c.herokuapp.com"),
-    protocol: 'https'
-  }
-
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
@@ -80,11 +74,23 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
 
-  config.hosts = [
-    ENV.fetch("APP_HOST", "https://kitten-lovers-d41eb669d13c.herokuapp.com"),
-    /.*\.herokuapp\.com/
-  ]
-
+  # config/environments/production.rb
   config.action_mailer.perform_deliveries = true
-    config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: 'cineroom-4a08b0587adb.herokuapp.com', protocol: 'https' }
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              "in-v3.mailjet.com",
+    port:                 587,
+    domain:               "cineroom.com", 
+    user_name:            ENV["SMTP_USERNAME"],
+    password:             ENV["SMTP_PASSWORD"],
+    authentication:       "plain",
+    enable_starttls_auto: true
+  }
+
+
+
+
 end

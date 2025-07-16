@@ -12,8 +12,41 @@ class Event < ApplicationRecord
 
   before_save :update_status_if_sold_out
 
+  # Filters
+  scope :by_title, ->(q) {
+    joins(:movie).where("movies.title ILIKE ?", "%#{q}%") if q.present?
+  }
+
+  scope :by_genre, ->(genre) {
+    joins(:movie).where(movies: { genre: genre }) if genre.present?
+  }
+
+  scope :by_venue, ->(venue) {
+    where(venue_name: venue) if venue.present?
+  }
+
+  scope :by_date_filter, ->(filter) {
+    case filter
+    when "week"
+      where(event_date: Date.today..Date.today.end_of_week)
+    when "month"
+      where(event_date: Date.today..Date.today.end_of_month)
+    else
+      all
+    end
+  }
+
+  def self.filter_by(params)
+    by_title(params[:q])
+      .by_genre(params[:genre])
+      .by_venue(params[:venue])
+      .by_date_filter(params[:date_filter])
+  end
+
+
   def available_spots
-    max_capacity - participations.where(status: 'confirmed').count
+  reserved_seats = participations.where(status: 'confirmed').sum(:seats)
+  max_capacity - reserved_seats
   end
 
   def sold_out?

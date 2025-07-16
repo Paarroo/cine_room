@@ -22,6 +22,7 @@ ActiveAdmin.register_page "Dashboard" do
 
       column do
         panel "Revenus & Conversion" do
+          # Calculate revenue
           total_revenue = Participation.joins(:event)
                            .where(status: 'confirmed')
                            .sum('events.price_cents') / 100.0
@@ -56,3 +57,30 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
       end
+
+      column do
+        panel "Films en Attente de Validation" do
+          table_for Movie.where(validation_status: 'pending').includes(:creator).limit(5) do
+            column("Titre") { |movie| link_to movie.title, admin_movie_path(movie) }
+            column("Créateur") { |movie| movie.creator.user.first_name + " " + movie.creator.user.last_name }
+            column("Genre") { |movie| movie.genre }
+            column("Soumis") { |movie| movie.created_at.strftime("%d/%m/%Y") }
+            column("Actions") { |movie| link_to "Valider", admin_movie_path(movie), class: "button" }
+          end
+        end
+      end
+    end
+
+    columns do
+      column do
+        panel "Activité Récente" do
+          ul do
+            Participation.includes(:user, :event).order(created_at: :desc).limit(8).each do |participation|
+              li "#{participation.user.first_name} a réservé #{participation.seats} place(s) pour '#{participation.event.title}' - #{time_ago_in_words(participation.created_at)} ago"
+            end
+          end
+        end
+      end
+    end
+  end
+end

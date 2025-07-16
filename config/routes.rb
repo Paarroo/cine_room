@@ -29,5 +29,10 @@ Rails.application.routes.draw do
 
   resources :reviews, only: [ :index, :show ]
 
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

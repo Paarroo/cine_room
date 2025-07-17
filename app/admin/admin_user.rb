@@ -64,4 +64,33 @@ ActiveAdmin.register User do
         row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
       end
 
+      if user.creator.present?
+            panel "Creator Information" do
+              attributes_table_for user.creator do
+                row :status do |creator|
+                  status_tag creator.status.humanize, class: creator.status
+                end
+                row :bio
+                row :verified_at
+                row :created_at
+              end
+            end
+
+            panel "Creator's Movies" do
+              table_for user.creator.movies.limit(10) do
+                column :title do |movie|
+                  link_to movie.title, admin_movie_path(movie)
+                end
+                column :validation_status do |movie|
+                  status_tag movie.validation_status.humanize, class: movie.validation_status
+                end
+                column :year
+                column :genre
+              end
+              div do
+                link_to "View all movies", admin_movies_path(q: { creator_id_eq: user.creator.id })
+              end
+            end
+          end
+
   end

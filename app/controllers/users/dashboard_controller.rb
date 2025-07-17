@@ -22,7 +22,7 @@ class Users::DashboardController < ApplicationController
   def update_profile
 
     if @user.update(profile_params)
-      redirect_to users_dashboard_path, notice: "Profil mis à jour."
+      redirect_to users_dashboard_path(current_user), notice: "Profil mis à jour."
     else
       render :edit_profile, status: :unprocessable_entity
     end

@@ -49,3 +49,19 @@ ActiveAdmin.register User do
 
     actions
   end
+  show do
+      attributes_table do
+        row :id
+        row :email
+        row :first_name
+        row :last_name
+        row :role do |user|
+          status_tag user.role.humanize, class: user.role
+        end
+        row :bio
+        row :created_at
+        row :updated_at
+        row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
+      end
+
+  end

@@ -1,4 +1,3 @@
-# config/database.yml
 default: &default
   adapter: postgresql
   encoding: unicode

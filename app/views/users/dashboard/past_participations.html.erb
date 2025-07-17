@@ -1,0 +1,29 @@
+<div class="page-content active pt-24">
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-12 text-center">
+      <h1 class="text-4xl lg:text-5xl font-bold mb-4 text-white">🎬 Historique complet de mes événements</h1>
+    </div>
+
+    <% if @past_participations.any? %>
+      <div class="space-y-4">
+        <% @past_participations.each do |p| %>
+          <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
+            <div class="flex justify-between items-center">
+              <div>
+                <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
+                <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+              </div>
+              <% if current_user.reviews.where(event: p.event).empty? %>
+                <%= link_to "Laisser un avis", new_review_path(event_id: p.event.id), class: "text-sm text-gold-400 hover:underline" %>
+              <% else %>
+                <span class="text-sm text-green-400">Avis donné</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-center text-gray-400 py-16">Aucun événement passé</p>
+    <% end %>
+  </section>
+</div>

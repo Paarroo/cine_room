@@ -1,0 +1,14 @@
+<!-- _user_card.html.erb -->
+<div class="glass-effect p-6 rounded-2xl text-white">
+  <div class="flex items-center space-x-4 mb-4">
+    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-xl font-bold">
+      <%= user.first_name.first.upcase + user.last_name.first.upcase %>
+    </div>
+    <div>
+      <h3 class="text-2xl font-semibold"><%= user.full_name %></h3>
+      <p class="text-gray-400 text-sm"><%= user.email %></p>
+    </div>
+  </div>
+  <%= link_to "Modifier mon profil", edit_user_registration_path,
+              class: "text-sm text-gold-400 hover:underline" %>
+</div>

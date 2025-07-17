@@ -1,0 +1,83 @@
+<div id="user-dashboard" class="page-content active mt-18">
+  <section class="relative min-h-screen w-full bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+      <!-- Header -->
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-6">
+          <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
+          <span class="text-gold-400 font-medium">Espace personnel</span>
+        </div>
+        <h2 class="text-4xl lg:text-6xl font-bold mb-4 text-white">
+          Bienvenue <span class="gradient-text"><%= @user.first_name %></span>
+        </h2>
+        <p class="text-xl text-gray-300">Gérez vos réservations et informations</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <!-- Profile Card -->
+        <div class="glass-effect p-6 rounded-2xl h-fit">
+          <h3 class="text-2xl font-semibold text-white mb-4"><i class="fas fa-user mr-2 text-gold-500"></i>Mon profil</h3>
+          <p class="text-gray-300 mb-2"><strong>Nom :</strong> <%= @user.full_name %></p>
+          <p class="text-gray-300 mb-2"><strong>Email :</strong> <%= @user.email %></p>
+          <%= link_to "Modifier mon profil", edit_user_registration_path, class: "text-sm text-gold-400 hover:underline" %>
+          <%= link_to "Modifier mes infos", users_dashboard_edit_profile_path(current_user), class: "text-sm text-gold-400 hover:underline" %>
+        </div>
+
+        <!-- Upcoming Events Card -->
+        <div class="xl:col-span-2 space-y-8">
+          <div class="glass-effect p-6 rounded-2xl">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-2xl font-semibold text-white"><i class="fas fa-calendar-alt mr-2 text-gold-500"></i>Prochains événements</h3>
+              <% if @upcoming_participations.size > 3 %>
+                <%= link_to "Voir tout", upcoming_participations_users_dashboard_path(@user), class: "text-sm text-gold-400 hover:underline" %>
+              <% end %>
+            </div>
+            <% @upcoming_participations.first(3).each do |p| %>
+              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
+                    <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+                  </div>
+                  <%= link_to "Détails", event_path(p.event), class: "text-sm text-gold-400 hover:underline" %>
+                </div>
+              </div>
+            <% end %>
+            <% if @upcoming_participations.empty? %>
+              <p class="text-gray-400">Aucune participation prévue.</p>
+            <% end %>
+          </div>
+
+          <!-- Past Events Card -->
+          <div class="glass-effect p-6 rounded-2xl">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-2xl font-semibold text-white"><i class="fas fa-history mr-2 text-gold-500"></i>Historique</h3>
+              <% if @past_participations.size > 3 %>
+                <%= link_to "Voir tout", past_participations_users_dashboard_path(@user), class: "text-sm text-gold-400 hover:underline" %>
+              <% end %>
+            </div>
+            <% @past_participations.first(3).each do |p| %>
+              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
+                    <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+                  </div>
+                  <% if current_user.reviews.where(event: p.event).empty? %>
+                    <%= link_to "Laisser un avis", new_review_path(event_id: p.event.id), class: "text-sm text-gold-400 hover:underline" %>
+                  <% else %>
+                    <span class="text-sm text-green-400">Avis donné</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            <% if @past_participations.empty? %>
+              <p class="text-gray-400">Aucun événement passé.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

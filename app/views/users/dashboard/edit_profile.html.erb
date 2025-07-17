@@ -1,0 +1,41 @@
+<div class="relative min-h-screen py-20 bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400">
+  <div class="max-w-3xl mx-auto px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-4">
+        <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
+        <span class="text-gold-400 font-medium">Mise à jour du profil</span>
+      </div>
+      <h2 class="text-4xl font-bold gradient-text mb-2">Modifier mes informations</h2>
+      <p class="text-lg text-gray-400">Prénom, nom & biographie publique</p>
+    </div>
+
+    <!-- Form card -->
+    <div class="glass-effect rounded-2xl p-8 shadow-xl">
+      <%= form_with model: @user, url: users_dashboard_update_profile_path, method: :patch do |f| %>
+        <div class="mb-6">
+          <%= f.label :first_name, "Prénom", class: "block text-sm font-semibold text-gray-300 mb-1" %>
+          <%= f.text_field :first_name, placeholder: "Votre prénom",
+                class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 transition" %>
+        </div>
+
+        <div class="mb-6">
+          <%= f.label :last_name, "Nom", class: "block text-sm font-semibold text-gray-300 mb-1" %>
+          <%= f.text_field :last_name, placeholder: "Votre nom de famille",
+                class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 transition" %>
+        </div>
+
+        <div class="mb-8">
+          <%= f.label :bio, "Bio", class: "block text-sm font-semibold text-gray-300 mb-1" %>
+          <%= f.text_area :bio, rows: 5, placeholder: "Parlez un peu de vous...",
+                class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" %>
+        </div>
+
+        <div class="text-right">
+          <%= f.submit "💾 Enregistrer", class: "inline-flex items-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

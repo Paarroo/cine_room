@@ -1,0 +1,8 @@
+{
+  "name": "app",
+  "private": "true",
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.9",
+    "tailwindcss": "^4.1.11"
+  }
+}

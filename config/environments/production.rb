@@ -1,9 +1,16 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  config.assets.compile = true
-    config.assets.digest = true
-    config.serve_static_assets = true
+  # No credential
+  config.secret_key_base = ENV['SECRET_KEY_BASE']
+
+   # Assets Heroku
+   config.assets.compile = true
+   config.assets.digest = true
+   config.serve_static_assets = true
+
+   # Desable redentials
+   config.require_master_key = false
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.

@@ -1,4 +1,4 @@
-# PostgreSQL. Versions 9.3 and up are supported.
+# config/database.yml
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -6,11 +6,11 @@ default: &default
 
 development:
   <<: *default
-  database: kitten_lovers_development
+  database: cineroom_development
 
 test:
   <<: *default
-  database: kitten_lovers_test
+  database: cineroom_test
 
 production:
   primary: &primary_production

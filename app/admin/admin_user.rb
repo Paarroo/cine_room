@@ -132,6 +132,53 @@ ActiveAdmin.register User do
         end
       end
 
+  form do |f|
+      f.semantic_errors
+
+      f.inputs "User Information" do
+        f.input :email, required: true
+        f.input :first_name
+        f.input :last_name
+        f.input :role, as: :select, collection: User.roles.map { |key, value| [key.humanize, key] }, include_blank: false
+        f.input :bio, as: :text, input_html: { rows: 4 }
+      end
+
+      f.inputs "Password" do
+        f.input :password, hint: "Leave blank to keep current password"
+        f.input :password_confirmation
+      end
+
+      f.actions
+    end
+
+    # Batch actions
+    batch_action :promote_to_admin, confirm: "Are you sure you want to promote selected users to admin?" do |ids|
+      User.where(id: ids).update_all(role: :admin)
+      redirect_to collection_path, notice: "Users promoted to admin successfully!"
+    end
+
+    batch_action :demote_to_user, confirm: "Are you sure you want to demote selected users?" do |ids|
+      User.where(id: ids).update_all(role: :user)
+      redirect_to collection_path, notice: "Users demoted successfully!"
+    end
+
+    # Custom actions
+    member_action :reset_password, method: :put do
+      user = User.find(params[:id])
+      new_password = SecureRandom.hex(8)
+      user.update!(password: new_password, password_confirmation: new_password)
+
+      # Here send an email with the new password
+      # UserMailer.password_reset(user, new_password).deliver_now
+
+      redirect_to resource_path, notice: "Password reset successfully! New password: #{new_password}"
+    end
+
+    action_item :reset_password, only: :show do
+      link_to "Reset Password", reset_password_admin_user_path(user), method: :put,
+              confirm: "Are you sure? This will generate a new password.",
+              class: "button"
+    end
 
 
 

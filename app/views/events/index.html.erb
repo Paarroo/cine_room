@@ -1,0 +1,63 @@
+<turbo-frame id="events_results">
+  <div id="events" class="page-content active mt-24">
+    <section class="py-8 min-h-screen">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div class="mb-12 text-center">
+          <h1 class="text-4xl lg:text-6xl font-bold mb-4">
+            Tous nos <span class="gradient-text">Événements</span>
+          </h1>
+          <p class="text-xl text-gray-400">Découvrez notre programmation complète</p>
+        </div>
+
+        <!-- Filter form -->
+        <div class="glass-effect rounded-2xl p-6 mb-12">
+          <%= form_with url: events_path, method: :get,
+                        data: { controller: "filters", action: "change->filters#submit" } do |f| %>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <!-- Search -->
+              <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <%= f.text_field :q, placeholder: "Rechercher un film...",
+                  value: params[:q],
+                  class: "w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400" %>
+              </div>
+
+              <!-- Date -->
+              <%= f.select :date_filter,
+                [["🗓️ Toutes les dates", ""], ["Cette semaine", "week"], ["Ce mois", "month"]],
+                { selected: params[:date_filter] },
+                class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+
+              <!-- Genre -->
+              <%= f.select :genre,
+                [["🎭 Tous les genres", ""]] + Movie.distinct.pluck(:genre).map { |g| [g, g] },
+                { selected: params[:genre] },
+                class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+
+              <!-- Venue -->
+              <%= f.select :venue,
+                [["📍 Tous les lieux", ""]] + Event.distinct.pluck(:venue_name).map { |v| [v, v] },
+                { selected: params[:venue] },
+                class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+            </div>
+
+            <!-- Reset button -->
+            <div class="mt-6 text-right">
+              <%= link_to "Réinitialiser les filtres", events_path,
+                  data: { turbo_frame: "events_results" },
+                  class: "text-sm text-gray-400 hover:underline" %>
+            </div>
+
+          <% end %>
+        </div>
+
+        <!-- Results -->
+        <%= render "results" %>
+
+      </div>
+    </section>
+  </div>
+</turbo-frame>

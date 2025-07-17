@@ -1,0 +1,14 @@
+<div style="font-family: sans-serif; background: #1a1a1a; color: #f0f0f0; padding: 2rem;">
+  <h1 style="color: #FFD700;">🎬 Merci pour votre réservation !</h1>
+
+  <p>Bonjour <strong><%= @user.first_name %></strong>,</p>
+
+  <p>Votre participation à l’événement <strong><%= @event.title %></strong> est bien confirmée.</p>
+
+  <p><strong>Date :</strong> <%= "#{l(@event.event_date, format: :long)} à #{@event.start_time.strftime('%Hh%M')}" %><br>
+     <strong>Lieu :</strong> <%= @event.venue_name %> - <%= @event.venue_address %></p>
+
+  <p style="margin-top: 1rem;">Nous avons hâte de vous y retrouver !</p>
+
+  <p>L’équipe CinéRoom 🎥</p>
+</div>

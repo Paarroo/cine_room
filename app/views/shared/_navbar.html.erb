@@ -1,0 +1,94 @@
+<nav data-controller="navigation" class="fixed top-0 w-full z-50 nav-blur border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <%= link_to root_path, class: "flex items-center space-x-3 cursor-pointer" do %>
+        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
+          <i class="fas fa-film text-white text-lg"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-bold tracking-tight">CinéRoom</span>
+          <span class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</span>
+        </div>
+      <% end %>
+
+      <!-- Desktop navigation links -->
+      <div class="hidden lg:flex items-center space-x-8">
+        <%= link_to root_path, class: "group relative nav-btn text-muted font-medium cursor-pointer transition duration-300 hover:text-primary" do %>
+          Accueil
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        <% end %>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="creators">
+          Créateurs
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
+                data-action="click->navigation#navigate"
+                data-target="events">
+          Événements
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
+        </button>
+
+        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-cinema-blue"
+                data-action="click->navigation#navigate"
+                data-target="about">
+          À propos
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-cinema-blue transition-all duration-300 group-hover:w-full"></span>
+        </button>
+      </div>
+
+      <!-- User account actions -->
+      <div class="hidden lg:flex items-center space-x-4">
+        <% if user_signed_in? %>
+          <!-- User connected -->
+          <div class="flex items-center space-x-4">
+            <%= link_to "Dashboard", "#", class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
+            <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
+          </div>
+        <% else %>
+          <!-- User non connected -->
+          <%= link_to "Connexion", new_user_session_path,
+              class: "px-4 py-2 text-muted hover:text-content transition-colors duration-200 font-medium" %>
+          <%= link_to "Rejoindre", new_user_registration_path,
+              class: "px-6 py-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-content rounded-full font-medium transition-all duration-200 hover:scale-105" %>
+        <% end %>
+      </div>
+
+      <!-- Mobile menu toggle button -->
+      <button class="lg:hidden w-10 h-10 bg-white/10 rounded-full flex items-center justify-center"
+              data-action="click->navigation#toggleMenu">
+        <i class="fas fa-bars text-muted"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu section -->
+  <div data-navigation-target="mobileMenu" class="lg:hidden hidden nav-blur border-t border-white/10">
+    <div class="px-4 py-6 space-y-4">
+      <%= link_to root_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+        Accueil
+      <% end %>
+
+      <%= link_to "#", class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+        Créateurs
+      <% end %>
+
+      <%= link_to "#", class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
+        Lieux
+      <% end %>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="events">Événements</button>
+
+      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-cinema-blue cursor-pointer"
+              data-action="click->navigation#navigate"
+              data-target="about">À propos</button>
+    </div>
+  </div>
+</nav>

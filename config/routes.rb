@@ -1,14 +1,39 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # ActiveAdmin.routes(self)
+  # devise_for :admin_users
+  devise_for :users
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  root 'pages#home'
+
+  get '/contact', to: 'pages#contact', as: :contact
+  get '/legal',   to: 'pages#legal',   as: :legal
+  get '/privacy', to: 'pages#privacy', as: :privacy
+  get '/terms',   to: 'pages#terms',   as: :terms
+
+  get 'about', to: 'pages#about'
+  get 'contact', to: 'pages#contact'
+
+  get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
+  get "stripe_checkout/cancel",  to: "stripe_checkout#cancel",  as: :stripe_cancel
+
+  resources :movies do
+    resources :reviews, except: [ :index ]
+  end
+
+  resources :events do
+    resources :participations, only: [ :new, :create, :destroy ]
+  end
+
+  resources :creators
+  resources :participations, only: [ :index, :show ]
+  resources :reviews, only: [ :index, :show ]
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 end

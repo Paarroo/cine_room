@@ -1,0 +1,48 @@
+<section class="py-20 lg:py-32 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-6xl font-bold mb-6">
+        <span class="text-cinema-blue">Lieux</span> d'exception
+      </h2>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        Des espaces uniques pour vivre le cinéma autrement
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% @venues.each do |venue| %>
+        <% color = venue[:icon].to_s.include?("palette") ? "rose" :
+                   venue[:icon].to_s.include?("building") ? "indigo" :
+                   venue[:icon].to_s.include?("home") ? "amber" : "blue" %>
+
+        <div class="venue-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card" data-target="venues">
+          <div class="relative h-80 bg-gradient-to-br from-<%= color %>-500/20 to-<%= color %>-600/20">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-400 via-transparent to-transparent"></div>
+
+            <!-- Badge -->
+            <div class="absolute top-6 left-6">
+              <span class="bg-<%= color %>-500/20 border border-<%= color %>-500/30 px-4 py-2 rounded-full text-sm font-medium text-<%= color %>-300">
+                <i class="<%= venue[:icon] %> mr-2"></i><%= venue[:label] %>
+              </span>
+            </div>
+
+            <!-- Title / Info -->
+            <div class="absolute bottom-6 left-6 right-6">
+              <h3 class="text-2xl font-bold mb-2 text-<%= color %>-400"><%= venue["venue_name"] %></h3>
+              <p class="text-gray-300 mb-3"><%= venue["venue_address"] %></p>
+              <div class="flex items-center space-x-4 text-sm text-gray-400">
+                <%# venue["max_capacity"] est récupéré dans la requête SQL groupée %>
+                <span><i class="fas fa-users mr-1"></i><%= venue["max_capacity"] || "?" %> places</span>
+                <span><i class="fas fa-calendar mr-1"></i><%= venue["events_count"] %> événements</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-16">
+      <%= link_to "Découvrir tous les lieux", "#", class: "nav-btn px-8 py-4 bg-gradient-to-r from-cinema-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
+    </div>
+  </div>
+</section>

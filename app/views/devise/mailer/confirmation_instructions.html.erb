@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      body { background-color: #111827; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+      .btn { background-color: #fbbf24; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <h1>Bienvenue sur CinéRoom 🎬</h1>
+    <p>Bonjour <%= @resource.email %>,</p>
+
+    <p>Merci de vous être inscrit !</p>
+
+    <p>Veuillez confirmer votre compte en cliquant ci-dessous :</p>
+
+    <p>
+      <a href="<%= confirmation_url(@resource, confirmation_token: @token) %>" class="btn">
+        Confirmer mon compte
+      </a>
+    </p>
+
+    <p>— L’équipe CinéRoom</p>
+  </body>
+</html>

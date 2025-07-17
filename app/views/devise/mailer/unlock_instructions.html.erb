@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <body style="font-family: sans-serif; background-color: #111827; color: #e5e7eb; padding: 2rem;">
+    <h1 style="color: #10b981;">Votre compte est verrouillé</h1>
+    <p>Bonjour <%= @resource.email %>,</p>
+    <p>Vous pouvez déverrouiller votre compte en cliquant sur le bouton suivant :</p>
+    <p>
+      <a href="<%= unlock_url(@resource, unlock_token: @token) %>" style="background: #10b981; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">Déverrouiller mon compte</a>
+    </p>
+    <p>Si vous n'avez pas tenté de vous connecter, nous vous conseillons de changer votre mot de passe.</p>
+  </body>
+</html>

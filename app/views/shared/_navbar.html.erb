@@ -46,7 +46,7 @@
         <% if user_signed_in? %>
           <!-- User connected -->
           <div class="flex items-center space-x-4">
-            <%= link_to "Dashboard", "#", class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
+            <%= link_to "Dashboard", users_dashboard_path(current_user), class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
             <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
             class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
           </div>

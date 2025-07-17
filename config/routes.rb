@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+  namespace :users do
+    resources :dashboard, only: [:show] do
+      get :edit_profile    # /users/dashboard/edit_profile
+      patch :update_profile
+      member do
+        get :upcoming_participations
+        get :past_participations
+        
+      end
+    end
+  end
+
   # ActiveAdmin.routes(self)
   # devise_for :admin_users
   devise_for :users

@@ -12,6 +12,10 @@ class User < ApplicationRecord
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
 
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
   private
 
   def send_welcome_email

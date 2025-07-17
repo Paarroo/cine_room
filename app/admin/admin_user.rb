@@ -179,9 +179,46 @@ ActiveAdmin.register User do
               confirm: "Are you sure? This will generate a new password.",
               class: "button"
     end
+    csv do
+        column :id
+        column :email
+        column :first_name
+        column :last_name
+        column :role
+        column("Full Name") { |user| "#{user.first_name} #{user.last_name}".strip }
+        column("Participations Count") { |user| user.participations.count }
+        column("Is Creator") { |user| user.creator.present? ? "Yes" : "No" }
+        column :created_at
+      end
 
+      # Controller customization
+      controller do
+        def create
+          @user = User.new(permitted_params[:user])
 
+          if @user.save
+            redirect_to admin_user_path(@user), notice: "User created successfully!"
+          else
+            render :new
+          end
+        end
 
-    ####
+        def update
+          # Don't require current password for admin updates
+          user_params = permitted_params[:user]
+
+          if user_params[:password].blank?
+            user_params.delete(:password)
+            user_params.delete(:password_confirmation)
+          end
+
+          if resource.update(user_params)
+            redirect_to admin_user_path(resource), notice: "User updated successfully!"
+          else
+            render :edit
+          end
+        end
+      end
+    end
   end
 end

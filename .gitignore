@@ -68,7 +68,7 @@ node_modules/
 # NPM
 .npm
 npm-debug.log*
-
+/node_modules
 .DS_Store
 .DS_Store?
 ._*

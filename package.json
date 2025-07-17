@@ -1,0 +1,13 @@
+{
+  "name": "app_name",
+  "version": "1.0.0",
+  "dependencies": {
+    "tailwindcss": "^3.4.17", // Mandatory!!
+    // Install all plugins and modules that are referenced in tailwind.config.js
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    // And so on...
+  },
+}

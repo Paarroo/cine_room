@@ -11,7 +11,7 @@ ActiveAdmin.register User do
   filter :email
   filter :first_name
   filter :last_name
-  filter :role, as: :select, collection: User.roles.map { |key, value| [key.humanize, key] }
+  filter :role, as: :select, collection: User.roles.map { |key, value| [ key.humanize, key ] }
   filter :created_at
   filter :updated_at
 
@@ -49,48 +49,73 @@ ActiveAdmin.register User do
 
     actions
   end
+
   show do
-      attributes_table do
-        row :id
-        row :email
-        row :first_name
-        row :last_name
-        row :role do |user|
-          status_tag user.role.humanize, class: user.role
+    attributes_table do
+      row :id
+      row :email
+      row :first_name
+      row :last_name
+      row :role do |user|
+        status_tag user.role.humanize, class: user.role
+      end
+      row :bio
+      row :created_at
+      row :updated_at
+      row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
+    end
+
+    # Creator information if exists
+    if user.creator.present?
+      panel "Creator Information" do
+        attributes_table_for user.creator do
+          row :status do |creator|
+            status_tag creator.status.humanize, class: creator.status
+          end
+          row :bio
+          row :verified_at
+          row :created_at
         end
-        row :bio
-        row :created_at
-        row :updated_at
-        row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
       end
 
-      if user.creator.present?
-            panel "Creator Information" do
-              attributes_table_for user.creator do
-                row :status do |creator|
-                  status_tag creator.status.humanize, class: creator.status
-                end
-                row :bio
-                row :verified_at
-                row :created_at
-              end
-            end
-
-            panel "Creator's Movies" do
-              table_for user.creator.movies.limit(10) do
-                column :title do |movie|
-                  link_to movie.title, admin_movie_path(movie)
-                end
-                column :validation_status do |movie|
-                  status_tag movie.validation_status.humanize, class: movie.validation_status
-                end
-                column :year
-                column :genre
-              end
-              div do
-                link_to "View all movies", admin_movies_path(q: { creator_id_eq: user.creator.id })
-              end
-            end
+      panel "Creator's Movies" do
+        table_for user.creator.movies.limit(10) do
+          column :title do |movie|
+            link_to movie.title, admin_movie_path(movie)
           end
+          column :validation_status do |movie|
+            status_tag movie.validation_status.humanize, class: movie.validation_status
+          end
+          column :year
+          column :genre
+        end
+        div do
+          link_to "View all movies", admin_movies_path(q: { creator_id_eq: user.creator.id })
+        end
+      end
+    end
 
+    panel "Participations" do
+      table_for user.participations.includes(:event).limit(10) do
+        column :event do |participation|
+          link_to participation.event.title, admin_event_path(participation.event)
+        end
+        column :status do |participation|
+          status_tag participation.status.humanize, class: participation.status
+        end
+        column :seats
+        column :created_at do |participation|
+          participation.created_at.strftime("%d/%m/%Y")
+        end
+      end
+      div do
+        link_to "View all participations", admin_participations_path(q: { user_id_eq: user.id })
+      end
+    end
+
+
+
+
+    ####
   end
+end

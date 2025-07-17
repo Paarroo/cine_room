@@ -65,7 +65,6 @@ ActiveAdmin.register User do
       row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
     end
 
-    # Creator information if exists
     if user.creator.present?
       panel "Creator Information" do
         attributes_table_for user.creator do
@@ -112,6 +111,26 @@ ActiveAdmin.register User do
         link_to "View all participations", admin_participations_path(q: { user_id_eq: user.id })
       end
     end
+    panel "Reviews" do
+          table_for user.reviews.includes(:movie, :event).limit(10) do
+            column :movie do |review|
+              link_to review.movie.title, admin_movie_path(review.movie)
+            end
+            column :event do |review|
+              link_to review.event.title, admin_event_path(review.event)
+            end
+            column :rating do |review|
+              "⭐" * review.rating if review.rating
+            end
+            column :created_at do |review|
+              review.created_at.strftime("%d/%m/%Y")
+            end
+          end
+          div do
+            link_to "View all reviews", admin_reviews_path(q: { user_id_eq: user.id })
+          end
+        end
+      end
 
 
 

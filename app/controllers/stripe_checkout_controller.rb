@@ -19,7 +19,7 @@ class StripeCheckoutController < ApplicationController
     end
 
     participation = current_user.participations.create!(
-      event: @event, # ✅ Association nécessaire
+      event: @event, 
       seats: seats,
       stripe_payment_id: session_id,
       status: :confirmed

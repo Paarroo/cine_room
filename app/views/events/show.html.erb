@@ -120,16 +120,21 @@
               </div>
 
               <div class="p-6 space-y-6">
-                <!-- Availability -->
+              <!-- Availability -->
                 <div>
                   <div class="flex justify-between items-center mb-3">
                     <span class="font-medium text-gray-300">Places disponibles</span>
-                    <span class="text-lg font-bold text-green-400"><%= @event.participations.count %>/<%= @event.max_capacity %></span>
+                    <span class="text-lg font-bold text-green-400">
+                      <%= @event.available_spots %>/<%= @event.max_capacity %>
+                    </span>
                   </div>
-                  <% pourcentage = (@event.participations.count.to_f / @event.max_capacity * 100).round %>
+
+                  <% pourcentage = ((@event.available_spots.to_f / @event.max_capacity) * 100).round %>
                   <div class="w-full bg-white/10 rounded-full h-3">
-                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500" style="width: <%= pourcentage %>%"></div>
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                        style="width: <%= 100 - pourcentage %>%"></div>
                   </div>
+
                   <p class="text-sm text-gray-400 mt-3">
                     <i class="fas fa-clock mr-2"></i>Réservation possible jusqu'à 2h avant
                   </p>

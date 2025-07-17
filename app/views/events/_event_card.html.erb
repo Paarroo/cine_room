@@ -25,12 +25,13 @@
 
     <!-- Seats remaining -->
     <div class="absolute bottom-4 right-4 text-right">
-      <% places_left = event.max_capacity - event.participations.count %>
+     <% places_left = event.available_spots %>
       <% status_color = places_left <= 0 ? 'red' : (places_left < 5 ? 'orange' : 'green') %>
       <div class="bg-<%= status_color %>-500/20 border border-<%= status_color %>-500/30 text-<%= status_color %>-300 px-2 py-1 rounded-full text-xs mb-1">
         <%= pluralize(places_left, 'place') %>
       </div>
       <div class="text-gray-400 text-xs">sur <%= event.max_capacity %></div>
+
     </div>
   </div>
 
@@ -67,12 +68,13 @@
     <div class="flex items-center justify-between">
       <div class="text-3xl font-bold gradient-text"><%= event.price_cents %>€</div>
       <% if places_left > 0 %>
-        <%= link_to "Voir détails", event_path(event),data: { turbo: false }, class: "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
-      <% else %>
-        <button disabled class="px-6 py-3 bg-gray-600 text-gray-400 rounded-xl font-medium cursor-not-allowed">
-          Complet
-        </button>
-      <% end %>
+          <%= link_to "Voir détails", event_path(event), data: { turbo: false }, class: "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
+        <% else %>
+          <button disabled class="px-6 py-3 bg-gray-600 text-gray-400 rounded-xl font-medium cursor-not-allowed">
+            Complet
+          </button>
+       <% end %>
+
     </div>
   </div>
 </div>

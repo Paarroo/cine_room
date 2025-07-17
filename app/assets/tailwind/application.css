@@ -1,0 +1,134 @@
+/*
+ * CinéRoom - Tailwind v4 Configuration
+ * Jury requirements: 5 colors max, 3 fonts max, Mobile-first
+ */
+
+@import "tailwindcss";
+
+/* THEME CONFIGURATION - v4 syntax */
+@theme {
+  /* Brand colors - EXACTLY 5 for jury compliance */
+  --color-primary: #f59e0b;
+  --color-surface: #0a0a0a;
+  --color-content: #ffffff;
+  --color-muted: #6b7280;
+  --color-accent: #2563eb;
+
+  /* Fonts - Maximum 3 for jury */
+  --font-family-primary: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-family-display: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", monospace;
+
+  /* Custom utilities */
+  --nav-height: 4rem;
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+}
+
+/* GOOGLE FONTS IMPORT */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* CUSTOM COMPONENTS - Keep your existing styles */
+@layer components {
+  /* Glass effects */
+  /* .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  } */
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Navigation */
+  .nav-blur {
+    backdrop-filter: blur(20px);
+    background: rgba(10, 10, 10, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Buttons - responsive and accessible */
+  .btn-primary {
+    @apply bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-full;
+    @apply transition-all duration-300 hover:scale-105;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50;
+  }
+
+  /* .btn-secondary {
+    @apply glass-effect hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-xl;
+    @apply transition-all duration-300 hover:scale-105;
+  } */
+
+  /* Forms */
+  .form-input {
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl;
+    @apply focus:ring-2 focus:ring-primary focus:border-transparent;
+    @apply transition-all text-content placeholder-muted;
+  }
+
+  /* Cards with hover effects */
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-1 shadow-2xl;
+  }
+}
+
+/* UTILITY CLASSES */
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, theme(colors.primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .container-app {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-12 lg:py-20;
+  }
+}
+
+/* ANIMATIONS */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ACCESSIBILITY & RESPONSIVE */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* @media (prefers-contrast: high) {
+  .glass-effect {
+    border: 2px solid theme(colors.content);
+  }
+} */

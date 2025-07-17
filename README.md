@@ -77,3 +77,60 @@ SMTP_PASSWORD=your_smtp_password
 # Launch the application
 rails server
 ```
+
+## 🎮 How to Use
+
+1. **Discover** exclusive events on the homepage
+2. **Browse** available screenings with filters
+3. **View details** - film synopsis, venue, crew present
+4. **Create account** (email + password only)
+5. **Book securely** via Stripe payment
+6. **Receive confirmation** email with practical details
+7. **Attend** the magical screening experience
+8. **Leave review** and discover new events
+
+### 📱 Responsive Design
+
+- **Mobile-first** approach with Tailwind breakpoints
+- **Touch-friendly** navigation and interactions
+- **Progressive enhancement** from mobile to desktop
+- **Cross-device consistency** and performance
+
+###
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## 🙏 Acknowledgments
+
+- **The Hacking Project** for the comprehensive Ruby on Rails training
+- **Stripe** for the seamless payment integration
+- **Tailwind CSS** for the beautiful responsive design
+- **Independent filmmakers** who inspire unique cinema experiences
+
+## 📞 Support
+
+For support, email contact@cineroom.com or create an issue in this repository.
+
+---
+
+## 🤝 Team Collaboration
+
+### Git Workflow
+
+- Théo BANNERY
+- Florian BENOIT
+- Mathieu MARILLER
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+---
+
+**🎬 Built with ❤️ and Rails 8.0.2 for the ultimate cinema experience!**
+
+_"Where independent cinema meets exclusive experiences"_ ✨🍿
+
+**Live Demo**: https://cineroom-95309b4cb0ca.herokuapp.com/

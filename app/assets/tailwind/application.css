@@ -8,11 +8,11 @@
 /* THEME CONFIGURATION - v4 syntax */
 @theme {
   /* Brand colors - EXACTLY 5 for jury compliance */
-  --color-primary: #f59e0b;
-  --color-surface: #0a0a0a;
-  --color-content: #ffffff;
-  --color-muted: #6b7280;
-  --color-accent: #2563eb;
+  --color-primary: #f59e0b; /* Gold - main brand */
+  --color-surface: #0a0a0a; /* Dark - backgrounds */
+  --color-content: #ffffff; /* White - primary text */
+  --color-muted: #6b7280; /* Gray - secondary text */
+  --color-accent: #2563eb; /* Blue - links/actions */
 
   /* Fonts - Maximum 3 for jury */
   --font-family-primary: "Atkinson Hyperlegible", system-ui, sans-serif;

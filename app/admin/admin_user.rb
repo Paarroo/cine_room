@@ -139,7 +139,7 @@ ActiveAdmin.register User do
         f.input :email, required: true
         f.input :first_name
         f.input :last_name
-        f.input :role, as: :select, collection: User.roles.map { |key, value| [key.humanize, key] }, include_blank: false
+        f.input :role, as: :select, collection: User.roles.map { |key, value| [ key.humanize, key ] }, include_blank: false
         f.input :bio, as: :text, input_html: { rows: 4 }
       end
 
@@ -220,5 +220,3 @@ ActiveAdmin.register User do
         end
       end
     end
-  end
-end

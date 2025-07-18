@@ -221,10 +221,10 @@ ActiveAdmin.register_page "Dashboard" do
           panel "Recent Movies" do
             table_for Movie.includes(:user).order(created_at: :desc).limit(5) do
               column "Title" do |movie|
-                link_to movie.title, admin_movie_path(movie)
+                movie.title
               end
               column "Creator" do |movie|
-                link_to movie.user.full_name, admin_user_path(movie.user) if movie.user
+                movie.user.full_name if movie.user
               end
               column "Status" do |movie|
                 status_tag movie.validation_status.humanize, class: movie.validation_status

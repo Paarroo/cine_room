@@ -1,6 +1,22 @@
 Rails.application.routes.draw do
-  devise_for :admin_users, ActiveAdmin::Devise.config
-    ActiveAdmin.routes(self)
+  ActiveAdmin.routes(self)
+
+    devise_for :users, controllers: {
+      sessions: 'users/sessions',
+      registrations: 'users/registrations'
+    }
+
+    authenticated :user, ->(user) { user.admin? } do
+      root to: redirect('/admin'), as: :admin_authenticated_root
+    end
+
+    authenticated :user do
+      root to: 'pages#home', as: :authenticated_root
+    end
+
+    unauthenticated do
+      root to: 'pages#home'
+    end
 
   namespace :users do
     resources :dashboard, only: [ :show ] do
@@ -12,10 +28,6 @@ Rails.application.routes.draw do
       end
     end
   end
-
-  devise_for :users
-
-  root 'pages#home'
 
   get '/contact', to: 'pages#contact', as: :contact
   get '/legal',   to: 'pages#legal',   as: :legal
@@ -45,7 +57,6 @@ Rails.application.routes.draw do
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
-
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 end

@@ -80,7 +80,9 @@ ActiveAdmin.setup do |config|
     config.pundit_policy_namespace = :admin
 
 
-
+  config.show_comments = false
+  config.batch_actions = true
+  config.filter_attributes = [ :encrypted_password, :password, :password_confirmation ]
 
 
   # == User Authorization

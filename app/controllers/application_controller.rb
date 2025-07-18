@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+   include Pundit::Authorization
+
   def after_sign_in_path_for(resource)
      if resource.role == 'admin'
        admin_root_path
@@ -22,8 +24,16 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name, :bio ])
   end
 
+  def authenticate_user!
+      redirect_to new_user_session_path unless user_signed_in?
+    end
+
+    def current_user
+      @current_user ||= super
+    end
+
   def ensure_admin!
-    redirect_to root_path, alert: 'Access denied.' unless current_user&.admin?
+    redirect_to root_path, alert: 'Accès refusé !' unless current_user&.admin?
   end
 
   def ensure_creator_or_admin!

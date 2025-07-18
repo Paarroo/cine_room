@@ -14,31 +14,30 @@
 
       <!-- Desktop navigation links -->
       <div class="hidden lg:flex items-center space-x-8">
-        <%= link_to root_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-primary" do %>
+        <%= link_to root_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Accueil
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
-        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
-                data-action="click->navigation#navigate"
-                data-target="creators">
+        <%= link_to creators_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Créateurs
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
-        </button>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        <% end %>
 
-        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-gold-500"
-                data-action="click->navigation#navigate"
-                data-target="events">
+        <%= link_to events_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Événements
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full"></span>
-        </button>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        <% end %>
 
-        <button class="group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 hover:text-cinema-blue"
-                data-action="click->navigation#navigate"
-                data-target="about">
+        <%= link_to movies_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300" do %>
+          Films
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        <% end %>
+
+        <%= link_to about_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           À propos
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-cinema-blue transition-all duration-300 group-hover:w-full"></span>
-        </button>
+        <% end %>
       </div>
 
       <!-- User account actions -->
@@ -74,21 +73,21 @@
         Accueil
       <% end %>
 
-      <%= link_to "#", class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+      <%= link_to creators_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
         Créateurs
       <% end %>
 
-      <%= link_to "#", class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
-        Lieux
+      <%= link_to events_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
+        Événements
       <% end %>
 
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-gold-500 cursor-pointer"
-              data-action="click->navigation#navigate"
-              data-target="events">Événements</button>
+      <%= link_to movies_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
+        Films
+      <% end %>
 
-      <button class="nav-btn block w-full text-left py-3 text-gray-300 font-medium transition duration-300 hover:text-cinema-blue cursor-pointer"
-              data-action="click->navigation#navigate"
-              data-target="about">À propos</button>
+      <%= link_to about_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
+        À propos
+      <% end %>
     </div>
   </div>
 </nav>

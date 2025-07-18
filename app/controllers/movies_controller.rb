@@ -4,7 +4,7 @@ class MoviesController < ApplicationController
   before_action :ensure_owner_or_admin!, only: [ :edit, :update, :destroy ]
 
   def index
-    @movies = Movie.includes(:creator, :events)
+    @movies = Movie.includes(:user, :events)
                    .where(validation_status: 'approved')
                    .order(created_at: :desc)
   end
@@ -15,14 +15,14 @@ class MoviesController < ApplicationController
   end
 
   def new
-    @movie = current_user.creator.movies.build
+    @movie = current_user.movies.build
   end
 
   def create
-    @movie = current_user.creator.movies.build(movie_params)
+    @movie = current_user.movies.build(movie_params)
 
     if @movie.save
-      redirect_to @movie, notice: 'Movie submitted for validation.'
+      redirect_to @movie, notice: 'Film bien déposé pour validation.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,7 @@ class MoviesController < ApplicationController
 
   def update
     if @movie.update(movie_params)
-      redirect_to @movie, notice: 'Movie was successfully updated.'
+      redirect_to @movie, notice: 'La fiche du film a bien été mis à jour.'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -41,7 +41,7 @@ class MoviesController < ApplicationController
 
   def destroy
     @movie.destroy!
-    redirect_to movies_path, notice: 'Movie was successfully deleted.'
+    redirect_to movies_path, notice: 'La fiche du film à bien été supprimé.'
   end
 
   private
@@ -51,8 +51,8 @@ class MoviesController < ApplicationController
   end
 
   def ensure_owner_or_admin!
-    unless current_user.admin? || @movie.creator.user == current_user
-      redirect_to movies_path, alert: 'Access denied.'
+    unless current_user.admin? || @movie.creator == current_user
+      redirect_to movies_path, alert: 'Accès refusé.'
     end
   end
 

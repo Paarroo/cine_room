@@ -1,0 +1,49 @@
+<section class="py-20 lg:py-32 relative bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-6xl font-bold mb-6">
+        <span class="text-cinema-blue">Prochains</span> événements
+      </h2>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        Des projections uniques dans des lieux hors du commun.
+      </p>
+    </div>
+
+    <!-- Event Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% @events.each do |event| %>
+        <div class="event-card rounded-3xl overflow-hidden card-hover group cursor-pointer">
+          <div class="relative h-80 bg-gradient-to-br from-red-500/20 to-pink-500/20">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-400 via-transparent to-transparent"></div>
+
+            <!-- Badge -->
+            <div class="absolute top-6 left-6">
+              <span class="glass-effect px-4 py-2 rounded-full text-sm font-medium text-gray-300">
+                <i class="fas fa-calendar-alt mr-2 "></i><%= l(event.event_date, format: "%d %B") %>
+              </span>
+            </div>
+
+            <!-- Content -->
+            <div class="absolute bottom-6 left-6 right-6">
+              <h3 class="text-2xl font-bold text-white mb-1 group-hover:text-cinema-blue transition-colors">
+                <%= event.title %>
+              </h3>
+              <p class="text-gray-300 mb-2 text-sm italic"><%= event.movie.director %></p>
+              <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+                <span><i class="fas fa-map-marker-alt mr-1"></i><%= event.venue_name %></span>
+                <span><i class="fas fa-film mr-1 "></i><%= event.movie.genre %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-16">
+      <%= link_to "Voir tous les événements", events_path, class: "px-8 py-4 bg-gradient-to-r from-cinema-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
+    </div>
+  </div>
+</section>

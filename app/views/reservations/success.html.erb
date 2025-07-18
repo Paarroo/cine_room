@@ -1,0 +1,74 @@
+<div id="event-detail" class="mt-24">
+  <section class="py-8 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumb navigation -->
+      <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-8">
+        <%= link_to "Accueil", root_path, class: "hover:text-gold-500 transition-colors" %>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <%= link_to "Événements", events_path, class: "hover:text-gold-500 transition-colors" %>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <span class="text-white">Confirmation</span>
+      </nav>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        <!-- Main content -->
+        <div class="xl:col-span-2 space-y-8">
+          <div class="glass-effect rounded-3xl p-8">
+            <h1 class="text-4xl font-bold mb-6 gradient-text">🎉 Merci pour ta réservation !</h1>
+
+            <p class="text-lg text-gray-300 leading-relaxed mb-4">
+              Ta réservation pour <strong><%= @event.title %></strong> a bien été enregistrée.
+              Un e-mail de confirmation vient de t’être envoyé avec les détails de ta participation.
+            </p>
+
+            <div class="prose prose-lg text-gray-300">
+              <ul>
+                <li><strong>Date :</strong> <%= l(@event.event_date, format: :long) %></li>
+                <li><strong>Heure :</strong> <%= @event.start_time.strftime("%Hh%M") %></li>
+                <li><strong>Lieu :</strong> <%= @event.venue_name %>, <%= @event.venue_address %></li>
+                <li><strong>Participation n° :</strong> <%= @participation.id %></li>
+                <li><strong>Places réservées :</strong> <%= @participation.seats %></li>
+              </ul>
+            </div>
+
+            <div class="text-center mt-8">
+            <%= link_to "Voir la fiche de l'événement", event_path(@event),
+                class: "inline-block bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="xl:col-span-1">
+          <div class="sticky top-24 space-y-6">
+            
+            <!-- Email info -->
+            <div class="glass-effect rounded-3xl p-6">
+              <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-envelope text-gold-500 mr-2"></i>
+                Email de confirmation
+              </h3>
+              <p class="text-sm text-gray-400">
+                Vérifie ta boîte mail. Si tu ne reçois rien dans quelques minutes, pense à vérifier tes spams.
+              </p>
+            </div>
+
+            <!-- Dashboard link -->
+            <div class="glass-effect rounded-3xl p-6">
+              <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-ticket-alt text-gold-500 mr-2"></i>
+                Gérer mes réservations
+              </h3>
+              <%= link_to "Voir mes événements", users_dashboard_path(current_user),
+                class: "block w-full text-center bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-3 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>

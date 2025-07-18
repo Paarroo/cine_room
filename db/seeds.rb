@@ -7,25 +7,20 @@ test_user = User.create!(
   role: :user
 )
 
-admin_user = User.create!(
-  email: 'admin@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Admin',
-  last_name: 'CinéRoom',
-  role: :admin
-)
+
 
 Participation.destroy_all
 Event.destroy_all
 Movie.destroy_all
 Creator.destroy_all
 User.destroy_all
-AdminUser.destroy_all
+
 
 users = FactoryBot.create_list(:user, 10)
 
+
 AdminUser.create!(email: "admin@cineroom.com", password: "password")
+
 
 creators = users.first(3).map { |user| FactoryBot.create(:creator, user: user) }
 

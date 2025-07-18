@@ -14,19 +14,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "creators", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.text "bio"
-    t.integer "status", default: 1, null: false
-    t.datetime "verified_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["status"], name: "index_creators_on_status"
-    t.index ["user_id"], name: "index_creators_on_user_id", unique: true
-  end
-
   create_table "events", force: :cascade do |t|
     t.bigint "movie_id", null: false
+    t.bigint "user_id", null: false
     t.string "title", null: false
     t.text "description"
     t.string "venue_name", null: false
@@ -44,10 +34,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
     t.index ["latitude", "longitude"], name: "index_events_on_latitude_and_longitude"
     t.index ["movie_id"], name: "index_events_on_movie_id"
     t.index ["status"], name: "index_events_on_status"
+    t.index ["user_id"], name: "index_events_on_user_id"
   end
 
   create_table "movies", force: :cascade do |t|
-    t.bigint "creator_id", null: false
+    t.bigint "user_id", null: false
     t.string "title", null: false
     t.text "synopsis", null: false
     t.string "director", null: false
@@ -62,8 +53,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
     t.datetime "validated_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["creator_id"], name: "index_movies_on_creator_id"
     t.index ["genre"], name: "index_movies_on_genre"
+    t.index ["user_id"], name: "index_movies_on_user_id"
     t.index ["validated_by_id"], name: "index_movies_on_validated_by_id"
     t.index ["validation_status"], name: "index_movies_on_validation_status"
   end
@@ -114,9 +105,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
     t.index ["role"], name: "index_users_on_role"
   end
 
-  add_foreign_key "creators", "users"
   add_foreign_key "events", "movies"
-  add_foreign_key "movies", "creators"
+  add_foreign_key "events", "users"
+  add_foreign_key "movies", "users"
   add_foreign_key "movies", "users", column: "validated_by_id"
   add_foreign_key "participations", "events"
   add_foreign_key "participations", "users"

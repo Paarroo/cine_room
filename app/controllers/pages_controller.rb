@@ -19,29 +19,29 @@ class PagesController < ApplicationController
   private
 
   def featured_creators
-    User.creator
-        .joins(:movies)
-        .where(movies: { validation_status: Movie.validation_statuses[:approved] })
-        .group('users.id')
-        .select('users.*, COUNT(movies.id) AS movies_count')
-        .order('movies_count DESC')
-        .limit(3)
-  end
+      User.joins(creator: :movies)
+          .where(movies: { validation_status: :approved })
+          .group('users.id')
+          .select('users.*, COUNT(movies.id) AS movies_count')
+          .order('movies_count DESC')
+          .limit(3)
+    end
+
 
   def featured_venues
-    Event.group(:venue_name, :venue_address)
-         .select('venue_name, venue_address, MAX(max_capacity) as max_capacity, COUNT(*) as events_count')
-         .order('events_count DESC')
-         .limit(3)
-         .map { |venue| venue.attributes.merge(venue_icon_data(venue.venue_name)) }
-  end
+      Event.group(:venue_name, :venue_address)
+           .select('venue_name, venue_address, MAX(max_capacity) as max_capacity, COUNT(*) as events_count')
+           .order('events_count DESC')
+           .limit(3)
+           .map { |venue| venue.attributes.merge(venue_icon_data(venue.venue_name)) }
+    end
 
   def home_stats
     {
-      directors_count: User.creator.count,
-      movies_count: Movie.approved.count,
-      venues_count: Event.select(:venue_name, :venue_address).distinct.count,
-      events_count: Event.upcoming.count
+      directors_count: User.joins(:creator).count,
+           movies_count: Movie.where(validation_status: :approved).count,
+           venues_count: Event.select(:venue_name, :venue_address).distinct.count,
+           events_count: Event.where(status: :upcoming).count
     }
   end
 

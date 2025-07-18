@@ -38,7 +38,7 @@ class PagesController < ApplicationController
 
   def home_stats
     {
-      directors_count: User.joins(:creator).count,
+           directors_count: User.creators.count,
            movies_count: Movie.where(validation_status: :approved).count,
            venues_count: Event.select(:venue_name, :venue_address).distinct.count,
            events_count: Event.where(status: :upcoming).count

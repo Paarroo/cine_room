@@ -127,3 +127,4 @@ group :production do
   gem "newrelic_rpm"
   gem "sentry-ruby"
 end
+gem 'pundit', '~> 2.3'

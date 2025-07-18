@@ -4,12 +4,12 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = "Cine Room"
+  config.site_title = "CinéRoom Admin"
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
   #
-  # config.site_title_link = "/"
+  config.site_title_link = "/"
 
   # Set an optional image to be displayed for the header
   # instead of a string (overrides :site_title)
@@ -71,10 +71,18 @@ ActiveAdmin.setup do |config|
   #
   # This setting changes the method which Active Admin calls
   # within the application controller.
-  config.site_title = "CinéRoom Admin"
-  config.authentication_method = :authenticate_admin_user!
-  config.current_user_method = :current_admin_user
-  config.logout_link_path = :destroy_admin_user_session_path
+  config.authentication_method = :authenticate_user!
+    config.current_user_method = :current_user
+    config.logout_link_path = :destroy_user_session_path
+
+
+    config.authorization_adapter = ActiveAdmin::PunditAdapter
+    config.pundit_policy_namespace = :admin
+
+
+
+
+
   # == User Authorization
   #
   # Active Admin will automatically call an authorization
@@ -101,7 +109,7 @@ ActiveAdmin.setup do |config|
   # because, by default, user gets redirected to Dashboard. If user
   # doesn't have access to Dashboard, he'll end up in a redirect loop.
   # Method provided here should be defined in application_controller.rb.
-  # config.on_unauthorized_access = :access_denied
+  config.on_unauthorized_access = :access_denied
 
   # == Current User
   #
@@ -123,7 +131,8 @@ ActiveAdmin.setup do |config|
   #
   # Default:
   config.logout_link_path = :destroy_admin_user_session_path
-
+  config.logout_link_method = :delete
+  config.show_comments = false
   # This setting changes the http method used when rendering the
   # link. For example :get, :delete, :put, etc..
   #

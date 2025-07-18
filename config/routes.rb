@@ -1,22 +1,22 @@
 Rails.application.routes.draw do
   ActiveAdmin.routes(self)
 
-    devise_for :users, controllers: {
-      sessions: 'users/sessions',
-      registrations: 'users/registrations'
-    }
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+  }
 
-    authenticated :user, ->(user) { user.admin? } do
-      root to: redirect('/admin'), as: :admin_authenticated_root
-    end
+  authenticated :user, ->(user) { user.admin? } do
+    root to: redirect('/admin'), as: :admin_authenticated_root
+  end
 
-    authenticated :user do
-      root to: 'pages#home', as: :authenticated_root
-    end
+  authenticated :user do
+    root to: 'pages#home', as: :authenticated_root
+  end
 
-    unauthenticated do
-      root to: 'pages#home'
-    end
+  unauthenticated do
+    root to: 'pages#home'
+  end
 
   namespace :users do
     resources :dashboard, only: [ :show ] do
@@ -33,9 +33,7 @@ Rails.application.routes.draw do
   get '/legal',   to: 'pages#legal',   as: :legal
   get '/privacy', to: 'pages#privacy', as: :privacy
   get '/terms',   to: 'pages#terms',   as: :terms
-
   get 'about', to: 'pages#about'
-  get 'contact', to: 'pages#contact'
 
   get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
   get "stripe_checkout/cancel",  to: "stripe_checkout#cancel",  as: :stripe_cancel

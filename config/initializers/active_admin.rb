@@ -79,8 +79,6 @@ ActiveAdmin.setup do |config|
     config.authorization_adapter = ActiveAdmin::PunditAdapter
     config.pundit_policy_namespace = :admin
 
-
-  config.show_comments = false
   config.batch_actions = true
   config.filter_attributes = [ :encrypted_password, :password, :password_confirmation ]
 
@@ -134,7 +132,6 @@ ActiveAdmin.setup do |config|
   # Default:
   config.logout_link_path = :destroy_admin_user_session_path
   config.logout_link_method = :delete
-  config.show_comments = false
   # This setting changes the http method used when rendering the
   # link. For example :get, :delete, :put, etc..
   #

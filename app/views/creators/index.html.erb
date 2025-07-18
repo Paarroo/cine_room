@@ -1,0 +1,71 @@
+<div id="creators" class="page-content active mt-24">
+  <section class="py-8 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Header -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl lg:text-6xl font-bold mb-4">
+          Nos <span class="gradient-text">Créateurs</span>
+        </h1>
+        <p class="text-xl text-gray-400">Rencontrez les visionnaires du cinéma indépendant</p>
+      </div>
+
+      <!-- Creator cards grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <% @creators.each do |creator| %>
+          <% initials = "#{creator.first_name.first}#{creator.last_name.first}".upcase %>
+          <div class="creator-card rounded-2xl overflow-hidden card-hover">
+            <div class="relative h-72 bg-gradient-to-br from-gold-500/20 to-amber-600/20">
+              <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
+              <div class="absolute bottom-4 left-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-gold-500 to-gold-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-3">
+                  <%= initials %>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <h3 class="text-2xl font-bold mb-1">
+                <%= "#{creator.first_name} #{creator.last_name}" %>
+              </h3>
+
+              <% if creator.present? %>
+                <p class="text-gray-400 mb-3"><%= "Réalisateur" %></p>
+              <% else %>
+                <p class="text-gray-400 mb-3">Créateur indépendant</p>
+              <% end %>
+
+              <div class="flex items-center space-x-4 text-sm text-gray-400 mb-4">
+                <span><i class="fas fa-film mr-1 text-gold-500"></i><%= creator.movies.approved.size %> films</span>
+                <% if creator.present? %>
+                  <span><i class="fas fa-award mr-1 text-gold-500"></i><%= "Award" %></span>
+                <% end %>
+              </div>
+
+              <% if creator.bio.present? %>
+                <p class="text-gray-300 text-sm mb-4">"<%= truncate(creator.bio, length: 80) %>"</p>
+              <% end %>
+
+              <%= link_to "Voir profil", creator_path(creator), class: "px-4 py-2 bg-gold-500 hover:bg-gold-600 text-white rounded-xl transition-colors font-medium text-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Call to join section -->
+      <div class="mt-20">
+        <div class="glass-effect rounded-3xl p-8 text-center">
+          <h3 class="text-3xl font-bold mb-4">Vous êtes créateur ?</h3>
+          <p class="text-gray-400 mb-6 max-w-2xl mx-auto">
+            Rejoignez notre communauté de réalisateurs passionnés et partagez votre vision avec un public d'amateurs éclairés
+          </p>
+          <%= link_to new_movie_path, class: "bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105" do %>
+            <i class="fas fa-plus mr-3"></i>
+            Proposer votre film
+          <% end %>
+        </div
+      </div>
+
+    </div>
+  </section>
+</div>

@@ -16,7 +16,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
 
   create_table "events", force: :cascade do |t|
     t.bigint "movie_id", null: false
-    t.bigint "user_id", null: false
     t.string "title", null: false
     t.text "description"
     t.string "venue_name", null: false
@@ -34,7 +33,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
     t.index ["latitude", "longitude"], name: "index_events_on_latitude_and_longitude"
     t.index ["movie_id"], name: "index_events_on_movie_id"
     t.index ["status"], name: "index_events_on_status"
-    t.index ["user_id"], name: "index_events_on_user_id"
   end
 
   create_table "movies", force: :cascade do |t|
@@ -106,7 +104,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_171414) do
   end
 
   add_foreign_key "events", "movies"
-  add_foreign_key "events", "users"
   add_foreign_key "movies", "users"
   add_foreign_key "movies", "users", column: "validated_by_id"
   add_foreign_key "participations", "events"

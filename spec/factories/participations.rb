@@ -2,7 +2,8 @@ FactoryBot.define do
   factory :participation do
     association :user
     association :event
-    status { :confirmed }
-    stripe_payment_id { "pi_#{Faker::Alphanumeric.alphanumeric(number: 24)}" }
+    status { 0 }
+    seats { rand(1..3) }
+    stripe_payment_id { Faker::Alphanumeric.alphanumeric(number: 10) }
   end
 end

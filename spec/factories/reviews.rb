@@ -3,7 +3,7 @@ FactoryBot.define do
     association :user
     association :movie
     association :event
-    rating { Faker::Number.between(from: 3, to: 5) }
-    comment { Faker::Lorem.paragraph(sentence_count: rand(2..4)) }
+    rating { rand(1..5) }
+    comment { Faker::Movie.quote }
   end
 end

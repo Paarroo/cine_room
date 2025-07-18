@@ -1,135 +1,65 @@
-<div id="user-dashboard" class="page-content active mt-18">
-  <section class="relative min-h-screen w-full bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
+<div class="relative mt-20 min-h-screen" data-controller="dashboard-tabs">
+  <!-- SECTION HEADER AND TABS -->
+  <section class="relative bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
-      <div class="text-center mb-16">
-        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-6">
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-4">
           <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
           <span class="text-gold-400 font-medium">Espace personnel</span>
         </div>
-        <h2 class="text-4xl lg:text-6xl font-bold mb-4 text-white">
+        <h2 class="text-4xl lg:text-6xl font-bold mb-2 text-white">
           Bienvenue <span class="gradient-text"><%= @user.first_name %></span>
         </h2>
         <p class="text-xl text-gray-300">Gérez vos réservations et informations</p>
       </div>
 
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <!-- Profile Card -->
-        <div class="glass-effect p-6 rounded-2xl h-fit">
-          <h3 class="text-2xl font-semibold text-white mb-4">
-            <i class="fas fa-user mr-2 text-gold-500"></i>Mon profil
-          </h3>
-          <p class="text-gray-300 mb-2"><strong>Nom :</strong> <%= @user.full_name %></p>
-          <p class="text-gray-300 mb-2"><strong>Email :</strong> <%= @user.email %></p>
-          <%= link_to "Modifier mon profil", edit_user_registration_path, class: "text-sm text-gold-400 hover:underline block" %>
-          <%= link_to "Modifier mes infos", users_dashboard_edit_profile_path(current_user), class: "text-sm text-gold-400 hover:underline block mt-1" %>
-        </div>
+      <!-- Tabs -->
+      <div class="flex justify-end mt-4 mb-4 space-x-4">
+        <button
+          data-action="click->dashboard-tabs#switch"
+          data-tab="user"
+          data-dashboard-tabs-target="tabButton"
+          class="transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md px-4 py-2 rounded-full font-semibold bg-gold-500 text-white">
+          Utilisateur
+        </button>
 
-        <!-- Upcoming Events Card -->
-        <div class="xl:col-span-2 space-y-8">
-          <div class="glass-effect p-6 rounded-2xl">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-2xl font-semibold text-white">
-                <i class="fas fa-calendar-alt mr-2 text-gold-500"></i>Prochains événements
-              </h3>
-              <% if @upcoming_participations.size > 3 %>
-                <%= link_to "Voir tout", upcoming_participations_users_dashboard_path(@user), class: "text-sm text-gold-400 hover:underline" %>
-              <% end %>
-            </div>
-            <% @upcoming_participations.first(3).each do |p| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
-                    <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
-                  </div>
-                  <%= link_to "Détails", event_path(p.event), class: "text-sm text-gold-400 hover:underline" %>
-                </div>
-              </div>
-            <% end %>
-            <% if @upcoming_participations.empty? %>
-              <p class="text-gray-400">Aucune participation prévue.</p>
-            <% end %>
-          </div>
-
-          <!-- Past Events Card -->
-          <div class="glass-effect p-6 rounded-2xl">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-2xl font-semibold text-white">
-                <i class="fas fa-history mr-2 text-gold-500"></i>Historique
-              </h3>
-              <% if @past_participations.size > 3 %>
-                <%= link_to "Voir tout", past_participations_users_dashboard_path(@user), class: "text-sm text-gold-400 hover:underline" %>
-              <% end %>
-            </div>
-            <% @past_participations.first(3).each do |p| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
-                    <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
-                  </div>
-                  <% if current_user.reviews.where(event: p.event).empty? %>
-                    <%= link_to "Laisser un avis", new_review_path(event_id: p.event.id), class: "text-sm text-gold-400 hover:underline" %>
-                  <% else %>
-                    <span class="text-sm text-green-400">Avis donné</span>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-            <% if @past_participations.empty? %>
-              <p class="text-gray-400">Aucun événement passé.</p>
-            <% end %>
-          </div>
-        </div>
+        <button
+          data-action="click->dashboard-tabs#switch"
+          data-tab="creator"
+          data-dashboard-tabs-target="tabButton"
+          class="transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md px-4 py-2 rounded-full font-semibold bg-dark-300 text-white">
+          Créateur
+        </button>
       </div>
+    </div>
+  </section>
 
-      <!-- Publications & reviews -->
-      <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <!-- USER DASHBOARD -->
+  <section
+    data-dashboard-tabs-target="panel"
+    data-panel="user"
+    class="page-content bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-12 pb-60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= render 'users/dashboard/user_dashboard_content', user: @user, upcoming_participations: @upcoming_participations, past_participations: @past_participations %>
+    </div>
+  </section>
 
-        <!-- Publications -->
-        <div class="glass-effect p-6 rounded-2xl">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-2xl font-semibold text-white">
-              <i class="fas fa-film mr-2 text-gold-500"></i>Mes publications
-            </h3>
-            <%= link_to "Publier un film", new_movie_path, class: "inline-block bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 shadow" %>
-          </div>
-
-          <% if @user.creator&.movies&.any? %>
-            <% @user.creator.movies.each do |movie| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
-                <strong><%= movie.title %></strong> – <span class="text-sm text-gray-400"><%= movie.year %>, <%= movie.genre %></span>
-                <p class="text-sm text-gray-400 mt-1">Réalisé par <%= movie.director %></p>
-                <%= link_to "Voir le film", movie_path(movie), class: "text-sm text-gold-400 hover:underline" %>
-              </div>
-            <% end %>
-          <% else %>
-            <p class="text-gray-400">Aucune publication pour le moment.</p>
-          <% end %>
+  <!-- CREATOR DASHBOARD -->
+  <section
+    data-dashboard-tabs-target="panel"
+    data-panel="creator"
+    class="page-content hidden bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-12 pb-60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <% if @user.creator? %>
+        <%= render 'users/dashboard/creator_dashboard_content', user: @user, published_movies: @published_movies, created_events: @created_events %>
+      <% else %>
+        <div class="text-center mt-20">
+          <h2 class="text-3xl text-white font-bold mb-4">Vous souhaitez devenir créateur ?</h2>
+          <p class="text-gray-300 mb-6">Publiez votre premier film et entrez dans la communauté CineRoom !</p>
+          <%= link_to "Publier mon premier film", new_movie_path, class: "inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow" %>
         </div>
-
-
-        <!-- Reviews -->
-        <div class="glass-effect p-6 rounded-2xl">
-          <h3 class="text-2xl font-semibold text-white mb-4">
-            <i class="fas fa-star mr-2 text-gold-500"></i>Mes critiques
-          </h3>
-          <% if @user.reviews.any? %>
-            <% @user.reviews.order(created_at: :desc).each do |review| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
-                <strong><%= review.movie.title %></strong> – <span class="text-yellow-400"><%= review.rating %>★</span>
-                <p class="text-sm text-gray-400 mt-1 italic">« <%= truncate(review.comment, length: 100) %> »</p>
-                <%= link_to "Voir l'événement", event_path(review.event), class: "text-sm text-gold-400 hover:underline" %>
-              </div>
-            <% end %>
-          <% else %>
-            <p class="text-gray-400">Vous n’avez laissé aucun avis pour le moment.</p>
-          <% end %>
-        </div>
-
-      </div>
+      <% end %>
     </div>
   </section>
 </div>

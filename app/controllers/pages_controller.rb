@@ -1,9 +1,8 @@
 class PagesController < ApplicationController
   def home
     @creators = featured_creators
-    @venues = featured_venues
+    @venues   = featured_venues
 
-    # Extracted stats in separated instance variables
     stats = home_stats
     @directors_count = stats[:directors_count]
     @movies_count    = stats[:movies_count]
@@ -11,33 +10,23 @@ class PagesController < ApplicationController
     @events_count    = stats[:events_count]
   end
 
-  def about
-  end
-
-
-  def contact
-  end
-
-  def legal
-  end
-
-  def privacy
-  end
-
-  def terms
-  end
+  def about; end
+  def contact; end
+  def legal; end
+  def privacy; end
+  def terms; end
 
   private
 
   def featured_creators
-    Creator.joins(:movies, :user)
-          .where(movies: { validation_status: 'approved' })
-          .group('creators.id', 'users.first_name', 'users.last_name')
-          .select('creators.*, users.first_name, users.last_name, COUNT(movies.id) AS movies_count')
-          .order('movies_count DESC')
-          .limit(3)
+    User.creator
+        .joins(:movies)
+        .where(movies: { validation_status: Movie.validation_statuses[:approved] })
+        .group('users.id')
+        .select('users.*, COUNT(movies.id) AS movies_count')
+        .order('movies_count DESC')
+        .limit(3)
   end
-
 
   def featured_venues
     Event.group(:venue_name, :venue_address)
@@ -49,7 +38,7 @@ class PagesController < ApplicationController
 
   def home_stats
     {
-      directors_count: Creator.verified.count,
+      directors_count: User.creator.count,
       movies_count: Movie.approved.count,
       venues_count: Event.select(:venue_name, :venue_address).distinct.count,
       events_count: Event.upcoming.count
@@ -57,11 +46,11 @@ class PagesController < ApplicationController
   end
 
   def venue_icon_data(name)
-    case name.downcase
-    when /galerie/ then { icon: 'fas fa-palette', label: 'Galerie d\'art' }
-    when /rooftop/ then { icon: 'fas fa-building', label: 'Rooftop' }
+    case name.to_s.downcase
+    when /galerie/       then { icon: 'fas fa-palette', label: 'Galerie d\'art' }
+    when /rooftop/       then { icon: 'fas fa-building', label: 'Rooftop' }
     when /hôtel|mansion/ then { icon: 'fas fa-home', label: 'Hôtel particulier' }
-    else { icon: 'fas fa-map-marker-alt', label: 'Lieu unique' }
+    else                      { icon: 'fas fa-map-marker-alt', label: 'Lieu unique' }
     end
   end
 end

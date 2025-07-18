@@ -113,7 +113,7 @@ ActiveAdmin.register_page "Dashboard" do
           panel "Recent Events" do
             table_for Event.includes(:movie).order(created_at: :desc).limit(5) do
               column "Title" do |event|
-                link_to event.title, admin_event_path(event)
+                link_to event.title, admin_dashboard_path
               end
               column "Movie", :movie
               column "Date", :event_date

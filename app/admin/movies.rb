@@ -15,7 +15,7 @@ ActiveAdmin.register Movie do
   filter :year
   filter :language
   filter :validation_status, as: :select, collection: Movie.validation_statuses.map { |key, value| [ key.humanize, key ] }
-  filter :user, as: :select, collection: -> { User.joins(:movies).distinct.map { |u| [u.full_name, u.id] } }
+  filter :user, as: :select, collection: -> { User.joins(:movies).distinct.map { |u| [ u.full_name, u.id ] } }
   filter :created_at
 
   index do
@@ -45,3 +45,94 @@ ActiveAdmin.register Movie do
         "-"
       end
     end
+
+    column :events_count do |movie|
+      movie.events.count
+    end
+
+    column :created_at do |movie|
+      movie.created_at.strftime("%d/%m/%Y")
+    end
+
+    actions
+  end
+
+  show do
+    attributes_table do
+      row :title
+      row :synopsis do |movie|
+        simple_format(movie.synopsis)
+      end
+      row :creator do |movie|
+        link_to movie.user.full_name, admin_user_path(movie.user) if movie.user
+      end
+      row :director
+      row :duration do |movie|
+        "#{movie.duration} minutes"
+      end
+      row :genre
+      row :language
+      row :year
+      row :validation_status do |movie|
+        status_tag movie.validation_status.humanize, class: movie.validation_status
+      end
+      row :validated_by do |movie|
+        if movie.validated_by
+          link_to movie.validated_by.full_name, admin_user_path(movie.validated_by)
+        end
+      end
+      row :validated_at
+      row :created_at
+      row :updated_at
+    end
+  end
+
+  form do |f|
+    f.semantic_errors
+
+    f.inputs "Movie Information" do
+      f.input :user, as: :select,
+              collection: User.all.map { |u| [ u.full_name, u.id ] },
+              prompt: "Select Creator",
+              required: true
+      f.input :title, required: true
+      f.input :synopsis, as: :text, input_html: { rows: 6 }, required: true
+      f.input :director, required: true
+      f.input :duration, hint: "Duration in minutes", required: true
+      f.input :genre, required: true
+      f.input :language, as: :select,
+              collection: [ [ 'French', 'fr' ], [ 'English', 'en' ], [ 'Spanish', 'es' ], [ 'Other', 'other' ] ],
+              include_blank: false
+      f.input :year, required: true
+      f.input :trailer_url, hint: "YouTube or Vimeo URL"
+      f.input :poster_url, hint: "Direct image URL"
+    end
+
+    f.inputs "Validation" do
+      f.input :validation_status, as: :select,
+              collection: Movie.validation_statuses.map { |key, value| [ key.humanize, key ] },
+              include_blank: false
+    end
+
+    f.actions
+  end
+
+  # Batch actions for movies
+  batch_action :validate_movies, confirm: "Validate selected movies?" do |ids|
+    Movie.where(id: ids).update_all(
+      validation_status: :validated,
+      validated_by_id: current_user.id,
+      validated_at: Time.current
+    )
+    redirect_to collection_path, notice: "#{ids.count} movies validated successfully!"
+  end
+
+  batch_action :reject_movies, confirm: "Reject selected movies?" do |ids|
+    Movie.where(id: ids).update_all(
+      validation_status: :rejected,
+      validated_by_id: current_user.id,
+      validated_at: Time.current
+    )
+    redirect_to collection_path, notice: "#{ids.count} movies rejected!"
+  end
+end

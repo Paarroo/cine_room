@@ -20,7 +20,7 @@ class PagesController < ApplicationController
 
   def featured_creators
     User.creator
-        .joins(:movies)
+        .joins(:validated_movies)
         .where(movies: { validation_status: Movie.validation_statuses[:approved] })
         .group('users.id')
         .select('users.*, COUNT(movies.id) AS movies_count')

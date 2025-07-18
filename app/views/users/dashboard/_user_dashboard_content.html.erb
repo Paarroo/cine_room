@@ -29,7 +29,7 @@
               <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
               <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
             </div>
-            <%= link_to "Détails", event_path(p.event), class: "text-sm text-gold-400 hover:underline" %>
+            <%= link_to "Détails", reservation_path(p), class: "text-sm text-gold-400 hover:underline" %>
           </div>
         </div>
       <% end %>

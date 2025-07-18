@@ -1,7 +1,7 @@
 class PagesController < ApplicationController
   def home
     @creators = featured_creators
-    @venues   = featured_venues
+    @events   = featured_events
 
     stats = home_stats
     @directors_count = stats[:directors_count]
@@ -28,12 +28,11 @@ class PagesController < ApplicationController
         .limit(3)
   end
 
-  def featured_venues
-    Event.group(:venue_name, :venue_address)
-         .select('venue_name, venue_address, MAX(max_capacity) as max_capacity, COUNT(*) as events_count')
-         .order('events_count DESC')
+  def featured_events
+    Event.includes(:movie)
+         .upcoming
+         .order(event_date: :asc)
          .limit(3)
-         .map { |venue| venue.attributes.merge(venue_icon_data(venue.venue_name)) }
   end
 
   def home_stats
@@ -43,14 +42,5 @@ class PagesController < ApplicationController
       venues_count: Event.select(:venue_name, :venue_address).distinct.count,
       events_count: Event.upcoming.count
     }
-  end
-
-  def venue_icon_data(name)
-    case name.to_s.downcase
-    when /galerie/       then { icon: 'fas fa-palette', label: 'Galerie d\'art' }
-    when /rooftop/       then { icon: 'fas fa-building', label: 'Rooftop' }
-    when /hôtel|mansion/ then { icon: 'fas fa-home', label: 'Hôtel particulier' }
-    else                      { icon: 'fas fa-map-marker-alt', label: 'Lieu unique' }
-    end
   end
 end

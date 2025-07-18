@@ -3,7 +3,7 @@ class CreatorsController < ApplicationController
 
   # GET /creators or /creators.json
   def index
-    @creators = Creator.all
+    @creators = User.creator
   end
 
   # GET /creators/1 or /creators/1.json
@@ -60,7 +60,7 @@ class CreatorsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_creator
-      @creator = Creator.find(params.expect(:id))
+      @creator = User.creator.find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.

@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations
+
   has_many :validated_movies, class_name: 'Movie', foreign_key: 'validated_by_id'
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user

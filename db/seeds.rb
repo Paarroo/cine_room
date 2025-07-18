@@ -1,4 +1,17 @@
-test_user = User.create!(
+require 'faker'
+
+puts "🌱 Seeding the database..."
+
+puts "Cleaning database..."
+Review.destroy_all
+Participation.destroy_all
+Event.destroy_all
+Movie.destroy_all
+User.destroy_all
+
+puts "Creating specific users..."
+
+User.create!(
   email: 'test@cineroom.com',
   password: 'password123',
   password_confirmation: 'password123',
@@ -7,7 +20,7 @@ test_user = User.create!(
   role: :user
 )
 
-admin_user = User.create!(
+User.create!(
   email: 'admin@cineroom.com',
   password: 'password123',
   password_confirmation: 'password123',
@@ -16,27 +29,46 @@ admin_user = User.create!(
   role: :admin
 )
 
-Participation.destroy_all
-Event.destroy_all
-Movie.destroy_all
-Creator.destroy_all
-User.destroy_all
-AdminUser.destroy_all
+User.create!(
+  email: 'creator@cineroom.com',
+  password: 'password123',
+  password_confirmation: 'password123',
+  first_name: 'Créa',
+  last_name: 'Testeur',
+  role: :creator
+)
 
-users = FactoryBot.create_list(:user, 10)
+puts "Creating random users..."
 
-AdminUser.create!(email: "admin@cineroom.com", password: "password")
+admin        = FactoryBot.create(:user, role: :admin, email: "admin@example.com")
+creators     = FactoryBot.create_list(:user, 3, role: :creator)
+regular_users = FactoryBot.create_list(:user, 10, role: :user)
 
-creators = users.first(3).map { |user| FactoryBot.create(:creator, user: user) }
+puts "Creating approved movies for creators..."
 
-movies = creators.map { |creator| FactoryBot.create(:movie, creator: creator) }
-
-events = movies.map do |movie|
-  FactoryBot.create(:event, movie: movie)
+creators.each do |creator|
+  # 2 approved, 1 pending
+  2.times do
+    FactoryBot.create(:movie, user: creator, validation_status: :approved)
+  end
+  FactoryBot.create(:movie, user: creator, validation_status: :pending)
 end
 
-users.each do |user|
-  events.sample(2).each do |event|
+puts "Creating events for each approved movie..."
+
+Movie.approved.each do |movie|
+  FactoryBot.create_list(:event, 2, movie: movie)
+end
+
+puts "Creating participations and reviews..."
+
+Event.all.each do |event|
+  participants = regular_users.sample(rand(2..4))
+  participants.each do |user|
     FactoryBot.create(:participation, user: user, event: event)
+    FactoryBot.create(:review, user: user, event: event, movie: event.movie)
   end
 end
+
+puts "✅ Seeding complete!"
+

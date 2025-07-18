@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :authenticate_user!, unless: :devise_controller?
+  before_action :authenticate_user!, unless: :skip_authentication?
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   def after_sign_in_path_for(resource)
@@ -35,6 +35,11 @@ class ApplicationController < ActionController::Base
       redirect_to root_path, alert: 'Les droits de Créateur te sont requis pour y accéder !'
     end
   end
+  private
+
+    def skip_authentication?
+      devise_controller? || (controller_name == 'pages' && action_name == 'home')
+    end
 
   protected
 

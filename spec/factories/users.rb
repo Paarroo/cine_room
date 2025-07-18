@@ -11,7 +11,7 @@ FactoryBot.define do
     trait :admin do
       role { :admin }
       email { "admin@cineroom.com" }
-      first_name { "Admin" }
+      first_name { "Name" }
       last_name { "User" }
     end
 

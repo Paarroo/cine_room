@@ -1,68 +1,119 @@
-require 'faker'
+# Destroy existing data in development
+if Rails.env.development?
+  puts "🗑️  Cleaning database..."
+  Review.destroy_all
+  Participation.destroy_all
+  Event.destroy_all
+  Movie.destroy_all
+  User.destroy_all
+  puts "✅ Database cleaned!"
+end
 
-puts "Cleaning database..."
-Review.destroy_all
-Participation.destroy_all
-Event.destroy_all
-Movie.destroy_all
-User.destroy_all
+puts "🌱 Starting seeds..."
 
-puts "Creating specific users..."
+# Create admin user
+puts "👑 Creating admin..."
+admin = FactoryBot.create(:user, :admin)
+puts "✅ Admin created: #{admin.email}"
 
-User.create!(
-  email: 'test@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Jean',
-  last_name: 'Cinéphile',
-  role: :user
-)
+# Create regular users (20)
+puts "👥 Creating users..."
+users = FactoryBot.create_list(:user, 20)
+puts "✅ #{users.count} users created"
 
-User.create!(
-  email: 'admin@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Admin',
-  last_name: 'CinéRoom',
-  role: :admin
-)
+# Create creator users (10)
+puts "🎬 Creating creators..."
+creators = FactoryBot.create_list(:user, 10, :creator)
+puts "✅ #{creators.count} creators created"
 
-User.create!(
-  email: 'creator@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Créa',
-  last_name: 'Testeur',
-  role: :creator
-)
+# Create movies (30)
+puts "🎭 Creating movies..."
+movies = []
 
-puts "Creating random users..."
+# Validated movies (20)
+validated_movies = FactoryBot.create_list(:movie, 20, :validated) do |movie|
+  movie.validated_by = admin
+  movie.user = creators.sample
+end
+movies += validated_movies
 
-admin        = FactoryBot.create(:user, role: :admin, email: "admin@example.com")
-creators     = FactoryBot.create_list(:user, 3, role: :creator)
-regular_users = FactoryBot.create_list(:user, 10, role: :user)
+# Pending movies (7)
+pending_movies = FactoryBot.create_list(:movie, 7, :pending) do |movie|
+  movie.user = creators.sample
+end
+movies += pending_movies
 
-puts "Creating approved movies for creators..."
+# Rejected movies (3)
+rejected_movies = FactoryBot.create_list(:movie, 3, :rejected) do |movie|
+  movie.validated_by = admin
+  movie.user = creators.sample
+end
+movies += rejected_movies
 
-creators.each do |creator|
-  2.times do
-    FactoryBot.create(:movie, user: creator, validation_status: :approved)
+puts "✅ #{movies.count} movies created (#{validated_movies.count} validated, #{pending_movies.count} pending, #{rejected_movies.count} rejected)"
+
+# Create events (40) - only for validated movies
+puts "📅 Creating events..."
+events = []
+
+validated_movies.each do |movie|
+  # 1-3 events per validated movie
+  movie_events = FactoryBot.create_list(:event, rand(1..3)) do |event|
+    event.movie = movie
+    event.title = "Projection de #{movie.title}"
   end
-  FactoryBot.create(:movie, user: creator, validation_status: :pending)
+  events += movie_events
 end
 
-puts "Creating events for each approved movie..."
+puts "✅ #{events.count} events created"
 
-Movie.approved.each do |movie|
-  FactoryBot.create_list(:event, 2, movie: movie)
+# Create participations (100)
+puts "🎫 Creating participations..."
+all_users = users + creators
+participations = []
+
+events.each do |event|
+  # 1-8 participations per event
+  event_participations = FactoryBot.create_list(:participation, rand(1..8)) do |participation|
+    participation.event = event
+    participation.user = all_users.sample
+
+    # Ensure unique user per event
+    existing_users = event.participations.pluck(:user_id)
+    available_users = all_users.reject { |u| existing_users.include?(u.id) }
+    participation.user = available_users.sample if available_users.any?
+  end
+  participations += event_participations
 end
 
-puts "Creating participations and reviews..."
+puts "✅ #{participations.count} participations created"
 
-Event.all.each do |event|
-  participants = regular_users.sample(rand(2..4))
-  participants.each do |user|
-    FactoryBot.create(:participation, user: user, event: event)
-    FactoryBot.create(:review, user: user, event: event, movie: event.movie)
+# Create reviews (60) - only for completed events with confirmed participations
+puts "⭐ Creating reviews..."
+completed_participations = Participation.joins(:event)
+                                      .where(events: { status: :completed }, status: :confirmed)
+                                      .includes(:user, :event, event: :movie)
+
+reviews = completed_participations.sample(60).map do |participation|
+  FactoryBot.create(:review) do |review|
+    review.user = participation.user
+    review.movie = participation.event.movie
+    review.event = participation.event
   end
 end
+
+puts "✅ #{reviews.count} reviews created"
+
+# Final statistics
+puts "\n📊 FINAL STATISTICS:"
+puts "👑 Admins: #{User.where(role: :admin).count}"
+puts "👥 Users: #{User.where(role: :user).count}"
+puts "🎬 Total creators (users with movies): #{User.joins(:movies).distinct.count}"
+puts "🎭 Movies: #{Movie.count} (✅#{Movie.where(validation_status: :validated).count} validated, ⏳#{Movie.where(validation_status: :pending).count} pending, ❌#{Movie.where(validation_status: :rejected).count} rejected)"
+puts "📅 Events: #{Event.count} (🔜#{Event.where(status: :upcoming).count} upcoming, ✅#{Event.where(status: :completed).count} completed, 🔥#{Event.where(status: :sold_out).count} sold out)"
+puts "🎫 Participations: #{Participation.count} (✅#{Participation.where(status: :confirmed).count} confirmed, ⏳#{Participation.where(status: :pending).count} pending, ❌#{Participation.where(status: :cancelled).count} cancelled)"
+puts "⭐ Reviews: #{Review.count}"
+puts "💰 Total Revenue: #{Participation.joins(:event).where(status: :confirmed).sum('events.price_cents * participations.seats') / 100.0}€"
+
+puts "\n🎉 Seeds completed successfully!"
+puts "🔑 Admin login: #{admin.email} / password123"

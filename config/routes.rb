@@ -35,6 +35,12 @@ Rails.application.routes.draw do
   get '/terms',   to: 'pages#terms',   as: :terms
   get 'about', to: 'pages#about'
 
+  delete '/admin/logout', to: 'application#admin_logout'
+
+  devise_scope :user do
+    get '/users/sign_out', to: 'devise/sessions#destroy'
+  end
+
   get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
   get "stripe_checkout/cancel",  to: "stripe_checkout#cancel",  as: :stripe_cancel
 

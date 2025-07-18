@@ -9,11 +9,6 @@ test_user = User.create!(
 
 
 
-# db/seeds.rb
-
-puts "🌱 Seeding the database..."
-
-# Clean all
 Participation.destroy_all
 Event.destroy_all
 Movie.destroy_all
@@ -21,26 +16,22 @@ Creator.destroy_all
 User.destroy_all
 
 
-# Create Users
 users = FactoryBot.create_list(:user, 10)
 
 
-# Create Creators
+AdminUser.create!(email: "admin@cineroom.com", password: "password")
+
+
 creators = users.first(3).map { |user| FactoryBot.create(:creator, user: user) }
 
-# Create Movies
 movies = creators.map { |creator| FactoryBot.create(:movie, creator: creator) }
 
-# Create Events
 events = movies.map do |movie|
   FactoryBot.create(:event, movie: movie)
 end
 
-# Create Participations
 users.each do |user|
   events.sample(2).each do |event|
     FactoryBot.create(:participation, user: user, event: event)
   end
 end
-
-puts "✅ Done seeding!"

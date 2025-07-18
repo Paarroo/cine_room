@@ -117,8 +117,6 @@ For support, email contact@cineroom.com or create an issue in this repository.
 
 ## 🤝 Team Collaboration
 
-### Git Workflow
-
 - Théo BANNERY
 - Florian BENOIT
 - Mathieu MARILLER

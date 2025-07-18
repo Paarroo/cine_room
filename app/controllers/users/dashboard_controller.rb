@@ -3,9 +3,16 @@ class Users::DashboardController < ApplicationController
   before_action :set_user
 
   def show
-    @upcoming_participations = @user.participations.joins(:event).where("event_date >= ?", Date.today).order("events.event_date ASC").limit(5)
-    @past_participations = @user.participations.joins(:event).where("event_date < ?", Date.today).order("events.event_date DESC").limit(5)
+    @user = current_user
+    @upcoming_participations = @user.participations.upcoming.includes(:event)
+    @past_participations = @user.participations.past.includes(:event)
+
+    if @user.creator?
+      @published_movies = @user.movies.includes(:events)
+      @created_events = @user.created_events
+    end
   end
+
 
   def upcoming_participations
     @upcoming_participations = @user.participations.joins(:event).where("event_date >= ?", Date.today).order("events.event_date ASC")

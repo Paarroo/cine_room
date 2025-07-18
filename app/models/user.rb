@@ -7,8 +7,8 @@ class User < ApplicationRecord
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations
-  has_one :creator, dependent: :destroy
-
+  has_many :movies
+  has_many :created_events, through: :movies, source: :events
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
 

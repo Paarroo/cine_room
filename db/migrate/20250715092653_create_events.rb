@@ -2,7 +2,6 @@ class CreateEvents < ActiveRecord::Migration[8.0]
   def change
     create_table :events do |t|
       t.references :movie, null: false, foreign_key: true
-      t.references :user, null: false, foreign_key: true
       t.string :title, null: false
       t.text :description
       t.string :venue_name, null: false

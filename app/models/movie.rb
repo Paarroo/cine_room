@@ -1,5 +1,5 @@
 class Movie < ApplicationRecord
-  belongs_to :creator
+  belongs_to :user
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
   has_many :reviews, dependent: :destroy

@@ -1,0 +1,63 @@
+<% if current_user.creator? %>
+  <section class=" bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Button to publish a new movie -->
+      <div class="flex justify-end mb-8">
+        <%= link_to "Publier un nouveau film", new_movie_path, class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg" %>
+      </div>
+
+      <!-- Published Movies Section -->
+      <div class="glass-effect p-6 rounded-2xl mb-16">
+        <h3 class="text-2xl font-semibold text-white mb-4">
+          <i class="fas fa-film mr-2 text-cinema-blue"></i>Mes films publiés
+        </h3>
+
+        <% if published_movies.any? %>
+          <div class="space-y-4">
+            <% published_movies.each do |movie| %>
+              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
+                <h4 class="text-xl font-semibold text-white"><%= movie.title %></h4>
+                <p class="text-sm text-gray-300 mt-1"><%= movie.genre %> — <%= movie.year %></p>
+                <p class="text-sm text-gray-400">Réalisé par <%= movie.director %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-400 text-lg italic">Aucun film publié pour le moment.</p>
+        <% end %>
+      </div>
+
+      <!-- Created Events Section -->
+      <div class="glass-effect p-6 rounded-2xl">
+        <h3 class="text-2xl font-semibold text-white mb-4">
+          <i class="fas fa-calendar-alt mr-2 text-cinema-blue"></i>Mes événements
+        </h3>
+
+        <% if created_events.any? %>
+          <div class="space-y-4">
+            <% created_events.each do |event| %>
+              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
+                <h4 class="text-xl font-semibold text-white"><%= event.title %></h4>
+                <p class="text-sm text-gray-300">Le <%= l(event.event_date, format: :long) %></p>
+                <p class="text-sm text-gray-400">Film associé : <%= event.movie.title %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-400 text-lg italic">Aucun événement organisé pour le moment.</p>
+        <% end %>
+      </div>
+
+    </div>
+  </section>
+<% else %>
+  <!-- Not a creator yet -->
+  <section class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 px-6 text-center">
+    <div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Vous souhaitez devenir créateur ?</h2>
+      <p class="text-gray-300 mb-6 text-lg">Publiez votre premier film et rejoignez la communauté CineRoom !</p>
+      <%= link_to "Publier mon premier film", new_movie_path, class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg" %>
+    </div>
+  </section>
+<% end %>

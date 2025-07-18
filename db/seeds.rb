@@ -71,3 +71,4 @@ Event.all.each do |event|
 end
 
 puts "✅ Seeding complete!"
+

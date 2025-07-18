@@ -19,15 +19,15 @@ class PagesController < ApplicationController
   private
 
   def featured_creators
-    User.creator
-        .joins(:movies)
-        .where(movies: { validation_status: Movie.validation_statuses[:approved] })
-        .group('users.id')
-        .select('users.*, COUNT(movies.id) AS movies_count')
-        .order('movies_count DESC')
-        .limit(3)
-  end
 
+      User.joins(creator: :movies)
+          .where(movies: { validation_status: :approved })
+          .group('users.id')
+          .select('users.*, COUNT(movies.id) AS movies_count')
+          .order('movies_count DESC')
+          .limit(3)
+    end
+  
   def featured_events
     Event.includes(:movie)
          .upcoming
@@ -42,5 +42,6 @@ class PagesController < ApplicationController
       venues_count: Event.select(:venue_name, :venue_address).distinct.count,
       events_count: Event.upcoming.count
     }
+
   end
 end

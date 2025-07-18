@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+  
+  get "/reservation/success", to: "reservations#success", as: :reservation_success
 
   get "up" => "rails/health#show", as: :rails_health_check
 

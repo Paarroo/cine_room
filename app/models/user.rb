@@ -2,35 +2,29 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  after_create :send_welcome_email
+  enum :role, { user: 0, admin: 1 }, default: :user
 
-  has_one :creator, dependent: :destroy
+  has_many :movies, foreign_key: :creator_id, dependent: :destroy
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations
 
-  has_many :validated_movies, class_name: 'Movie', foreign_key: 'validated_by_id'
-
-  enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
-
-  validates :email, presence: true, uniqueness: true
+  validates :first_name, :last_name, presence: true
   validates :role, presence: true
 
   def full_name
-    "#{first_name} #{last_name}"
+    "#{first_name} #{last_name}".strip
   end
 
-  def display_name
-    full_name.present? ? full_name : email
+  def creator?
+    movies.exists?
   end
 
-  def can_access_admin?
-    admin?
+  def validator?
+    admin? && Movie.where(validated_by: self).exists?
   end
 
-  private
+  scope :creators, -> { joins(:movies).distinct }
 
-  def send_welcome_email
-    UserMailer.welcome_email(self).deliver_later
-  end
+  scope :active_participants, -> { joins(:participations).where(participations: { status: :confirmed }).distinct }
 end

@@ -1,7 +1,5 @@
 require 'faker'
 
-puts "🌱 Seeding the database..."
-
 puts "Cleaning database..."
 Review.destroy_all
 Participation.destroy_all
@@ -47,7 +45,6 @@ regular_users = FactoryBot.create_list(:user, 10, role: :user)
 puts "Creating approved movies for creators..."
 
 creators.each do |creator|
-  # 2 approved, 1 pending
   2.times do
     FactoryBot.create(:movie, user: creator, validation_status: :approved)
   end
@@ -69,6 +66,3 @@ Event.all.each do |event|
     FactoryBot.create(:review, user: user, event: event, movie: event.movie)
   end
 end
-
-puts "✅ Seeding complete!"
-

@@ -6,20 +6,24 @@ class StripeCheckoutController < ApplicationController
 
     begin
       stripe_session = Stripe::Checkout::Session.retrieve(session_id)
-    rescue Stripe::InvalidRequestError => e
+    rescue Stripe::InvalidRequestError
       redirect_to root_path, alert: "Session introuvable." and return
     end
 
     event_id = stripe_session.metadata.event_id
-    seats = stripe_session.metadata.seats.to_i
-    @event = Event.find(event_id)
+    seats     = stripe_session.metadata.seats.to_i
+    @event    = Event.find(event_id)
+
+    unless stripe_session.payment_status == "paid"
+      redirect_to root_path, alert: "Le paiement n'a pas été confirmé." and return
+    end
 
     if current_user.participations.exists?(event: @event)
       redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
     end
 
     participation = current_user.participations.create!(
-      event: @event, 
+      event: @event,
       seats: seats,
       stripe_payment_id: session_id,
       status: :confirmed
@@ -27,7 +31,8 @@ class StripeCheckoutController < ApplicationController
 
     ParticipationMailer.confirmation_email(participation).deliver_later
 
-    redirect_to @event, notice: "Merci pour ta réservation ! Paiement confirmé."
+    
+    redirect_to reservation_success_path(participation_id: participation.id)
   end
 
   def cancel

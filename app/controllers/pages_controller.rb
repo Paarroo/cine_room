@@ -36,14 +36,14 @@ class PagesController < ApplicationController
            .map { |venue| venue.attributes.merge(venue_icon_data(venue.venue_name)) }
     end
 
-  def home_stats
-    {
-           directors_count: User.creators.count,
-           movies_count: Movie.where(validation_status: :approved).count,
-           venues_count: Event.select(:venue_name, :venue_address).distinct.count,
-           events_count: Event.where(status: :upcoming).count
-    }
-  end
+    def home_stats
+      {
+        directors_count: User.joins("INNER JOIN movies ON movies.creator_id = users.id").distinct.count,
+        movies_count: Movie.where(validation_status: :validated).count,
+        venues_count: Event.select(:venue_name, :venue_address).distinct.count,
+        events_count: Event.where(status: :upcoming).count
+      }
+    end
 
   def venue_icon_data(name)
     case name.to_s.downcase

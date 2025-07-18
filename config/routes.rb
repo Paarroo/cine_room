@@ -60,6 +60,7 @@ Rails.application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
   
+  resources :reservations, only: [:show]
   get "/reservation/success", to: "reservations#success", as: :reservation_success
 
   get "up" => "rails/health#show", as: :rails_health_check

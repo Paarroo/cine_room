@@ -19,6 +19,7 @@ class PagesController < ApplicationController
   private
 
   def featured_creators
+
       User.joins(creator: :movies)
           .where(movies: { validation_status: :approved })
           .group('users.id')
@@ -26,7 +27,6 @@ class PagesController < ApplicationController
           .order('movies_count DESC')
           .limit(3)
     end
-
 
   def featured_venues
       Event.group(:venue_name, :venue_address)

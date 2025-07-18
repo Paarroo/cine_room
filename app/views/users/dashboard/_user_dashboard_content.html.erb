@@ -5,6 +5,7 @@
       <i class="fas fa-user mr-2 text-gold-500"></i>Mon profil
     </h3>
     <p class="text-gray-300 mb-2"><strong>Nom :</strong> <%= user.full_name %></p>
+    <p class="text-gray-300 mb-2"><strong>Bio :</strong> <%= user.bio %></p>
     <p class="text-gray-300 mb-2"><strong>Email :</strong> <%= user.email %></p>
     <%= link_to "Modifier mon compte", edit_user_registration_path, class: "text-sm text-gold-400 hover:underline block" %>
     <%= link_to "Modifier mon profil", users_dashboard_edit_profile_path(user), class: "text-sm text-gold-400 hover:underline block mt-1" %>
@@ -28,7 +29,7 @@
               <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
               <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
             </div>
-            <%= link_to "Détails", event_path(p.event), class: "text-sm text-gold-400 hover:underline" %>
+            <%= link_to "Détails", reservation_path(p), class: "text-sm text-gold-400 hover:underline" %>
           </div>
         </div>
       <% end %>

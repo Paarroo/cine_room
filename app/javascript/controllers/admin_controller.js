@@ -397,3 +397,85 @@ export default class extends Controller {
       }
     }
   }
+
+  userHasPermissions(userRole, requiredPermissions) {
+    const rolePermissions = {
+      'admin': ['read', 'write', 'delete', 'manage'],
+      'moderator': ['read', 'write'],
+      'viewer': ['read']
+    }
+
+    const userPermissions = rolePermissions[userRole] || []
+    return requiredPermissions.every(permission => userPermissions.includes(permission))
+  }
+
+  showAccessDeniedMessage() {
+    this.showToast('Accès non autorisé à cette section', 'error')
+
+    // Redirect to safe page after delay
+    setTimeout(() => {
+      window.location.href = '/admin'
+    }, 3000)
+  }
+
+  // Debug Mode
+  toggleDebugMode() {
+    const isDebug = this.bodyTarget.classList.toggle('debug-mode')
+
+    if (isDebug) {
+      this.enableDebugMode()
+      this.showToast('Mode debug activé', 'info')
+    } else {
+      this.disableDebugMode()
+      this.showToast('Mode debug désactivé', 'info')
+    }
+
+    localStorage.setItem('admin-debug', isDebug)
+  }
+
+  enableDebugMode() {
+    // Add debug indicators to elements
+    document.querySelectorAll('[data-controller]').forEach(element => {
+      element.style.outline = '1px dashed #f59e0b'
+      element.setAttribute('title', `Controller: ${element.getAttribute('data-controller')}`)
+    })
+
+    // Log controller connections
+    console.log('🐛 Debug mode enabled - Controllers will be logged')
+  }
+
+  disableDebugMode() {
+    // Remove debug indicators
+    document.querySelectorAll('[data-controller]').forEach(element => {
+      element.style.outline = ''
+      element.removeAttribute('title')
+    })
+  }
+
+  // Shortcuts Modal
+  showShortcutsModal() {
+    const shortcuts = [
+      { key: 'Ctrl + /', description: 'Afficher cette aide' },
+      { key: 'Ctrl + K', description: 'Recherche rapide' },
+      { key: 'Ctrl + Shift + S', description: 'Basculer la sidebar' },
+      { key: 'Ctrl + Shift + T', description: 'Changer le thème' },
+      { key: 'Ctrl + Shift + D', description: 'Mode debug' },
+      { key: 'Escape', description: 'Fermer modales/dropdowns' }
+    ]
+
+    const content = `
+      <div class="shortcuts-modal p-6">
+        <h3 class="text-xl font-bold mb-4">Raccourcis clavier</h3>
+        <div class="space-y-3">
+          ${shortcuts.map(shortcut => `
+            <div class="flex items-center justify-between">
+              <span class="text-muted">${shortcut.description}</span>
+              <kbd class="px-2 py-1 bg-white/10 rounded text-xs font-mono">${shortcut.key}</kbd>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `
+
+    this.openModal('shortcuts-modal', { content })
+  }

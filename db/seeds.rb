@@ -1,122 +1,51 @@
-Review.destroy_all
-Participation.destroy_all
-Event.destroy_all
-Movie.destroy_all
+ActiveRecord::Base.connection.execute("SET session_replication_role = replica")
 
-User.connection.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
+ActiveRecord::Base.connection.execute("TRUNCATE TABLE reviews RESTART IDENTITY CASCADE")
+ActiveRecord::Base.connection.execute("TRUNCATE TABLE participations RESTART IDENTITY CASCADE")
+ActiveRecord::Base.connection.execute("TRUNCATE TABLE events RESTART IDENTITY CASCADE")
+ActiveRecord::Base.connection.execute("TRUNCATE TABLE movies RESTART IDENTITY CASCADE")
+ActiveRecord::Base.connection.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
 
-Faker::Internet.unique.clear
-
-test_user = User.create!(
-  email: 'test@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Test',
-  last_name: 'User',
-  role: 'user',
-  bio: 'Utilisateur de test'
-)
-
-admin = User.create!(
-  email: 'admin@cineroom.com',
-  password: 'password123',
-  password_confirmation: 'password123',
-  first_name: 'Admin',
-  last_name: 'CinéRoom',
-  role: 'admin',
-  bio: 'Administrateur de la plateforme CinéRoom'
-)
-
-admins = []
-3.times do |i|
-  admins << User.create!(
-    email: "admin#{i+1}@cineroom.com",
-    password: 'password123',
-    password_confirmation: 'password123',
-    first_name: "Admin#{i+1}",
-    last_name: 'CinéRoom',
-    role: 'admin',
-    bio: "Administrateur #{i+1} de la plateforme CinéRoom"
+puts "Création de 10 utilisateurs..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO users (email, encrypted_password, first_name, last_name, role, bio, created_at, updated_at)
+     VALUES ('user#{i+1}@test.com', '$2a$12$K/j.KwwZOI1J5ZQhKQGKkOqj7J8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8', 'User#{i+1}', 'Test', #{i == 0 ? 1 : 0}, 'Bio utilisateur #{i+1}', NOW(), NOW())"
   )
 end
 
-creators = []
-5.times do |i|
-  creators << User.create!(
-    email: "creator#{i+1}@cineroom.com",
-    password: 'password123',
-    password_confirmation: 'password123',
-    first_name: Faker::Name.first_name,
-    last_name: Faker::Name.last_name,
-    role: 'user',
-    bio: "Passionné de cinéma indépendant, je crée des films depuis #{rand(2..15)} ans."
+puts "Création de 10 films..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO movies (creator_id, title, synopsis, director, duration, genre, language, year, trailer_url, poster_url, validation_status, validated_by_id, validated_at, created_at, updated_at)
+     VALUES (#{(i % 10) + 1}, 'Film #{i+1}', 'Synopsis du film #{i+1}', 'Réalisateur #{i+1}', #{90 + (i * 10)}, '#{[ "Drame", "Comédie", "Thriller", "Documentaire", "Science-Fiction" ][i % 5]}', 'fr', #{2020 + (i % 5)}, 'https://www.youtube.com/watch?v=test#{i+1}', 'https://example.com/poster#{i+1}.jpg', 1, 1, NOW(), NOW(), NOW())"
   )
 end
 
-regular_users = []
-15.times do |i|
-  regular_users << User.create!(
-    email: "user#{i+1}@cineroom.com",
-    password: 'password123',
-    password_confirmation: 'password123',
-    first_name: Faker::Name.first_name,
-    last_name: Faker::Name.last_name,
-    role: 'user',
-    bio: Faker::Lorem.paragraph(sentence_count: 3)
+ActiveRecord::Base.connection.execute("SET session_replication_role = DEFAULT")
+
+puts "Création de 10 événements..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO events (movie_id, title, description, venue_name, venue_address, event_date, start_time, max_capacity, price_cents, status, latitude, longitude, created_at, updated_at)
+     VALUES (#{i+1}, 'Projection Film #{i+1}', 'Projection spéciale', 'Cinéma #{i+1}', '#{i+1} rue du cinéma', '#{Date.current + (i * 7).days}', '20:00', #{50 + (i * 10)}, #{1000 + (i * 200)}, 0, #{48.8566 + (i * 0.001)}, #{2.3522 + (i * 0.001)}, NOW(), NOW())"
   )
 end
 
-movies = []
-creators.each do |creator|
-  rand(2..4).times do
-    validation_status = [ 'pending', 'approved', 'rejected' ].sample
-    movie = Movie.new
-    movie.creator_id = creator.id
-    movie.title = Faker::Movie.title
-    movie.synopsis = Faker::Lorem.paragraph(sentence_count: 5)
-    movie.director = Faker::Name.name
-    movie.duration = rand(80..180)
-    movie.genre = [ 'Drame', 'Comédie', 'Thriller', 'Documentaire', 'Science-Fiction' ].sample
-    movie.language = [ 'fr', 'en', 'es' ].sample
-    movie.year = rand(2015..2024)
-    movie.trailer_url = "https://www.youtube.com/watch?v=#{Faker::Alphanumeric.alpha(number: 11)}"
-    movie.poster_url = Faker::LoremFlickr.image(size: "300x450", search_terms: [ 'movie' ])
-    movie.validation_status = validation_status
-    movie.validated_by = (validation_status != 'pending' ? [ admin, *admins ].sample : nil)
-    movie.validated_at = (validation_status != 'pending' ? rand(1.month.ago..Time.current) : nil)
-    movie.save!(validate: false)
-    movies << movie
-  end
+puts "Création de 10 participations..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO participations (user_id, event_id, status, seats, created_at, updated_at)
+     VALUES (#{i+1}, #{i+1}, #{i % 3}, #{1 + (i % 4)}, NOW(), NOW())"
+  )
 end
 
-approved_movies = movies.select { |movie| movie.validation_status == 'approved' }
-
-events = approved_movies.flat_map do |movie|
-  FactoryBot.create_list(:event, rand(1..3), movie: movie)
+puts "Création de 10 avis..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO reviews (user_id, movie_id, event_id, rating, comment, created_at, updated_at)
+     VALUES (#{i+1}, #{i+1}, #{i+1}, #{1 + (i % 5)}, 'Commentaire #{i+1}', NOW(), NOW())"
+  )
 end
 
-events.each do |event|
-  participants_count = rand(5..15)
-  available_users = (regular_users + [ test_user ]).sample(participants_count)
-  available_users.each do |user|
-    unless Participation.exists?(user: user, event: event)
-      FactoryBot.create(:participation, user: user, event: event)
-    end
-  end
-end
-
-completed_events = Event.where('event_date < ?', 1.week.ago).limit(5)
-completed_events.update_all(status: :completed)
-
-completed_events.each do |event|
-  confirmed_participations = event.participations.where(status: :confirmed)
-  confirmed_participations.sample(rand(2..5)).each do |participation|
-    FactoryBot.create(:review,
-      user: participation.user,
-      movie: event.movie,
-      event: event
-    )
-  end
-end
-
-puts "Created #{User.count} users, #{Movie.count} movies, #{Event.count} events, #{Participation.count} participations, #{Review.count} reviews"
+puts "SEED TERMINÉ"

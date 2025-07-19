@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   enum :role, { user: 0, admin: 1 }, default: :user
 
-  has_many :movies, foreign_key: :creator_id, dependent: :destroy
+  has_many :movies, dependent: :destroy
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :events, through: :participations

@@ -155,3 +155,111 @@ export default class extends Controller {
         break
     }
   }
+
+  // Metrics Updates
+  updateParticipationMetrics(data) {
+    const participationCard = this.metricsTarget.querySelector('[data-metric="participations"]')
+    if (participationCard) {
+      const valueElement = participationCard.querySelector('.metric-value')
+      const trendElement = participationCard.querySelector('.metric-trend')
+
+      if (valueElement) {
+        const currentValue = parseInt(valueElement.textContent)
+        this.animateValueChange(valueElement, currentValue, currentValue + 1)
+      }
+
+      if (trendElement) {
+        this.highlightTrendUpdate(trendElement)
+      }
+    }
+  }
+
+  updateRevenueMetrics(data) {
+    const revenueCard = this.metricsTarget.querySelector('[data-metric="revenue"]')
+    if (revenueCard) {
+      const valueElement = revenueCard.querySelector('.metric-value')
+
+      if (valueElement && data.newTotal) {
+        this.animateValueChange(valueElement, data.oldTotal, data.newTotal, true)
+      }
+    }
+  }
+
+  updateUserMetrics(data) {
+    const userCard = this.metricsTarget.querySelector('[data-metric="users"]')
+    if (userCard) {
+      const valueElement = userCard.querySelector('.metric-value')
+
+      if (valueElement) {
+        const currentValue = parseInt(valueElement.textContent)
+        this.animateValueChange(valueElement, currentValue, currentValue + 1)
+      }
+    }
+  }
+
+  // Value Animation
+  animateValueChange(element, fromValue, toValue, isCurrency = false) {
+    const duration = 1000
+    const startTime = performance.now()
+    const difference = toValue - fromValue
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+
+      // Easing function (ease-out)
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+      const currentValue = fromValue + (difference * easeOut)
+
+      if (isCurrency) {
+        element.textContent = new Intl.NumberFormat('fr-FR', {
+          style: 'currency',
+          currency: 'EUR'
+        }).format(currentValue)
+      } else {
+        element.textContent = Math.round(currentValue)
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+
+    // Add highlight effect
+    element.classList.add('value-updated')
+    setTimeout(() => {
+      element.classList.remove('value-updated')
+    }, 1500)
+  }
+
+  highlightTrendUpdate(element) {
+    element.classList.add('trend-updated')
+    setTimeout(() => {
+      element.classList.remove('trend-updated')
+    }, 2000)
+  }
+
+  // Recent Activity Management
+  addRecentActivity(type, data) {
+    if (!this.hasRecentActivityTarget) return
+
+    const activityList = this.recentActivityTarget.querySelector('.activity-list')
+    if (!activityList) return
+
+    const activityItem = this.createActivityItem(type, data)
+
+    // Add to top of list
+    activityList.insertAdjacentHTML('afterbegin', activityItem)
+
+    // Remove oldest item if more than 10
+    const items = activityList.querySelectorAll('.activity-item')
+    if (items.length > 10) {
+      items[items.length - 1].remove()
+    }
+
+    // Animate new item
+    const newItem = activityList.firstElementChild
+    newItem.style.animation = 'slideInFromRight 0.5s ease-out'
+  }

@@ -263,3 +263,160 @@ export default class extends Controller {
     const newItem = activityList.firstElementChild
     newItem.style.animation = 'slideInFromRight 0.5s ease-out'
   }
+
+  createActivityItem(type, data) {
+    const icons = {
+      participation: 'fas fa-ticket-alt text-primary',
+      movie: 'fas fa-film text-accent',
+      user: 'fas fa-user-plus text-success'
+    }
+
+    const descriptions = {
+      participation: `Nouvelle participation pour "${data.event_title}"`,
+      movie: `Film "${data.movie_title}" ${data.status}`,
+      user: `Nouvel utilisateur: ${data.user_name}`
+    }
+
+    const now = new Date().toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+
+    return `
+      <div class="activity-item flex items-center space-x-3 p-3 hover:bg-white/5 rounded-xl transition-colors">
+        <div class="activity-icon w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+          <i class="${icons[type]} text-sm"></i>
+        </div>
+
+        <div class="activity-content flex-1 min-w-0">
+          <div class="activity-description text-sm text-content">
+            ${descriptions[type]}
+          </div>
+          <div class="activity-time text-xs text-muted">
+            ${now}
+          </div>
+        </div>
+
+        <div class="activity-actions">
+          <button
+            class="w-6 h-6 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
+            data-action="click->admin-dashboard#viewActivityDetail"
+            data-activity-type="${type}"
+            data-activity-id="${data.id || ''}"
+          >
+            <i class="fas fa-external-link-alt text-xs text-muted"></i>
+          </button>
+        </div>
+      </div>
+    `
+  }
+
+  // Chart Management
+  refreshChart(chartType) {
+    const chartTargets = {
+      revenue: this.revenueChartTarget,
+      events: this.eventsChartTarget
+    }
+
+    const target = chartTargets[chartType]
+    if (!target) return
+
+    // Get chart controller and refresh
+    const chartController = this.application.getControllerForElementAndIdentifier(target, 'admin-chart')
+    if (chartController) {
+      chartController.refreshData()
+    }
+  }
+
+  // Quick Actions
+  handleQuickAction(event) {
+    const action = event.currentTarget.dataset.action
+    const actionData = event.currentTarget.dataset
+
+    switch (action) {
+      case 'export-data':
+        this.exportData(actionData.type)
+        break
+
+      case 'validate-movies':
+        this.bulkValidateMovies()
+        break
+
+      case 'send-notifications':
+        this.sendBulkNotifications()
+        break
+
+      case 'backup-database':
+        this.initiateBackup()
+        break
+
+      default:
+        console.warn(`Unknown quick action: ${action}`)
+    }
+  }
+
+  async exportData(type) {
+    this.showToast(`Export ${type} en cours...`, 'info')
+
+    try {
+      const response = await fetch(`/admin/export/${type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `cineroom_${type}_${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+
+        this.showToast('Export terminé avec succès', 'success')
+      } else {
+        throw new Error('Export failed')
+      }
+    } catch (error) {
+      console.error('Export error:', error)
+      this.showToast('Erreur lors de l\'export', 'error')
+    }
+  }
+
+  async bulkValidateMovies() {
+    const pendingCount = document.querySelectorAll('[data-movie-status="pending"]').length
+
+    if (pendingCount === 0) {
+      this.showToast('Aucun film en attente de validation', 'info')
+      return
+    }
+
+    if (!confirm(`Valider tous les ${pendingCount} films en attente ?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/admin/movies/bulk_validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+
+      if (response.ok) {
+        this.showToast(`${pendingCount} films validés avec succès`, 'success')
+        this.refreshDashboard()
+      } else {
+        throw new Error('Bulk validation failed')
+      }
+    } catch (error) {
+      console.error('Bulk validation error:', error)
+      this.showToast('Erreur lors de la validation', 'error')
+    }
+  }

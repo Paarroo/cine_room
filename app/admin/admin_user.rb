@@ -6,7 +6,7 @@ ActiveAdmin.register User do
   scope :all, default: true
   scope :admins, -> { where(role: :admin) }
   scope :users, -> { where(role: :user) }
-  scope :creators, -> { joins(:creator) }
+  scope :creators, -> User.creators
 
   filter :email
   filter :first_name

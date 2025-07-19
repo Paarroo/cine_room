@@ -479,3 +479,64 @@ export default class extends Controller {
 
     this.openModal('shortcuts-modal', { content })
   }
+
+  // Utility Methods
+  isInputFocused() {
+    const activeElement = document.activeElement
+    return activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.contentEditable === 'true'
+    )
+  }
+
+  trapFocus(modal) {
+    const focusableElements = modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+
+    if (focusableElements.length === 0) return
+
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    firstElement.focus()
+
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement.focus()
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement.focus()
+        }
+      }
+    })
+  }
+
+  restoreFocus() {
+    // Restore focus to previously focused element
+    if (this.previousFocus) {
+      this.previousFocus.focus()
+      this.previousFocus = null
+    }
+  }
+
+  showToast(message, type = 'info') {
+    this.dispatch('toast', {
+      detail: { message, type }
+    })
+  }
+
+  // Cleanup
+  teardownListeners() {
+    if (this.keyboardHandler) {
+      document.removeEventListener('keydown', this.keyboardHandler)
+    }
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval)
+    }
+  }
+}

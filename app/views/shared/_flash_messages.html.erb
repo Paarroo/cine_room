@@ -1,0 +1,139 @@
+<%#
+  Admin Flash Messages Partial
+  Displays flash messages with Stimulus controller for auto-dismiss and animations
+%>
+
+<div
+  class="flash-messages fixed top-20 right-6 z-50 space-y-3"
+  data-controller="admin-flash"
+  data-admin-flash-auto-dismiss-value="true"
+  data-admin-flash-dismiss-delay-value="5000"
+>
+  <% flash.each do |type, message| %>
+    <%
+      # Map Rails flash types to our design system
+      flash_type_map = {
+        'notice' => 'success',
+        'alert' => 'error',
+        'error' => 'error',
+        'warning' => 'warning',
+        'info' => 'info'
+      }
+
+      mapped_type = flash_type_map[type] || type
+
+      # CSS classes based on type
+      base_classes = "flash-message glass-effect border rounded-xl p-4 shadow-lg transform transition-all duration-300 max-w-md"
+
+      type_classes = case mapped_type
+        when 'success'
+          "border-green-500/30 bg-green-500/10 text-green-300"
+        when 'error'
+          "border-red-500/30 bg-red-500/10 text-red-300"
+        when 'warning'
+          "border-yellow-500/30 bg-yellow-500/10 text-yellow-300"
+        when 'info'
+          "border-blue-500/30 bg-blue-500/10 text-blue-300"
+        else
+          "border-white/20 bg-white/5 text-content"
+      end
+
+      icon_classes = case mapped_type
+        when 'success'
+          "fas fa-check-circle text-green-400"
+        when 'error'
+          "fas fa-exclamation-circle text-red-400"
+        when 'warning'
+          "fas fa-exclamation-triangle text-yellow-400"
+        when 'info'
+          "fas fa-info-circle text-blue-400"
+        else
+          "fas fa-bell text-primary"
+      end
+    %>
+
+    <div
+      class="<%= base_classes %> <%= type_classes %>"
+      data-admin-flash-target="message"
+      data-flash-type="<%= mapped_type %>"
+      style="animation: slideInRight 0.3s ease-out"
+    >
+      <div class="flex items-start space-x-3">
+        <!-- Icon -->
+        <div class="flex-shrink-0 mt-0.5">
+          <i class="<%= icon_classes %>"></i>
+        </div>
+
+        <!-- Message Content -->
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-medium leading-5">
+            <%= message %>
+          </div>
+
+          <!-- Timestamp -->
+          <div class="mt-1 text-xs opacity-75">
+            <%= Time.current.strftime("%H:%M") %>
+          </div>
+        </div>
+
+        <!-- Dismiss Button -->
+        <button
+          class="flex-shrink-0 ml-3 p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+          data-action="click->admin-flash#dismissMessage"
+          data-admin-flash-target="dismissBtn"
+        >
+          <i class="fas fa-times text-xs opacity-75 hover:opacity-100"></i>
+        </button>
+      </div>
+
+      <!-- Progress Bar for Auto-Dismiss -->
+      <% if mapped_type != 'error' %>
+        <div class="progress-bar mt-3 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div
+            class="progress-fill h-full bg-current rounded-full transition-all duration-linear"
+            data-admin-flash-target="progressBar"
+            style="animation: progressShrink 5s linear"
+          ></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Custom CSS for animations -->
+<style>
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes progressShrink {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+
+  .flash-message.dismissing {
+    animation: slideOutRight 0.3s ease-in forwards;
+  }
+</style>

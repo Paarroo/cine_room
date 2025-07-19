@@ -1,7 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Admin Sidebar Controller
-export default class extends Controller {
   static targets = [
     "sidebar",
     "overlay",
@@ -202,4 +201,51 @@ export default class extends Controller {
   showToast(message, type = 'info') {
     // Dispatch custom event for toast notifications
     this.dispatch('toast', {
-      detail
+      detail: { message, type }
+    })
+  }
+
+  // Hide sidebar for mobile
+  hideSidebar() {
+    if (this.mobileValue) {
+      this.sidebarTarget.classList.add('-translate-x-full')
+    }
+  }
+
+  // Show sidebar for desktop
+  showSidebar() {
+    if (!this.mobileValue) {
+      this.sidebarTarget.classList.remove('-translate-x-full')
+    }
+  }
+
+  // Navigation item click handler
+  handleNavClick(event) {
+    const navItem = event.currentTarget
+
+    // Add loading state
+    navItem.classList.add('nav-loading')
+
+    // Remove loading after navigation
+    setTimeout(() => {
+      navItem.classList.remove('nav-loading')
+    }, 500)
+
+    // Close mobile sidebar after navigation
+    if (this.mobileValue) {
+      this.closeSidebar()
+    }
+  }
+
+  // Section collapse/expand
+  toggleSection(event) {
+    const section = event.currentTarget.closest('[data-admin-sidebar-target="section"]')
+    const isCollapsed = section.classList.contains('section-collapsed')
+
+    if (isCollapsed) {
+      section.classList.remove('section-collapsed')
+    } else {
+      section.classList.add('section-collapsed')
+    }
+  }
+}

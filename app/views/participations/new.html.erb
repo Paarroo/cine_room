@@ -34,32 +34,7 @@
             <div class="p-8 space-y-6">
               <h2 class="text-2xl font-bold mb-4 text-white">Réserve ta place</h2>
 
-              <%= form_with(model: [@event, @participation], local: true, data: { turbo: false }, class: "space-y-6") do |form| %>
-
-                <% if @participation.errors.any? %>
-                  <div class="bg-red-500/10 text-red-400 p-4 rounded-lg">
-                    <h3 class="font-bold mb-2">Erreur :</h3>
-                    <ul class="list-disc list-inside">
-                      <% @participation.errors.full_messages.each do |message| %>
-                        <li><%= message %></li>
-                      <% end %>
-                    </ul>
-                  </div>
-                <% end %>
-
-                <!-- Seats -->
-                <div>
-                  <%= form.label :seats, "Nombre de places", class: "block text-sm text-gray-300 mb-1" %>
-                  <%= form.number_field :seats, min: 1, max: @event.available_spots,
-                    class: "w-full rounded-lg border border-gray-600 bg-black text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gold-500" %>
-                </div>
-
-                <!-- Submit -->
-                <div class="pt-4">
-                  <%= form.submit "Confirmer la réservation",
-                    class: "w-full text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-black font-bold py-3 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
-                </div>
-              <% end %>
+              <%= render 'form', event: @event, participation: @participation %>
 
               <%= link_to "⬅ Retour à l’événement", event_path(@event),
                 class: "inline-block text-sm text-gray-400 hover:text-gold-400 transition mt-6" %>
@@ -71,11 +46,15 @@
         <div class="xl:col-span-1">
           <div class="sticky top-24 space-y-6">
 
-            <!-- Availability box -->
-            <div class="glass-effect rounded-3xl overflow-hidden">
+            <!-- Availability  -->
+            <div class="glass-effect rounded-3xl overflow-hidden" data-controller="seats" data-seats-unit-price-value="<%= @event.price_cents / 100.0 %>">
               <div class="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-center">
-                <div class="text-4xl font-bold mb-2"><%= number_to_currency(@event.price_cents, unit: "€") %></div>
+                
+                <div class="text-4xl font-bold mb-2" data-seats-target="totalPrice">
+                  <%= number_to_currency(@event.price_cents, unit: "€") %>
+                </div>
                 <div class="text-white/90">par personne</div>
+                
               </div>
 
               <div class="p-6 space-y-6">
@@ -83,7 +62,7 @@
                   <div class="flex justify-between items-center mb-3">
                     <span class="font-medium text-gray-300">Places disponibles</span>
                     <span class="text-lg font-bold text-green-400">
-                      <%= @event.available_spots %>/<%= @event.max_capacity %>
+                      <%= @event.available_spots %>
                     </span>
                   </div>
 
@@ -96,15 +75,10 @@
                     <i class="fas fa-clock mr-2"></i>Réservation possible jusqu'à 2h avant
                   </p>
                 </div>
-
-                <!-- Fake CTA (visuel uniquement) -->
-                <div class="pointer-events-none opacity-50">
-                  <a class="w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 text-white font-bold py-4 rounded-xl text-lg">Réserver maintenant</a>
-                </div>
               </div>
             </div>
 
-            <!-- Venue info -->
+            <!-- Venue details -->
             <div class="glass-effect rounded-3xl p-6 space-y-6">
               <h3 class="text-xl font-bold mb-4">
                 <i class="fas fa-map-marker-alt text-gold-500 mr-2"></i>
@@ -136,6 +110,7 @@
 
           </div>
         </div>
+
       </div>
     </div>
   </section>

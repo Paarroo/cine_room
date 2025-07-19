@@ -10,9 +10,9 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <% @creators.each do |creator| %>
+      <% User.joins("INNER JOIN movies ON movies.creator_id = users.id").distinct.each do |creator| %>
         <% initials = "#{creator.first_name.first}#{creator.last_name.first}".upcase %>
-        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card" data-target="creators">
+        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card" data-target="#">
           <div class="relative h-80 bg-gradient-to-br from-gold-500/20 to-amber-600/20">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-400 via-transparent to-transparent"></div>
 
@@ -29,7 +29,7 @@
               <h3 class="text-2xl font-bold mb-2"><%= "#{creator.first_name} #{creator.last_name}" %></h3>
               <p class="text-gray-300 mb-3"><%=  "Réalisateur·rice" %></p>
               <div class="flex items-center space-x-4 text-sm text-gray-400">
-                <span><i class="fas fa-film mr-1"></i><%= creator.movies_count %> films</span>
+                <span><i class="fas fa-film mr-1"></i><%= Movie.where(creator_id: creator.id).count %> films</span>
               </div>
             </div>
           </div>

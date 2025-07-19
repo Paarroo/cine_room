@@ -1,7 +1,15 @@
-<div id="movie-show" class="page-content active mt-10 ">
+<div id="movie-show" class="page-content active mt-8 ">
   <section class="py-20 relative">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
+      <!-- Breadcrumb navigation -->
+      <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-8">
+        <%= link_to "Accueil", root_path, class: "hover:text-gold-500 transition-colors" %>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <%= link_to "Films", movies_path, class: "hover:text-gold-500 transition-colors" %>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <span class="text-white"><%= @movie.title %></span>
+      </nav>
 
       <!-- Movie Header -->
       <div class="flex flex-col lg:flex-row items-start gap-12 mb-16">
@@ -19,7 +27,7 @@
           <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= @movie.title %></h1>
           <p class="text-lg text-gray-400 mb-2">
             <i class="fas fa-user text-gold-500 mr-2"></i>
-            Réalisé par <%= link_to "#{@movie.creator.user.first_name} #{@movie.creator.user.last_name}", creator_path(@movie.creator), class: "underline hover:text-gold-400" %>
+            Réalisé par <%= link_to "#{@movie.user.first_name} #{@movie.user.last_name}", creator_path(@movie.user), class: "underline hover:text-gold-400" %>
           </p>
           <p class="text-sm text-gray-500 mb-6"><%= @movie.year %> · <%= @movie.genre %> · <%= @movie.duration %> min</p>
 

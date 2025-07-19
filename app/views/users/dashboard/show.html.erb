@@ -1,0 +1,65 @@
+<div class="relative mt-20 min-h-screen" data-controller="dashboard-tabs">
+  <!-- SECTION HEADER AND TABS -->
+  <section class="relative bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-4">
+          <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
+          <span class="text-gold-400 font-medium">Espace personnel</span>
+        </div>
+        <h2 class="text-4xl lg:text-6xl font-bold mb-2 text-white">
+          Bienvenue <span class="gradient-text"><%= @user.first_name %></span>
+        </h2>
+        <p class="text-xl text-gray-300">Gérez vos réservations et informations</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex justify-end mt-4 mb-4 space-x-4">
+        <button
+          data-action="click->dashboard-tabs#switch"
+          data-tab="user"
+          data-dashboard-tabs-target="tabButton"
+          class="transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md px-4 py-2 rounded-full font-semibold bg-gold-500 text-white">
+          Utilisateur
+        </button>
+
+        <button
+          data-action="click->dashboard-tabs#switch"
+          data-tab="creator"
+          data-dashboard-tabs-target="tabButton"
+          class="transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md px-4 py-2 rounded-full font-semibold bg-dark-300 text-white">
+          Créateur
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- USER DASHBOARD -->
+  <section
+    data-dashboard-tabs-target="panel"
+    data-panel="user"
+    class="page-content bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-12 pb-60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= render 'users/dashboard/user_dashboard_content', user: @user, upcoming_participations: @upcoming_participations, past_participations: @past_participations %>
+    </div>
+  </section>
+
+  <!-- CREATOR DASHBOARD -->
+  <section
+    data-dashboard-tabs-target="panel"
+    data-panel="creator"
+    class="page-content hidden bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 py-12 pb-60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <% if @user.creator? %>
+        <%= render 'users/dashboard/creator_dashboard_content', user: @user, published_movies: @published_movies, created_events: @created_events %>
+      <% else %>
+        <div class="text-center mt-20">
+          <h2 class="text-3xl text-white font-bold mb-4">Vous souhaitez devenir créateur ?</h2>
+          <p class="text-gray-300 mb-6">Publiez votre premier film et entrez dans la communauté CineRoom !</p>
+          <%= link_to "Publier mon premier film", new_movie_path, class: "inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</div>

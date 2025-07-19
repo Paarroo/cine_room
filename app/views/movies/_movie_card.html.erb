@@ -1,0 +1,43 @@
+<div class="movie-card rounded-2xl overflow-hidden card-hover group cursor-pointer">
+  <!-- Card Image / Background -->
+  <div class="relative h-72 bg-gradient-to-br from-cinema-blue/20 to-indigo-600/20">
+    <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
+
+    <!-- Favorite button -->
+    <div class="absolute top-4 right-4">
+      <button onclick="event.stopPropagation();" class="w-10 h-10 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+        <i class="far fa-heart text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Title + director -->
+    <div class="absolute bottom-4 left-4">
+      <h3 class="text-2xl font-bold mb-1 text-white group-hover:text-cinema-blue transition-colors duration-300"><%= movie.title %></h3>
+      <p class="text-gray-300"><%= movie.director %></p>
+    </div>
+  </div>
+
+  <div class="p-6">
+    <!-- Basic info -->
+    <div class="flex items-center space-x-4 mb-4 text-sm text-gray-400">
+      <span class="flex items-center">
+        <i class="fas fa-tag mr-1 text-gold-500"></i><%= movie.genre %>
+      </span>
+      <span class="flex items-center">
+        <i class="fas fa-clock mr-1 text-gold-500"></i><%= movie.duration %> min
+      </span>
+      <span class="flex items-center">
+        <i class="fas fa-star mr-1 text-yellow-400"></i>
+        <%= number_with_precision(movie.reviews.average(:rating) || 0, precision: 1) %>
+      </span>
+    </div>
+
+    <!-- Year + CTA -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-300">
+        <i class="fas fa-calendar-alt mr-2 text-gold-500"></i><%= movie.year %>
+      </span>
+      <%= link_to "Voir le film", movie_path(movie), class: "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
+    </div>
+  </div>
+</div>

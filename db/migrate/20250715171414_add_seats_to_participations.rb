@@ -1,5 +1,8 @@
-class AddSeatsToParticipations < ActiveRecord::Migration[7.0]
+class ChangeCreatorIdToUserIdInMovies < ActiveRecord::Migration[8.0]
   def change
-    add_column :participations, :seats, :integer, default: 1, null: false
+    rename_column :movies, :creator_id, :user_id
+
+    remove_foreign_key :movies, :creators if foreign_key_exists?(:movies, :creators)
+    add_foreign_key :movies, :users, column: :user_id
   end
 end

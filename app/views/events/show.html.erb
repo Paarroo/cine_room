@@ -10,6 +10,7 @@
         <span class="text-white"><%= @event.title %></span>
       </nav>
 
+
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <!-- Main content -->
         <div class="xl:col-span-2 space-y-8">
@@ -125,7 +126,7 @@
                   <div class="flex justify-between items-center mb-3">
                     <span class="font-medium text-gray-300">Places disponibles</span>
                     <span class="text-lg font-bold text-green-400">
-                      <%= @event.available_spots %>/<%= @event.max_capacity %>
+                      <%= @event.available_spots %>
                     </span>
                   </div>
 
@@ -142,17 +143,18 @@
 
                 <!-- CTA -->
                   <% if @participation.present? %>
-                      <p class="text-center text-yellow-400 font-medium">
-                        Tu as déjà réservé ta place pour cet événement 
-                      </p>
-                    <% elsif @event.sold_out? %>
-                      <p class="text-center text-red-400 font-medium">
-                        Cet événement est complet 
-                      </p>
-                    <% else %>
-                      <%= link_to "Réserver maintenant", new_event_participation_path(event_id: @event.id),
-                        class: "w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
-                   <% end %>
+                    <%= link_to "🎟 Voir mes événements", users_dashboard_path(current_user),
+                    class: "w-full block text-center bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+
+                  <% elsif @event.sold_out? %>
+                    <p class="text-center text-red-400 font-medium">
+                      Cet événement est complet 
+                    </p>
+                  <% else %>
+                    <%= link_to "Réserver maintenant", new_event_participation_path(event_id: @event.id),
+                      class: "w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+                  <% end %>
+
 
                 <!-- Guarantees -->
                 <div class="space-y-3 text-sm text-gray-400">

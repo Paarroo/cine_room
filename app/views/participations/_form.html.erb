@@ -1,4 +1,6 @@
-<%= form_with(model: [@event, participation], local: true, class: "space-y-6") do |form| %>
+<%= form_with(model: [@event, participation], local: true, 
+  data: { controller: "seats", "seats-unit-price-value": (@event.price_cents ), turbo: false }, 
+  class: "space-y-6") do |form| %>
 
   <% if participation.errors.any? %>
     <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
@@ -11,16 +13,16 @@
     </div>
   <% end %>
 
-  <!-- Select field for number of seats -->
+  <!-- Seats select field with Stimulus -->
   <div class="space-y-2">
-    <%= form.label :seats, "How many seats?", class: "block mb-2 font-medium text-white" %>
+    <%= form.label :seats, "Choisissez votre nombre de places", class: "block mb-2 font-medium text-white" %>
 
     <div class="relative">
-     <%= form.select :seats,
-      options_for_select((1..[@event.available_spots, 10].min).map { |n| [pluralize(n, "seat"), n] }, selected: 1),
-      {},
-      class: "block w-full appearance-none rounded-md border px-4 py-3 pr-10 text-base bg-black text-white border-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 [&::-ms-expand]:hidden" %>
-
+      <%= form.select :seats,
+        options_for_select((1..[@event.available_spots, 10].min).map { |n| [pluralize(n, "place"), n] }, selected: 1),
+        {},
+        class: "block w-full appearance-none rounded-md border px-4 py-3 pr-10 text-base bg-black text-white border-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 [&::-ms-expand]:hidden",
+        data: { action: "seats#updatePrice" } %>
 
       <!-- Chevron icon -->
       <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
@@ -31,8 +33,16 @@
     </div>
   </div>
 
-  <!-- Submit button -->
-  <div>
-    <%= form.submit "Book now", class: "w-full text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-black font-bold py-3 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+  <!-- Dynamic total price -->
+  <div class="text-white text-lg font-semibold">
+    Total: <span data-seats-target="price"><%= number_to_currency(@event.price_cents , unit: "€") %></span>
   </div>
+
+  <!-- Submit -->
+  <div>
+    <%= form.submit "Payez maintenant", 
+        class: "w-full block text-center bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105" %>
+  </div>
+
+
 <% end %>

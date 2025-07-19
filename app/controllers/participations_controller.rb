@@ -34,7 +34,7 @@ class ParticipationsController < ApplicationController
       line_items: [{
         price_data: {
           currency: 'eur',
-          unit_amount: @event.price_cents,
+          unit_amount: @event.price_cents*100,
           product_data: {
             name: @event.title
           }
@@ -47,7 +47,7 @@ class ParticipationsController < ApplicationController
         seats: seats
       },
       mode: 'payment',
-      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}",  # ✅ CORRECTION ICI
+      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}", 
       cancel_url: stripe_cancel_url(event_id: @event.id)
     )
 

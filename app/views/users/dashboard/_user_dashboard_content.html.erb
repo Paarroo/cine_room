@@ -1,0 +1,95 @@
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+  <!-- Profile section -->
+  <div class="glass-effect p-6 rounded-2xl h-fit">
+    <h3 class="text-2xl font-semibold text-white mb-4">
+      <i class="fas fa-user mr-2 text-gold-500"></i>Mon profil
+    </h3>
+    <p class="text-gray-300 mb-2"><strong>Nom :</strong> <%= user.full_name %></p>
+    <p class="text-gray-300 mb-2"><strong>Bio :</strong> <%= user.bio %></p>
+    <p class="text-gray-300 mb-2"><strong>Email :</strong> <%= user.email %></p>
+    <%= link_to "Modifier mon compte", edit_user_registration_path, class: "text-sm text-gold-400 hover:underline block" %>
+    <%= link_to "Modifier mon profil", users_dashboard_edit_profile_path(user), class: "text-sm text-gold-400 hover:underline block mt-1" %>
+  </div>
+
+  <!-- Upcoming events -->
+  <div class="xl:col-span-2 space-y-8">
+    <div class="glass-effect p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-semibold text-white">
+          <i class="fas fa-calendar-alt mr-2 text-gold-500"></i>Prochains événements
+        </h3>
+        <% if upcoming_participations.size > 3 %>
+          <%= link_to "Voir tout", upcoming_participations_users_dashboard_path(user), class: "text-sm text-gold-400 hover:underline" %>
+        <% end %>
+      </div>
+      <% upcoming_participations.first(3).each do |p| %>
+        <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
+          <div class="flex justify-between items-center">
+            <div>
+              <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
+              <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+            </div>
+            <%= link_to "Détails", reservation_path(p), class: "text-sm text-gold-400 hover:underline" %>
+          </div>
+        </div>
+      <% end %>
+      <% if upcoming_participations.empty? %>
+        <p class="text-gray-400">Aucune participation prévue.</p>
+      <% end %>
+    </div>
+
+    <!-- Past events -->
+    <div class="glass-effect p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-semibold text-white">
+          <i class="fas fa-history mr-2 text-gold-500"></i>Historique
+        </h3>
+        <% if past_participations.size > 3 %>
+          <%= link_to "Voir tout", past_participations_users_dashboard_path(user), class: "text-sm text-gold-400 hover:underline" %>
+        <% end %>
+      </div>
+      <% past_participations.first(3).each do |p| %>
+        <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
+          <div class="flex justify-between items-center">
+            <div>
+              <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
+              <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+            </div>
+            <% if user.reviews.where(event: p.event).empty? %>
+              <%= link_to "Laisser un avis", new_review_path(event_id: p.event.id), class: "text-sm text-gold-400 hover:underline" %>
+            <% else %>
+              <span class="text-sm text-green-400">Avis donné</span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <% if past_participations.empty? %>
+        <p class="text-gray-400">Aucun événement passé.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Publications and reviews -->
+<div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+  
+  <!-- Reviews -->
+  <div class="glass-effect p-6 rounded-2xl">
+    <h3 class="text-2xl font-semibold text-white mb-4">
+      <i class="fas fa-star mr-2 text-gold-500"></i>Mes critiques
+    </h3>
+    <% if user.reviews.any? %>
+      <% user.reviews.order(created_at: :desc).each do |review| %>
+        <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
+          <strong><%= review.movie.title %></strong> – <span class="text-yellow-400"><%= review.rating %>★</span>
+          <p class="text-sm text-gray-400 mt-1 italic">« <%= truncate(review.comment, length: 100) %> »</p>
+          <%= link_to "Voir l'événement", event_path(review.event), class: "text-sm text-gold-400 hover:underline" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-gray-400">Vous n’avez laissé aucun avis pour le moment.</p>
+    <% end %>
+  </div>
+</div>
+
+

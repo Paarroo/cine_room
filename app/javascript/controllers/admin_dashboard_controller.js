@@ -584,3 +584,66 @@ export default class extends Controller {
       }
     })
   }
+
+  updateChartsWithFilteredData(data) {
+    // Update charts with filtered data
+    if (data.charts) {
+      Object.entries(data.charts).forEach(([chartType, chartData]) => {
+        this.updateChartData(chartType, chartData)
+      })
+    }
+  }
+
+  updateChartData(chartType, data) {
+    const target = chartType === 'revenue' ? this.revenueChartTarget : this.eventsChartTarget
+    if (!target) return
+
+    const chartController = this.application.getControllerForElementAndIdentifier(target, 'admin-chart')
+    if (chartController) {
+      chartController.updateData(data)
+    }
+  }
+
+  // Performance Monitoring
+  trackPerformance() {
+    // Track dashboard load time
+    const navigationTiming = performance.getEntriesByType('navigation')[0]
+    if (navigationTiming) {
+      const loadTime = navigationTiming.loadEventEnd - navigationTiming.navigationStart
+      console.log(`Dashboard loaded in ${loadTime}ms`)
+
+      // Send to analytics if load time is concerning
+      if (loadTime > 3000) {
+        this.reportPerformanceIssue('slow_load', { loadTime })
+      }
+    }
+  }
+
+  reportPerformanceIssue(type, data) {
+    // Report performance issues to monitoring service
+    fetch('/admin/performance/report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ type, data, timestamp: Date.now() })
+    }).catch(console.error)
+  }
+
+  // Utility Methods
+  showToast(message, type = 'info') {
+    this.dispatch('toast', {
+      detail: { message, type }
+    })
+  }
+
+  // Cleanup
+  teardown() {
+    this.teardownAutoRefresh()
+    this.teardownRealtimeUpdates()
+
+    if (this.keyboardHandler) {
+      document.removeEventListener('keydown', this.keyboardHandler)
+    }
+  }
+}

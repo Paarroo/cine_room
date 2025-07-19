@@ -93,3 +93,69 @@ class Admin::DashboardController < ApplicationController
       occupancy_rate: calculate_occupancy_rate
     }
   end
+
+  def calculate_user_stats
+    {
+      total_users: User.count,
+      admin_users: User.where(role: :admin).count,
+      regular_users: User.where(role: :user).count,
+      creator_users: User.where(role: :creator).count,
+      new_users_this_month: User.where(
+        created_at: Time.current.beginning_of_month..Time.current.end_of_month
+      ).count,
+      active_participants: User.joins(:participations)
+                              .where(participations: { status: :confirmed })
+                              .distinct.count
+    }
+  end
+
+  def calculate_participation_stats
+    {
+      total_participations: Participation.count,
+      confirmed_participations: Participation.where(status: :confirmed).count,
+      pending_participations: Participation.where(status: :pending).count,
+      cancelled_participations: Participation.where(status: :cancelled).count,
+      total_seats_booked: Participation.where(status: :confirmed).sum(:seats),
+      average_seats_per_booking: Participation.average(:seats).to_f.round(1)
+    }
+  end
+
+  def calculate_movie_stats
+    {
+      total_movies: Movie.count,
+      validated_movies: Movie.where(validation_status: :validated).count,
+      pending_movies: Movie.where(validation_status: :pending).count,
+      rejected_movies: Movie.where(validation_status: :rejected).count,
+      movies_with_events: Movie.joins(:events).distinct.count,
+      average_movies_per_creator: calculate_average_movies_per_creator
+    }
+  end
+
+  def calculate_average_revenue_per_event
+    events_with_revenue = Event.joins(:participations)
+                              .where(participations: { status: :confirmed })
+                              .group(:id)
+                              .sum("events.price_cents * participations.seats")
+
+    return 0 if events_with_revenue.empty?
+
+    events_with_revenue.values.sum / events_with_revenue.count.to_f / 100.0
+  end
+
+  def calculate_occupancy_rate
+    total_capacity = Event.sum(:max_capacity)
+    total_bookings = Participation.where(status: :confirmed).sum(:seats)
+
+    return 0 if total_capacity.zero?
+
+    ((total_bookings.to_f / total_capacity) * 100).round(1)
+  end
+
+  def calculate_average_movies_per_creator
+    total_creators = User.where(role: :creator).count
+    total_movies = Movie.count
+
+    return 0 if total_creators.zero?
+
+    (total_movies.to_f / total_creators).round(1)
+  end

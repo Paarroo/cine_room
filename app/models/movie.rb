@@ -8,7 +8,7 @@ class Movie < ApplicationRecord
   validates :duration, numericality: { greater_than: 0, less_than: 300 }
   validates :year, numericality: {
     greater_than: 1900,
-    less_than_or_equal_to: Date.current.year + 2
+    less_than_or_equal_to: Date.current.year
   }
 
   enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending

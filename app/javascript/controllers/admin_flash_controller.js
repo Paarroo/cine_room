@@ -208,3 +208,69 @@ export default class extends Controller {
       </div>
     `
   }
+
+  // Screen reader announcements
+  announceToScreenReader(message) {
+    const announcement = document.createElement('div')
+    announcement.setAttribute('aria-live', 'polite')
+    announcement.setAttribute('aria-atomic', 'true')
+    announcement.className = 'sr-only'
+    announcement.textContent = message
+
+    document.body.appendChild(announcement)
+
+    setTimeout(() => {
+      document.body.removeChild(announcement)
+    }, 1000)
+  }
+
+  // Cleanup timers
+  clearTimers() {
+    this.messageTargets.forEach(message => {
+      const timerId = message.dataset.dismissTimer
+      if (timerId) {
+        clearTimeout(parseInt(timerId))
+      }
+    })
+  }
+
+  // Pause auto-dismiss on hover
+  pauseAutoDismiss(event) {
+    const message = event.currentTarget
+    const timerId = message.dataset.dismissTimer
+    const progressBar = message.querySelector('[data-admin-flash-target="progressBar"]')
+
+    if (timerId) {
+      clearTimeout(parseInt(timerId))
+      message.dataset.dismissTimer = null
+    }
+
+    if (progressBar) {
+      progressBar.style.animationPlayState = 'paused'
+    }
+  }
+
+  // Resume auto-dismiss on mouse leave
+  resumeAutoDismiss(event) {
+    const message = event.currentTarget
+    const type = message.dataset.flashType
+    const progressBar = message.querySelector('[data-admin-flash-target="progressBar"]')
+
+    if (type === 'error') return
+
+    // Calculate remaining time based on progress bar
+    if (progressBar) {
+      const computedStyle = window.getComputedStyle(progressBar)
+      const remainingWidth = parseFloat(computedStyle.width)
+      const totalWidth = parseFloat(computedStyle.maxWidth || '100')
+      const remainingTime = (remainingWidth / totalWidth) * this.dismissDelayValue
+
+      const timer = setTimeout(() => {
+        this.dismissMessage({ currentTarget: message })
+      }, remainingTime)
+
+      message.dataset.dismissTimer = timer
+      progressBar.style.animationPlayState = 'running'
+    }
+  }
+}

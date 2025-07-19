@@ -14,6 +14,14 @@ puts "Création de 10 utilisateurs..."
   )
 end
 
+puts "Création de 10 administrateurs..."
+10.times do |i|
+  ActiveRecord::Base.connection.execute(
+    "INSERT INTO users (email, encrypted_password, first_name, last_name, role, bio, created_at, updated_at)
+     VALUES ('admin#{i+1}@test.com', '$2a$12$K/j.KwwZOI1J5ZQhKQGKkOqj7J8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8', 'Admin#{i+1}', 'Test', 1, 'Bio administrateur #{i+1}', NOW(), NOW())"
+  )
+end
+
 puts "Création de 10 films..."
 10.times do |i|
   ActiveRecord::Base.connection.execute(

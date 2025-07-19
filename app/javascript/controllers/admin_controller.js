@@ -153,3 +153,76 @@ export default class extends Controller {
     event.detail.fetchOptions.headers['X-Admin-Request'] = 'true'
     event.detail.fetchOptions.headers['X-Admin-Version'] = '1.0'
   }
+
+  // Modal Management
+  openModal(modalId, options = {}) {
+    const modal = document.getElementById(modalId)
+    if (!modal) {
+      console.error(`Modal ${modalId} not found`)
+      return
+    }
+
+    // Set modal content if provided
+    if (options.content) {
+      const modalBody = modal.querySelector('.modal-body')
+      if (modalBody) {
+        modalBody.innerHTML = options.content
+      }
+    }
+
+    // Show modal
+    modal.classList.remove('hidden')
+    modal.classList.add('modal-open')
+
+    // Add to modals container if not already there
+    if (!this.modalsTarget.contains(modal)) {
+      this.modalsTarget.appendChild(modal)
+    }
+
+    // Focus management
+    this.trapFocus(modal)
+
+    // Prevent body scroll
+    document.body.classList.add('modal-open')
+
+    // Dispatch event
+    this.dispatch('modal-opened', { detail: { modalId, options } })
+  }
+
+  closeModal(modalId) {
+    const modal = document.getElementById(modalId)
+    if (!modal) return
+
+    modal.classList.add('modal-closing')
+
+    setTimeout(() => {
+      modal.classList.remove('modal-open', 'modal-closing')
+      modal.classList.add('hidden')
+
+      // Restore body scroll if no other modals
+      if (!document.querySelector('.modal-open')) {
+        document.body.classList.remove('modal-open')
+      }
+
+      // Restore focus
+      this.restoreFocus()
+
+      // Dispatch event
+      this.dispatch('modal-closed', { detail: { modalId } })
+    }, 300)
+  }
+
+  closeAllModals() {
+    const openModals = document.querySelectorAll('.modal-open')
+    openModals.forEach(modal => {
+      this.closeModal(modal.id)
+    })
+  }
+
+  // Dropdown Management
+  closeAllDropdowns() {
+    const openDropdowns = document.querySelectorAll('.dropdown-open')
+    openDropdowns.forEach(dropdown => {
+      dropdown.classList.remove('dropdown-open')
+    })
+  }

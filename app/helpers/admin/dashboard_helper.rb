@@ -139,3 +139,94 @@ module Admin::DashboardHelper
 
     ((total_bookings.to_f / total_capacity) * 100).round(1)
   end
+
+  # Get top performing events by revenue
+  def top_events_by_revenue(limit = 5)
+    Event.joins(:participations)
+         .where(participations: { status: :confirmed })
+         .group('events.id')
+         .select('events.*, SUM(events.price_cents * participations.seats) as total_revenue_cents')
+         .order('total_revenue_cents DESC')
+         .limit(limit)
+         .map do |event|
+           {
+             event: event,
+             revenue: event.total_revenue_cents.to_i / 100.0,
+             formatted_revenue: number_to_currency(event.total_revenue_cents.to_i / 100.0)
+           }
+         end
+  end
+
+  # Get active users count (users who logged in within last 30 days)
+  def active_users_count
+    # This would need to be implemented with proper session tracking
+    # For now, we'll use updated_at as a proxy
+    User.where(updated_at: 30.days.ago..Time.current).count
+  end
+
+  # Calculate average session duration (placeholder)
+  def average_session_duration
+    # This would require session tracking implementation
+    "12:34" # Placeholder
+  end
+
+  # Get conversion rate (visitors to participants)
+  def conversion_rate
+    total_users = User.count
+    participants = User.joins(:participations).distinct.count
+
+    return 0 if total_users.zero?
+
+    ((participants.to_f / total_users) * 100).round(1)
+  end
+
+  # Format large numbers for display
+  def format_large_number(number)
+    case number
+    when 0...1_000
+      number.to_s
+    when 1_000...1_000_000
+      "#{(number / 1_000.0).round(1)}k"
+    when 1_000_000...1_000_000_000
+      "#{(number / 1_000_000.0).round(1)}M"
+    else
+      "#{(number / 1_000_000_000.0).round(1)}B"
+    end
+  end
+
+  # Get dashboard refresh timestamp
+  def dashboard_last_updated
+    Time.current.strftime("%H:%M:%S")
+  end
+
+  # Check if there are critical alerts
+  def has_critical_alerts?
+    pending_movies_count > 10 ||
+    pending_participations_count > 20 ||
+    system_errors_count > 0
+  end
+
+  # Get system health status
+  def system_health_status
+    if has_critical_alerts?
+      { status: 'warning', message: 'Attention requise', color: 'text-warning' }
+    else
+      { status: 'healthy', message: 'Système opérationnel', color: 'text-success' }
+    end
+  end
+
+  private
+
+  def pending_movies_count
+    @pending_movies_count ||= Movie.where(validation_status: :pending).count
+  end
+
+  def pending_participations_count
+    @pending_participations_count ||= Participation.where(status: :pending).count
+  end
+
+  def system_errors_count
+    # This would integrate with error tracking service
+    0 # Placeholder
+  end
+end

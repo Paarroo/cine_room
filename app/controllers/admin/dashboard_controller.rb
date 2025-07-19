@@ -159,3 +159,124 @@ class Admin::DashboardController < ApplicationController
 
     (total_movies.to_f / total_creators).round(1)
   end
+
+  def calculate_online_users
+    # Simulate online users (in real app, use session tracking)
+    User.where(updated_at: 15.minutes.ago..Time.current).count
+  end
+
+  def calculate_pending_items
+    Movie.where(validation_status: :pending).count +
+    Participation.where(status: :pending).count
+  end
+
+  def calculate_today_revenue
+    Participation.where(status: :confirmed)
+                 .where(created_at: Time.current.beginning_of_day..Time.current.end_of_day)
+                 .joins(:event)
+                 .sum("events.price_cents * participations.seats") / 100.0
+  end
+
+  def dashboard_json_data
+    {
+      revenue_stats: @revenue_stats,
+      event_stats: @event_stats,
+      user_stats: @user_stats,
+      participation_stats: @participation_stats,
+      movie_stats: @movie_stats,
+      charts: {
+        revenue: revenue_chart_data,
+        events: events_status_chart_data
+      }
+    }
+  end
+
+  def revenue_chart_data
+    # Last 30 days revenue data for charts
+    (30.days.ago.to_date..Date.current).map do |date|
+      revenue = Participation.where(status: :confirmed)
+                            .where(created_at: date.beginning_of_day..date.end_of_day)
+                            .joins(:event)
+                            .sum("events.price_cents * participations.seats") / 100.0
+
+      { date: date.strftime("%d/%m"), revenue: revenue }
+    end
+  end
+
+  def events_status_chart_data
+    Event.group(:status).count.map do |status, count|
+      { status: status.humanize, count: count }
+    end
+  end
+
+  def export_users
+    # Implementation for user export
+    send_data generate_csv(User.all, user_attributes),
+              filename: "users_#{Date.current}.csv",
+              type: 'text/csv'
+  end
+
+  def export_events
+    # Implementation for events export
+    send_data generate_csv(Event.includes(:movie), event_attributes),
+              filename: "events_#{Date.current}.csv",
+              type: 'text/csv'
+  end
+
+  def export_participations
+    # Implementation for participations export
+    send_data generate_csv(Participation.includes(:user, :event), participation_attributes),
+              filename: "participations_#{Date.current}.csv",
+              type: 'text/csv'
+  end
+
+  def export_all_data
+    # Implementation for complete export
+    # This would create a ZIP file with multiple CSVs
+    redirect_to admin_root_path, notice: "Export complet en cours de préparation..."
+  end
+
+  def generate_csv(records, attributes)
+    require 'csv'
+
+    CSV.generate(headers: true) do |csv|
+      csv << attributes.keys
+
+      records.each do |record|
+        csv << attributes.values.map { |attr| record.send(attr) }
+      end
+    end
+  end
+
+  def user_attributes
+    {
+      'ID' => :id,
+      'Email' => :email,
+      'Nom complet' => :full_name,
+      'Rôle' => :role,
+      'Créé le' => :created_at
+    }
+  end
+
+  def event_attributes
+    {
+      'ID' => :id,
+      'Titre' => :title,
+      'Film' => proc { |event| event.movie&.title },
+      'Date' => :event_date,
+      'Statut' => :status,
+      'Prix' => proc { |event| event.price_cents / 100.0 }
+    }
+  end
+
+  def participation_attributes
+    {
+      'ID' => :id,
+      'Utilisateur' => proc { |p| p.user&.full_name },
+      'Événement' => proc { |p| p.event&.title },
+      'Places' => :seats,
+      'Statut' => :status,
+      'Créé le' => :created_at
+    }
+  end
+end

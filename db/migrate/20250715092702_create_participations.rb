@@ -5,6 +5,7 @@ class CreateParticipations < ActiveRecord::Migration[8.0]
       t.references :event, null: false, foreign_key: true
       t.string :stripe_payment_id
       t.integer :status, default: 0, null: false
+      t.integer :seats, default: 1, null: false
       t.timestamps
     end
 

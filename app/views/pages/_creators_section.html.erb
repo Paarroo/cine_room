@@ -29,7 +29,7 @@
               <h3 class="text-2xl font-bold mb-2"><%= "#{creator.first_name} #{creator.last_name}" %></h3>
               <p class="text-gray-300 mb-3"><%=  "Réalisateur·rice" %></p>
               <div class="flex items-center space-x-4 text-sm text-gray-400">
-                <span><i class="fas fa-film mr-1"></i><%= creator.movies.count %> films</span>
+                <span><i class="fas fa-film mr-1"></i><%= Movie.where(creator_id: creator.id).count %> films</span>
               </div>
             </div>
           </div>

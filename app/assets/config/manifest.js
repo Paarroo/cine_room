@@ -15,4 +15,4 @@
 
 //= link application.js
 
-//= link active_admin.jsrs
+//= link active_admin.js

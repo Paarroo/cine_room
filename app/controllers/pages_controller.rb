@@ -19,15 +19,15 @@ class PagesController < ApplicationController
   private
 
   def featured_creators
+    User.where(id: Movie.approved.select(:creator_id).distinct)
+        .joins("LEFT JOIN movies ON movies.creator_id = users.id")
+        .where(movies: { validation_status: :approved })
+        .group('users.id')
+        .select('users.*, COUNT(movies.id) AS movies_count')
+        .order('movies_count DESC')
+        .limit(3)
+  end
 
-      User.joins(creator: :movies)
-          .where(movies: { validation_status: :approved })
-          .group('users.id')
-          .select('users.*, COUNT(movies.id) AS movies_count')
-          .order('movies_count DESC')
-          .limit(3)
-    end
-  
   def featured_events
     Event.includes(:movie)
          .upcoming
@@ -37,11 +37,10 @@ class PagesController < ApplicationController
 
   def home_stats
     {
-      directors_count: User.creator.count,
-      movies_count: Movie.approved.count,
+      directors_count: User.joins("INNER JOIN movies ON movies.creator_id = users.id").distinct.count,
+      movies_count: Movie.where(validation_status: Movie.validation_statuses[:approved]).count,
       venues_count: Event.select(:venue_name, :venue_address).distinct.count,
-      events_count: Event.upcoming.count
+      events_count: Event.where(status: Event.statuses[:upcoming]).count
     }
-
   end
 end

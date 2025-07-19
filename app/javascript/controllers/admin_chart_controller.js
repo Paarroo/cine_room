@@ -110,3 +110,138 @@ export default class extends Controller {
 
     this.addLineChartInteractivity()
   }
+
+  createDoughnutChart() {
+    const data = this.dataValue || []
+    const total = data.reduce((sum, item) => sum + (item.count || 0), 0)
+
+    let cumulativeAngle = 0
+    const radius = 80
+    const centerX = 100
+    const centerY = 100
+
+    const segments = data.map((item, index) => {
+      const angle = (item.count / total) * 360
+      const startAngle = cumulativeAngle
+      const endAngle = cumulativeAngle + angle
+
+      // Calculate arc path
+      const startAngleRad = (startAngle - 90) * Math.PI / 180
+      const endAngleRad = (endAngle - 90) * Math.PI / 180
+
+      const x1 = centerX + radius * Math.cos(startAngleRad)
+      const y1 = centerY + radius * Math.sin(startAngleRad)
+      const x2 = centerX + radius * Math.cos(endAngleRad)
+      const y2 = centerY + radius * Math.sin(endAngleRad)
+
+      const largeArcFlag = angle > 180 ? 1 : 0
+
+      const pathData = [
+        `M ${centerX} ${centerY}`,
+        `L ${x1} ${y1}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+        'Z'
+      ].join(' ')
+
+      cumulativeAngle += angle
+
+      return {
+        path: pathData,
+        color: item.color || this.getSegmentColor(index),
+        label: item.status,
+        count: item.count,
+        percentage: item.percentage
+      }
+    })
+
+    this.element.innerHTML = `
+      <div class="chart-doughnut-placeholder w-full h-full flex items-center">
+        <div class="chart-container flex-1">
+          <svg class="w-full max-w-xs mx-auto" viewBox="0 0 200 200">
+            ${segments.map(segment => `
+              <path
+                d="${segment.path}"
+                fill="${segment.color}"
+                stroke="rgba(0,0,0,0.1)"
+                stroke-width="2"
+                class="chart-segment cursor-pointer hover:opacity-80 transition-opacity"
+                data-label="${segment.label}"
+                data-count="${segment.count}"
+                data-percentage="${segment.percentage}"
+              />
+            `).join('')}
+
+            <!-- Center hole -->
+            <circle cx="100" cy="100" r="50" fill="#0a0a0a"/>
+
+            <!-- Center text -->
+            <text x="100" y="95" text-anchor="middle" class="fill-content text-lg font-bold">
+              ${total}
+            </text>
+            <text x="100" y="110" text-anchor="middle" class="fill-muted text-xs">
+              Total
+            </text>
+          </svg>
+        </div>
+
+        <div class="chart-legend ml-6 space-y-2">
+          ${segments.map(segment => `
+            <div class="legend-item flex items-center space-x-2">
+              <div class="w-3 h-3 rounded-full" style="background-color: ${segment.color}"></div>
+              <span class="text-sm text-content">${segment.label}</span>
+              <span class="text-xs text-muted">(${segment.count})</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `
+
+    this.addDoughnutChartInteractivity()
+  }
+
+  createBarChart() {
+    const data = this.dataValue || []
+    const maxValue = Math.max(...data.map(d => d.value || 0))
+
+    this.element.innerHTML = `
+      <div class="chart-bar-placeholder w-full h-full">
+        <svg class="w-full h-full" viewBox="0 0 400 200">
+          <!-- Grid lines -->
+          <defs>
+            <pattern id="barGrid" width="40" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 0 20 L 400 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#barGrid)" />
+
+          <!-- Bars -->
+          ${data.map((item, index) => {
+            const barWidth = 300 / data.length - 10
+            const barHeight = (item.value / maxValue) * 160
+            const x = 50 + index * (300 / data.length)
+            const y = 180 - barHeight
+
+            return `
+              <rect
+                x="${x}"
+                y="${y}"
+                width="${barWidth}"
+                height="${barHeight}"
+                fill="url(#barGradient)"
+                class="chart-bar cursor-pointer hover:opacity-80 transition-opacity"
+                data-label="${item.label}"
+                data-value="${item.value}"
+              />
+            `
+          }).join('')}
+
+          <defs>
+            <linearGradient id="barGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    `
+  }

@@ -1,0 +1,66 @@
+<%#
+  Admin Dashboard - Main admin page with comprehensive overview
+  Uses partials extensively and Stimulus controllers for interactivity
+%>
+
+<% content_for :page_title, "Dashboard" %>
+<% content_for :head do %>
+  <meta name="description" content="CinéRoom Admin Dashboard - Vue d'ensemble">
+<% end %>
+
+<div
+  class="admin-dashboard p-6 space-y-8"
+  data-controller="admin-dashboard"
+  data-admin-dashboard-refresh-interval-value="30000"
+  data-admin-dashboard-auto-refresh-value="true"
+>
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <%= render 'shared/admin/dashboard/header' %>
+  </div>
+
+  <!-- Key Metrics Overview -->
+  <section class="metrics-overview" data-admin-dashboard-target="metrics">
+    <h2 class="section-title text-2xl font-bold text-content mb-6 font-display">
+      <i class="fas fa-chart-line text-primary mr-3"></i>
+      Métriques Clés
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <%= render 'shared/admin/dashboard/metric_card',
+          title: 'Revenus Total',
+          value: number_to_currency(
+            Participation.where(status: :confirmed)
+                        .joins(:event)
+                        .sum("events.price_cents * participations.seats") / 100.0
+          ),
+          icon: 'fas fa-euro-sign',
+          trend: '+12.5%',
+          trend_type: 'positive',
+          color: 'primary' %>
+
+      <%= render 'shared/admin/dashboard/metric_card',
+          title: 'Événements Actifs',
+          value: Event.where(status: :upcoming).count,
+          icon: 'fas fa-calendar-alt',
+          trend: '+3',
+          trend_type: 'positive',
+          color: 'accent' %>
+
+      <%= render 'shared/admin/dashboard/metric_card',
+          title: 'Utilisateurs Total',
+          value: User.count,
+          icon: 'fas fa-users',
+          trend: "+#{User.where(created_at: 1.week.ago..Time.current).count}",
+          trend_type: 'positive',
+          color: 'success' %>
+
+      <%= render 'shared/admin/dashboard/metric_card',
+          title: 'Taux Satisfaction',
+          value: "#{(Review.average(:rating) || 0).round(1)}/5",
+          icon: 'fas fa-star',
+          trend: '+0.2',
+          trend_type: 'positive',
+          color: 'warning' %>
+    </div>
+  </section>

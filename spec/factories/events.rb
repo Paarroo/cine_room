@@ -7,7 +7,7 @@ FactoryBot.define do
     venue_address { Faker::Address.full_address }
     event_date { rand(1.week.from_now..3.months.from_now).to_date }
     start_time { [ '19:00', '20:30', '21:00', '18:30', '22:00' ].sample }
-    max_capacity { rand(50..200) }
+    max_capacity { rand(50..100) }
     price_cents { rand(800..2500) }
     status { [ :upcoming, :completed, :sold_out ].sample }
     latitude { Faker::Address.latitude.to_f }

@@ -226,3 +226,73 @@ export default class extends Controller {
       dropdown.classList.remove('dropdown-open')
     })
   }
+
+  // Loading Indicators
+  showLoadingIndicator() {
+    const existingLoader = document.querySelector('.admin-loader')
+    if (existingLoader) return
+
+    const loader = document.createElement('div')
+    loader.className = 'admin-loader fixed top-0 left-0 w-full h-1 z-50'
+    loader.innerHTML = `
+      <div class="loader-bar h-full bg-primary animate-pulse" style="width: 0; animation: loading 2s ease-in-out infinite"></div>
+    `
+
+    document.body.appendChild(loader)
+
+    // Animate to 90% width
+    setTimeout(() => {
+      const bar = loader.querySelector('.loader-bar')
+      bar.style.width = '90%'
+      bar.style.transition = 'width 0.5s ease'
+    }, 100)
+  }
+
+  hideLoadingIndicator() {
+    const loader = document.querySelector('.admin-loader')
+    if (!loader) return
+
+    const bar = loader.querySelector('.loader-bar')
+    bar.style.width = '100%'
+
+    setTimeout(() => {
+      loader.remove()
+    }, 300)
+  }
+
+  // Component Reinitialization
+  reinitializeComponents() {
+    // Reinitialize tooltips, date pickers, etc.
+    this.initializeTooltips()
+    this.initializeDatePickers()
+    this.updatePageMetadata()
+  }
+
+  // Tooltip Initialization
+  initializeTooltips() {
+    const tooltipElements = document.querySelectorAll('[data-tooltip]')
+    tooltipElements.forEach(element => {
+      if (!element.hasAttribute('data-tooltip-initialized')) {
+        this.setupTooltip(element)
+        element.setAttribute('data-tooltip-initialized', 'true')
+      }
+    })
+  }
+
+  setupTooltip(element) {
+    let tooltip = null
+
+    element.addEventListener('mouseenter', () => {
+      const text = element.getAttribute('data-tooltip')
+      tooltip = this.createTooltip(text)
+      document.body.appendChild(tooltip)
+      this.positionTooltip(tooltip, element)
+    })
+
+    element.addEventListener('mouseleave', () => {
+      if (tooltip) {
+        tooltip.remove()
+        tooltip = null
+      }
+    })
+  }

@@ -4,9 +4,9 @@ ActiveAdmin.register User do
   permit_params :email, :first_name, :last_name, :role, :bio, :password, :password_confirmation
 
   scope :all, default: true
-  scope :admins, -> { where(role: :admin) }
-  scope :users, -> { where(role: :user) }
-  scope :creators, -> { creators }
+  scope :admin_users, -> { where(role: :admin) }
+  scope :regular_users, -> { where(role: :user) }
+  scope :movie_creators, -> { joins(:movies).distinct }
 
   # Filters for search functionality
   filter :email

@@ -296,3 +296,104 @@ export default class extends Controller {
       }
     })
   }
+
+  createTooltip(text) {
+    const tooltip = document.createElement('div')
+    tooltip.className = 'admin-tooltip fixed z-50 px-2 py-1 text-xs bg-surface border border-white/20 rounded-lg text-content shadow-lg pointer-events-none'
+    tooltip.textContent = text
+    return tooltip
+  }
+
+  positionTooltip(tooltip, element) {
+    const rect = element.getBoundingClientRect()
+    const tooltipRect = tooltip.getBoundingClientRect()
+
+    let top = rect.top - tooltipRect.height - 8
+    let left = rect.left + (rect.width - tooltipRect.width) / 2
+
+    // Adjust if tooltip goes off screen
+    if (top < 0) {
+      top = rect.bottom + 8
+    }
+
+    if (left < 0) {
+      left = 8
+    } else if (left + tooltipRect.width > window.innerWidth) {
+      left = window.innerWidth - tooltipRect.width - 8
+    }
+
+    tooltip.style.top = `${top}px`
+    tooltip.style.left = `${left}px`
+  }
+
+  // Date Picker Initialization
+  initializeDatePickers() {
+    const dateInputs = document.querySelectorAll('input[type="date"], input[type="datetime-local"]')
+    dateInputs.forEach(input => {
+      if (!input.hasAttribute('data-datepicker-initialized')) {
+        this.setupDatePicker(input)
+        input.setAttribute('data-datepicker-initialized', 'true')
+      }
+    })
+  }
+
+  setupDatePicker(input) {
+    // Add custom styling and behavior for date inputs
+    input.classList.add('admin-datepicker')
+
+    // Add calendar icon
+    const wrapper = document.createElement('div')
+    wrapper.className = 'relative'
+    input.parentNode.insertBefore(wrapper, input)
+    wrapper.appendChild(input)
+
+    const icon = document.createElement('i')
+    icon.className = 'fas fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-muted pointer-events-none'
+    wrapper.appendChild(icon)
+  }
+
+  // Page Metadata Update
+  updatePageMetadata() {
+    // Update page title if specified
+    const titleElement = document.querySelector('[data-page-title]')
+    if (titleElement) {
+      const title = titleElement.getAttribute('data-page-title')
+      document.title = `🎬 ${title} - CinéRoom Admin`
+    }
+
+    // Update breadcrumb if header controller exists
+    const headerController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller*="admin-header"]'),
+      'admin-header'
+    )
+
+    if (headerController) {
+      const breadcrumbData = this.extractBreadcrumbData()
+      if (breadcrumbData.length > 0) {
+        headerController.updateBreadcrumb(breadcrumbData)
+      }
+    }
+  }
+
+  extractBreadcrumbData() {
+    const breadcrumbElements = document.querySelectorAll('[data-breadcrumb]')
+    return Array.from(breadcrumbElements).map(element => ({
+      label: element.textContent.trim(),
+      path: element.getAttribute('href') || element.getAttribute('data-breadcrumb-path')
+    }))
+  }
+
+  // User Permissions Check
+  checkUserPermissions() {
+    const userRole = document.body.getAttribute('data-user-role')
+    const requiredPermissions = document.body.getAttribute('data-required-permissions')
+
+    if (requiredPermissions && userRole) {
+      const permissions = requiredPermissions.split(',')
+      const hasAccess = this.userHasPermissions(userRole, permissions)
+
+      if (!hasAccess) {
+        this.showAccessDeniedMessage()
+      }
+    }
+  }

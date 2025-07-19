@@ -12,7 +12,7 @@ class Event < ApplicationRecord
 
   before_save :update_status_if_sold_out
 
-  # Filters
+
   scope :by_title, ->(q) {
     joins(:movie).where("movies.title ILIKE ?", "%#{q}%") if q.present?
   }

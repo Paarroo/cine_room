@@ -245,3 +245,114 @@ export default class extends Controller {
       </div>
     `
   }
+
+  createDefaultChart() {
+    this.element.innerHTML = `
+      <div class="chart-placeholder w-full h-full flex items-center justify-center text-gray-400">
+        <div class="text-center">
+          <i class="fas fa-chart-bar text-4xl mb-4"></i>
+          <p class="text-sm">Graphique ${this.typeValue}</p>
+          <p class="text-xs text-muted mt-2">Données en cours de chargement...</p>
+        </div>
+      </div>
+    `
+  }
+
+  // Chart interactivity
+  addLineChartInteractivity() {
+    const points = this.element.querySelectorAll('.chart-point')
+    const tooltip = this.element.querySelector('.chart-tooltip')
+
+    points.forEach((point, index) => {
+      point.addEventListener('mouseenter', (e) => {
+        const data = this.dataValue[index]
+        if (data && tooltip) {
+          tooltip.querySelector('.tooltip-content').innerHTML = `
+            <div class="font-medium">${data.date}</div>
+            <div class="text-primary">${data.formatted_revenue || data.revenue}</div>
+          `
+          tooltip.classList.remove('hidden')
+
+          const rect = point.getBoundingClientRect()
+          const tooltipRect = tooltip.getBoundingClientRect()
+          tooltip.style.left = `${rect.left - tooltipRect.width / 2}px`
+          tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`
+        }
+      })
+
+      point.addEventListener('mouseleave', () => {
+        if (tooltip) {
+          tooltip.classList.add('hidden')
+        }
+      })
+    })
+  }
+
+  addDoughnutChartInteractivity() {
+    const segments = this.element.querySelectorAll('.chart-segment')
+
+    segments.forEach(segment => {
+      segment.addEventListener('mouseenter', () => {
+        // Highlight effect
+        segment.style.filter = 'brightness(1.1)'
+      })
+
+      segment.addEventListener('mouseleave', () => {
+        segment.style.filter = 'brightness(1)'
+      })
+
+      segment.addEventListener('click', () => {
+        const label = segment.dataset.label
+        const count = segment.dataset.count
+        console.log(`Clicked on ${label}: ${count} items`)
+
+        // Dispatch custom event for parent controllers
+        this.dispatch('segment-clicked', {
+          detail: { label, count }
+        })
+      })
+    })
+  }
+
+  // Helper methods
+  generateLinePoints(data) {
+    if (!data.length) return '0,100'
+
+    const maxRevenue = Math.max(...data.map(d => d.revenue || 0))
+
+    return data.map((point, index) => {
+      const x = (index / (data.length - 1)) * 380 + 10
+      const y = maxRevenue === 0 ? 100 : 180 - ((point.revenue || 0) / maxRevenue) * 160
+      return `${x},${y}`
+    }).join(' ')
+  }
+
+  getSegmentColor(index) {
+    const colors = [
+      '#f59e0b', // Gold
+      '#2563eb', // Blue
+      '#22c55e', // Green
+      '#ef4444', // Red
+      '#8b5cf6', // Purple
+      '#f97316'  // Orange
+    ]
+    return colors[index % colors.length]
+  }
+
+  // Public methods for external updates
+  updateData(newData) {
+    this.dataValue = newData
+    this.createPlaceholderChart()
+  }
+
+  refreshData() {
+    // Re-fetch data and update chart
+    this.dispatch('refresh-requested')
+  }
+
+  // Cleanup
+  destroyChart() {
+    // Clean up any chart instances, event listeners, etc.
+    this.element.innerHTML = ''
+  }
+}

@@ -64,3 +64,59 @@
           color: 'warning' %>
     </div>
   </section>
+
+  <!-- Charts Section -->
+  <section class="charts-section">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Revenue Chart -->
+      <div class="chart-container glass-effect rounded-3xl p-6">
+        <%= render 'shared/admin/dashboard/chart_header',
+            title: 'Évolution des Revenus',
+            subtitle: '30 derniers jours',
+            actions: true %>
+
+        <div
+          class="chart-wrapper h-64 mt-6"
+          data-controller="admin-chart"
+          data-admin-chart-type-value="line"
+          data-admin-chart-data-value="<%= revenue_chart_data.to_json %>"
+          data-admin-dashboard-target="revenueChart"
+        >
+          <!-- Chart rendered by Stimulus controller -->
+        </div>
+      </div>
+
+      <!-- Events Status Chart -->
+      <div class="chart-container glass-effect rounded-3xl p-6">
+        <%= render 'shared/admin/dashboard/chart_header',
+            title: 'Statut des Événements',
+            subtitle: 'Répartition actuelle',
+            actions: false %>
+
+        <div
+          class="chart-wrapper h-64 mt-6"
+          data-controller="admin-chart"
+          data-admin-chart-type-value="doughnut"
+          data-admin-chart-data-value="<%= events_status_chart_data.to_json %>"
+          data-admin-dashboard-target="eventsChart"
+        >
+          <!-- Chart rendered by Stimulus controller -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions & Recent Activity -->
+  <section class="activity-section">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Quick Actions -->
+      <div class="quick-actions glass-effect rounded-3xl p-6">
+        <%= render 'shared/admin/dashboard/quick_actions' %>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity lg:col-span-2 glass-effect rounded-3xl p-6">
+        <%= render 'shared/admin/dashboard/recent_activity' %>
+      </div>
+    </div>
+  </section>

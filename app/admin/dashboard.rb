@@ -1,7 +1,7 @@
 ActiveAdmin.register_page "Dashboard" do
-  menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }
+  menu priority: 1, label: "Dashboard"
 
-  content title: proc { I18n.t("active_admin.dashboard") } do
+  content title: "Dashboard" do
     div class: "blank_slate_container", id: "dashboard_default_message" do
       columns do
         column do
@@ -122,11 +122,11 @@ ActiveAdmin.register_page "Dashboard" do
               table do
                 tr do
                   th "Total Creators"
-                  td User.creators.count
+                  td User.where(role: :creator).count
                 end
                 tr do
                   th "New Creators (This Month)"
-                  td User.creators.where(
+                  td User.where(role: :creator).where(
                     created_at: Time.current.beginning_of_month..Time.current.end_of_month
                   ).count
                 end
@@ -172,7 +172,7 @@ ActiveAdmin.register_page "Dashboard" do
                 tr do
                   th "Average Movies per Creator"
                   td begin
-                    total_creators = User.creators.count
+                    total_creators = User.where(role: :creator).count
                     total_movies = Movie.count
                     total_creators > 0 ? (total_movies.to_f / total_creators).round(1) : 0
                   end

@@ -420,3 +420,113 @@ export default class extends Controller {
       this.showToast('Erreur lors de la validation', 'error')
     }
   }
+
+  async sendBulkNotifications() {
+    const notificationModal = document.getElementById('notification-modal')
+    if (notificationModal) {
+      // Open notification modal (handled by admin controller)
+      this.dispatch('open-modal', { detail: { modalId: 'notification-modal' } })
+    }
+  }
+
+  async initiateBackup() {
+    if (!confirm('Lancer une sauvegarde complète de la base de données ?')) {
+      return
+    }
+
+    this.showToast('Sauvegarde en cours...', 'info')
+
+    try {
+      const response = await fetch('/admin/backup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        this.showToast('Sauvegarde terminée avec succès', 'success')
+      } else {
+        throw new Error('Backup failed')
+      }
+    } catch (error) {
+      console.error('Backup error:', error)
+      this.showToast('Erreur lors de la sauvegarde', 'error')
+    }
+  }
+
+  // Activity Detail View
+  viewActivityDetail(event) {
+    const type = event.currentTarget.dataset.activityType
+    const id = event.currentTarget.dataset.activityId
+
+    if (!id) return
+
+    const routes = {
+      participation: `/admin/participations/${id}`,
+      movie: `/admin/movies/${id}`,
+      user: `/admin/users/${id}`
+    }
+
+    const url = routes[type]
+    if (url) {
+      // Open in new tab with Ctrl/Cmd click, otherwise navigate
+      if (event.ctrlKey || event.metaKey) {
+        window.open(url, '_blank')
+      } else {
+        window.location.href = url
+      }
+    }
+  }
+
+  // Keyboard Shortcuts
+  setupKeyboardShortcuts() {
+    this.keyboardHandler = this.handleKeyboard.bind(this)
+    document.addEventListener('keydown', this.keyboardHandler)
+  }
+
+  handleKeyboard(event) {
+    // Only handle when dashboard is focused
+    if (!this.element.contains(document.activeElement)) return
+
+    // R - Refresh dashboard
+    if (event.key === 'r' || event.key === 'R') {
+      if (!event.ctrlKey && !event.metaKey) {
+        event.preventDefault()
+        this.refreshDashboard()
+      }
+    }
+
+    // E - Export data
+    if (event.key === 'e' || event.key === 'E') {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        this.exportData('all')
+      }
+    }
+  }
+
+  // Auto-refresh Toggle
+  toggleAutoRefresh() {
+    this.autoRefreshValue = !this.autoRefreshValue
+
+    if (this.autoRefreshValue) {
+      this.setupAutoRefresh()
+      this.showToast('Actualisation automatique activée', 'success')
+    } else {
+      this.teardownAutoRefresh()
+      this.showToast('Actualisation automatique désactivée', 'info')
+    }
+
+    // Update toggle button state
+    const toggleButton = this.element.querySelector('[data-action*="toggleAutoRefresh"]')
+    if (toggleButton) {
+      const icon = toggleButton.querySelector('i')
+      if (icon) {
+        icon.classList.toggle('text-primary', this.autoRefreshValue)
+        icon.classList.toggle('text-muted', !this.autoRefreshValue)
+      }
+    }
+  }

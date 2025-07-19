@@ -530,3 +530,57 @@ export default class extends Controller {
       }
     }
   }
+
+  // Data Filtering
+  filterMetrics(event) {
+    const period = event.currentTarget.dataset.period
+    const filterButtons = this.element.querySelectorAll('[data-period]')
+
+    // Update active button
+    filterButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.period === period)
+    })
+
+    // Fetch filtered data
+    this.fetchFilteredData(period)
+  }
+
+  async fetchFilteredData(period) {
+    try {
+      const response = await fetch(`/admin/dashboard/filter?period=${period}`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        this.updateMetricsWithFilteredData(data)
+        this.updateChartsWithFilteredData(data)
+      }
+    } catch (error) {
+      console.error('Filter error:', error)
+      this.showToast('Erreur lors du filtrage', 'error')
+    }
+  }
+
+  updateMetricsWithFilteredData(data) {
+    // Update each metric card with filtered data
+    Object.entries(data.metrics).forEach(([key, value]) => {
+      const card = this.metricsTarget.querySelector(`[data-metric="${key}"]`)
+      if (card) {
+        const valueElement = card.querySelector('.metric-value')
+        const trendElement = card.querySelector('.metric-trend')
+
+        if (valueElement) {
+          valueElement.textContent = value.value
+        }
+
+        if (trendElement && value.trend) {
+          trendElement.textContent = value.trend
+          trendElement.className = `metric-trend ${value.trend_type}`
+        }
+      }
+    })
+  }

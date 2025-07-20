@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Admin Sidebar Controller
+// Admin Sidebar Controller - Handles sidebar navigation and responsive behavior
+export default class extends Controller {
   static targets = [
     "sidebar",
     "overlay",

@@ -115,3 +115,173 @@
       </div>
     </div>
   </div>
+
+  <!-- Management Tables -->
+  <div class="management-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+    <!-- Pending Movies -->
+    <div class="panel">
+      <h3>Films en Attente de Validation</h3>
+      <% if @pending_movies_count > 0 %>
+        <table class="index_table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Réalisateur</th>
+              <th>Année</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% Movie.where(validation_status: :pending).limit(5).each do |movie| %>
+              <tr>
+                <td><%= link_to movie.title, admin_movie_path(movie) %></td>
+                <td><%= movie.director %></td>
+                <td><%= movie.year %></td>
+                <td>
+                  <span class="status_tag pending">En attente</span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 15px;">
+          <button class="button" data-action="click->admin-dashboard#handleQuickAction" data-action="validate-movies">
+            Valider tous (<%= @pending_movies_count %>)
+          </button>
+        </div>
+      <% else %>
+        <p style="color: #666; text-align: center; padding: 20px;">
+          <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+          Aucun film en attente
+        </p>
+      <% end %>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="panel">
+      <h3>Activité Récente</h3>
+      <div class="recent-activity">
+        <% [@recent_participations.first(3), @recent_movies.first(2)].flatten.compact.each do |item| %>
+          <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+            <% if item.is_a?(Participation) %>
+              <div style="display: flex; align-items: center;">
+                <i class="fas fa-ticket-alt" style="color: #f59e0b; margin-right: 10px;"></i>
+                <div>
+                  <strong>Nouvelle participation</strong><br>
+                  <small style="color: #666;">
+                    <%= item.event.title %> • <%= time_ago_in_words(item.created_at) %>
+                  </small>
+                </div>
+              </div>
+            <% elsif item.is_a?(Movie) %>
+              <div style="display: flex; align-items: center;">
+                <i class="fas fa-film" style="color: #2563eb; margin-right: 10px;"></i>
+                <div>
+                  <strong>Film "<%= item.title %>"</strong><br>
+                  <small style="color: #666;">
+                    <%= item.validation_status.humanize %> • <%= time_ago_in_words(item.created_at) %>
+                  </small>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions panel">
+    <h3>Actions Rapides</h3>
+    <div class="quick_actions" style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <button class="button" data-action="click->admin-dashboard#handleQuickAction" data-action="export-data" data-type="users">
+        <i class="fas fa-download"></i> Exporter Utilisateurs
+      </button>
+      <button class="button" data-action="click->admin-dashboard#handleQuickAction" data-action="export-data" data-type="events">
+        <i class="fas fa-download"></i> Exporter Événements
+      </button>
+      <button class="button" data-action="click->admin-dashboard#handleQuickAction" data-action="backup-database">
+        <i class="fas fa-database"></i> Sauvegarde BDD
+      </button>
+    </div>
+  </div>
+
+  <!-- System Status -->
+  <div class="system-status panel" style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <div style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite;"></div>
+          <span style="color: #666;">Système opérationnel</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <div style="width: 10px; height: 10px; background: #2563eb; border-radius: 50%;"></div>
+          <span style="color: #666;">Base de données: OK</span>
+        </div>
+      </div>
+
+      <div style="color: #666; font-size: 0.9em;" data-admin-dashboard-target="lastUpdated">
+        Dernière mise à jour: <%= Time.current.strftime("%H:%M") %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .custom-admin-dashboard {
+    padding: 0;
+  }
+
+  .metric-card {
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.2s ease;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .metric-value {
+    margin: 10px 0;
+  }
+
+  .metric-trend {
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  .chart-container {
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+
+  .recent-activity {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .quick_actions button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .charts-section,
+    .management-section {
+      grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-metrics > div {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    }
+  }
+</style>

@@ -1,174 +1,551 @@
 <%#
-  Admin Dashboard - Main admin page with comprehensive overview
-  Uses partials extensively and Stimulus controllers for interactivity
+  CinéRoom Admin Dashboard - Main Overview
+  Modern glass-effect design with comprehensive metrics and real-time updates
 %>
 
-<% content_for :page_title, "Dashboard" %>
-<% content_for :head do %>
-  <meta name="description" content="CinéRoom Admin Dashboard - Vue d'ensemble">
-<% end %>
-
 <div
-  class="admin-dashboard p-6 space-y-8"
+  class="admin-dashboard"
   data-controller="admin-dashboard"
   data-admin-dashboard-refresh-interval-value="30000"
   data-admin-dashboard-auto-refresh-value="true"
 >
   <!-- Dashboard Header -->
-  <div class="dashboard-header">
-    <%= render 'shared/admin/dashboard/header' %>
-  </div>
+  <section class="dashboard-header py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 class="text-4xl lg:text-6xl font-bold mb-4">
+              Bonjour <span class="gradient-text"><%= current_user&.first_name || 'Admin' %></span> !
+            </h1>
+            <p class="text-xl text-gray-400">
+              Tableau de bord CinéRoom - <%= Date.current.strftime("%d %B %Y") %>
+            </p>
+            <div class="flex items-center mt-4 text-sm text-gray-400">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+              Système opérationnel • Dernière mise à jour: <%= Time.current.strftime("%H:%M") %>
+            </div>
+          </div>
+
+          <div class="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-4">
+            <%= link_to admin_movies_path,
+                class: "px-6 py-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white rounded-xl font-medium transition-all duration-300 hover:scale-105" do %>
+              <i class="fas fa-plus mr-2"></i>Nouveau Film
+            <% end %>
+
+            <%= link_to admin_events_path,
+                class: "px-6 py-3 glass-effect text-white hover:bg-white/10 rounded-xl font-medium transition-colors duration-300" do %>
+              <i class="fas fa-calendar-plus mr-2"></i>Nouvel Événement
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Key Metrics Overview -->
-  <section class="metrics-overview" data-admin-dashboard-target="metrics">
-    <h2 class="section-title text-2xl font-bold text-content mb-6 font-display">
-      <i class="fas fa-chart-line text-primary mr-3"></i>
-      Métriques Clés
-    </h2>
+  <section class="metrics-overview py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-white mb-6">
+        <i class="fas fa-chart-line text-primary mr-3"></i>
+        Métriques Clés
+      </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      <%= render 'shared/admin/dashboard/metric_card',
-          title: 'Revenus Total',
-          value: number_to_currency(
-            Participation.where(status: :confirmed)
-                        .joins(:event)
-                        .sum("events.price_cents * participations.seats") / 100.0
-          ),
-          icon: 'fas fa-euro-sign',
-          trend: '+12.5%',
-          trend_type: 'positive',
-          color: 'primary' %>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <!-- Revenue Metric -->
+        <div class="metric-card glass-effect rounded-2xl p-6 hover:border-primary/30 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-euro-sign text-primary text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-arrow-up mr-1"></i>+12.5%
+            </div>
+          </div>
 
-      <%= render 'shared/admin/dashboard/metric_card',
-          title: 'Événements Actifs',
-          value: Event.where(status: :upcoming).count,
-          icon: 'fas fa-calendar-alt',
-          trend: '+3',
-          trend_type: 'positive',
-          color: 'accent' %>
+          <div class="text-3xl font-bold gradient-text mb-2">
+            <%= number_to_currency(
+              Participation.where(status: :confirmed)
+                          .joins(:event)
+                          .sum("events.price_cents * participations.seats") / 100.0
+            ) %>
+          </div>
 
-      <%= render 'shared/admin/dashboard/metric_card',
-          title: 'Utilisateurs Total',
-          value: User.count,
-          icon: 'fas fa-users',
-          trend: "+#{User.where(created_at: 1.week.ago..Time.current).count}",
-          trend_type: 'positive',
-          color: 'success' %>
+          <div class="text-sm text-gray-400">Revenus Total</div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= number_to_currency(
+              Participation.where(status: :confirmed)
+                          .where(created_at: Time.current.beginning_of_month..Time.current.end_of_month)
+                          .joins(:event)
+                          .sum("events.price_cents * participations.seats") / 100.0
+            ) %> ce mois
+          </div>
+        </div>
 
-      <%= render 'shared/admin/dashboard/metric_card',
-          title: 'Taux Satisfaction',
-          value: "#{(Review.average(:rating) || 0).round(1)}/5",
-          icon: 'fas fa-star',
-          trend: '+0.2',
-          trend_type: 'positive',
-          color: 'warning' %>
+        <!-- Active Events Metric -->
+        <div class="metric-card glass-effect rounded-2xl p-6 hover:border-accent/30 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-calendar-alt text-accent text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-arrow-up mr-1"></i>+3
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-accent mb-2">
+            <%= Event.where(status: :upcoming).count %>
+          </div>
+
+          <div class="text-sm text-gray-400">Événements Actifs</div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= Event.where(status: :sold_out).count %> complets
+          </div>
+        </div>
+
+        <!-- Users Metric -->
+        <div class="metric-card glass-effect rounded-2xl p-6 hover:border-green-400/30 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-green-400/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-users text-green-400 text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-arrow-up mr-1"></i>+<%= User.where(created_at: 1.week.ago..Time.current).count %>
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-green-400 mb-2">
+            <%= User.count %>
+          </div>
+
+          <div class="text-sm text-gray-400">Utilisateurs Total</div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= User.joins(:participations).where(participations: { status: :confirmed }).distinct.count %> actifs
+          </div>
+        </div>
+
+        <!-- Satisfaction Metric -->
+        <div class="metric-card glass-effect rounded-2xl p-6 hover:border-yellow-400/30 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-star text-yellow-400 text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-arrow-up mr-1"></i>+0.2
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-yellow-400 mb-2">
+            <%= (Review.average(:rating) || 0).round(1) %>/5
+          </div>
+
+          <div class="text-sm text-gray-400">Satisfaction</div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= Review.count %> avis
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Charts Section -->
-  <section class="charts-section">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Revenue Chart -->
-      <div class="chart-container glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/chart_header',
-            title: 'Évolution des Revenus',
-            subtitle: '30 derniers jours',
-            actions: true %>
+  <section class="charts-section py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Revenue Chart -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-chart-line text-primary mr-2"></i>
+              Évolution des Revenus
+            </h3>
+            <span class="text-sm text-gray-400">30 derniers jours</span>
+          </div>
 
-        <div
-          class="chart-wrapper h-64 mt-6"
-          data-controller="admin-chart"
-          data-admin-chart-type-value="line"
-          data-admin-chart-data-value="<%= revenue_chart_data.to_json %>"
-          data-admin-dashboard-target="revenueChart"
-        >
-          <!-- Chart rendered by Stimulus controller -->
+          <div
+            class="chart-wrapper h-64"
+            data-controller="admin-chart"
+            data-admin-chart-type-value="line"
+            data-admin-chart-data-value='<%= (30.days.ago.to_date..Date.current).map { |date|
+              revenue = Participation.where(status: :confirmed)
+                                   .where(created_at: date.beginning_of_day..date.end_of_day)
+                                   .joins(:event)
+                                   .sum("events.price_cents * participations.seats") / 100.0
+              { date: date.strftime("%d/%m"), revenue: revenue }
+            }.to_json %>'
+            data-admin-dashboard-target="revenueChart"
+          >
+            <!-- Chart placeholder -->
+            <div class="h-full flex items-center justify-center text-gray-400">
+              <div class="text-center">
+                <i class="fas fa-chart-line text-4xl mb-4"></i>
+                <p>Graphique des revenus</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Events Status Chart -->
-      <div class="chart-container glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/chart_header',
-            title: 'Statut des Événements',
-            subtitle: 'Répartition actuelle',
-            actions: false %>
+        <!-- Events Status Chart -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-chart-pie text-accent mr-2"></i>
+              Statut des Événements
+            </h3>
+            <span class="text-sm text-gray-400">Répartition actuelle</span>
+          </div>
 
-        <div
-          class="chart-wrapper h-64 mt-6"
-          data-controller="admin-chart"
-          data-admin-chart-type-value="doughnut"
-          data-admin-chart-data-value="<%= events_status_chart_data.to_json %>"
-          data-admin-dashboard-target="eventsChart"
-        >
-          <!-- Chart rendered by Stimulus controller -->
+          <div
+            class="chart-wrapper h-64"
+            data-controller="admin-chart"
+            data-admin-chart-type-value="doughnut"
+            data-admin-chart-data-value='<%= Event.group(:status).count.map { |status, count|
+              percentage = (count.to_f / Event.count * 100).round(1)
+              { status: status.humanize, count: count, percentage: "#{percentage}%" }
+            }.to_json %>'
+            data-admin-dashboard-target="eventsChart"
+          >
+            <!-- Chart placeholder -->
+            <div class="h-full flex items-center justify-center text-gray-400">
+              <div class="text-center">
+                <i class="fas fa-chart-pie text-4xl mb-4"></i>
+                <p>Répartition des événements</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Quick Actions & Recent Activity -->
-  <section class="activity-section">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Quick Actions -->
-      <div class="quick-actions glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/quick_actions' %>
-      </div>
+  <!-- Management Tables -->
+  <section class="management-section py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
-      <!-- Recent Activity -->
-      <div class="recent-activity lg:col-span-2 glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/recent_activity' %>
+        <!-- Pending Movies -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-film text-primary mr-2"></i>
+              Films en Attente
+            </h3>
+            <% pending_movies_count = Movie.where(validation_status: :pending).count %>
+            <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-sm font-medium">
+              <%= pending_movies_count %> en attente
+            </span>
+          </div>
+
+          <% if pending_movies_count > 0 %>
+            <div class="space-y-3">
+              <% Movie.where(validation_status: :pending).limit(5).each do |movie| %>
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xs">
+                      <%= movie.title.first(2).upcase %>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-white"><%= movie.title %></h4>
+                      <p class="text-sm text-gray-400">
+                        <%= movie.director %> • <%= movie.year %>
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        Par <%= movie.user&.full_name || 'Créateur inconnu' %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-2">
+                    <%= link_to admin_movie_path(movie),
+                        class: "px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors" do %>
+                      <i class="fas fa-eye mr-1"></i>Voir
+                    <% end %>
+
+                    <button class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors">
+                      <i class="fas fa-check mr-1"></i>Valider
+                    </button>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="mt-6 text-center">
+              <%= link_to admin_movies_path(q: { validation_status_eq: 'pending' }),
+                  class: "inline-flex items-center px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors" do %>
+                <i class="fas fa-list mr-2"></i>
+                Voir tous les films en attente
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <i class="fas fa-check-circle text-4xl text-green-400 mb-4"></i>
+              <p class="text-gray-400">Aucun film en attente de validation</p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-clock text-accent mr-2"></i>
+              Activité Récente
+            </h3>
+            <span class="text-sm text-gray-400">Aujourd'hui</span>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Recent Participations -->
+            <% Participation.includes(:user, :event).order(created_at: :desc).limit(3).each do |participation| %>
+              <div class="flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
+                <div class="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-ticket-alt text-primary"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-white">
+                    Nouvelle réservation
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    <%= participation.user&.full_name || 'Utilisateur' %> •
+                    <%= participation.event&.title || 'Événement' %>
+                  </p>
+                </div>
+                <div class="text-xs text-gray-500">
+                  <%= time_ago_in_words(participation.created_at) %>
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Recent Movies -->
+            <% Movie.includes(:user).order(created_at: :desc).limit(2).each do |movie| %>
+              <div class="flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
+                <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-film text-blue-400"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-white">
+                    Nouveau film ajouté
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    "<%= movie.title %>" par <%= movie.user&.full_name || 'Créateur' %>
+                  </p>
+                </div>
+                <div class="text-xs text-gray-500">
+                  <%= time_ago_in_words(movie.created_at) %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mt-6 text-center">
+            <button class="text-sm text-primary hover:text-primary/80 transition-colors">
+              <i class="fas fa-history mr-1"></i>
+              Voir tout l'historique
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Data Tables -->
-  <section class="tables-section">
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <!-- Pending Movies -->
-      <div class="pending-movies glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/pending_movies_table' %>
-      </div>
+  <!-- Quick Actions -->
+  <section class="quick-actions py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-effect rounded-3xl p-8">
+        <h3 class="text-2xl font-bold text-white mb-6">
+          <i class="fas fa-bolt text-yellow-400 mr-3"></i>
+          Actions Rapides
+        </h3>
 
-      <!-- Recent Participations -->
-      <div class="recent-participations glass-effect rounded-3xl p-6">
-        <%= render 'shared/admin/dashboard/recent_participations_table' %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <%= link_to admin_movies_path,
+              class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-film text-primary"></i>
+              </div>
+              <div>
+                <div class="font-medium text-white">Gérer Films</div>
+                <div class="text-sm text-gray-400">
+                  <%= Movie.where(validation_status: :pending).count %> en attente
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%= link_to admin_events_path,
+              class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-calendar-alt text-accent"></i>
+              </div>
+              <div>
+                <div class="font-medium text-white">Événements</div>
+                <div class="text-sm text-gray-400">
+                  <%= Event.where(status: :upcoming).count %> à venir
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%= link_to admin_users_path,
+              class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-green-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-users text-green-400"></i>
+              </div>
+              <div>
+                <div class="font-medium text-white">Utilisateurs</div>
+                <div class="text-sm text-gray-400">
+                  <%= User.count %> total
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%= link_to admin_participations_path,
+              class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-ticket-alt text-yellow-400"></i>
+              </div>
+              <div>
+                <div class="font-medium text-white">Réservations</div>
+                <div class="text-sm text-gray-400">
+                  <%= Participation.where(status: :pending).count %> en attente
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Additional Actions -->
+        <div class="border-t border-white/10 mt-8 pt-6">
+          <div class="flex flex-wrap gap-4">
+            <button
+              class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+              data-action="click->admin-dashboard#exportData"
+              data-type="users"
+            >
+              <i class="fas fa-download mr-2"></i>Exporter Utilisateurs
+            </button>
+
+            <button
+              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors"
+              data-action="click->admin-dashboard#exportData"
+              data-type="events"
+            >
+              <i class="fas fa-download mr-2"></i>Exporter Événements
+            </button>
+
+            <button
+              class="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
+              data-action="click->admin-dashboard#backupDatabase"
+            >
+              <i class="fas fa-database mr-2"></i>Sauvegarde BDD
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- System Status -->
-  <section class="system-status">
-    <%= render 'shared/admin/dashboard/system_status' %>
+  <section class="system-status py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-effect rounded-3xl p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-white font-medium">Système opérationnel</span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+              <span class="text-gray-400">Base de données: OK</span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+              <span class="text-gray-400">
+                Serveur: <%= Rails.env.capitalize %>
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-4 lg:mt-0 text-sm text-gray-400" data-admin-dashboard-target="lastUpdated">
+            Dernière mise à jour: <%= Time.current.strftime("%d/%m/%Y à %H:%M") %>
+          </div>
+        </div>
+
+        <!-- Performance Indicators -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Taux d'occupation</span>
+              <span class="text-green-400 font-bold">
+                <%= ((Participation.where(status: :confirmed).sum(:seats).to_f / Event.sum(:max_capacity)) * 100).round(1) %>%
+              </span>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-2 mt-2">
+              <div
+                class="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+                style="width: <%= ((Participation.where(status: :confirmed).sum(:seats).to_f / Event.sum(:max_capacity)) * 100).round(1) %>%"
+              ></div>
+            </div>
+          </div>
+
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Taux de conversion</span>
+              <span class="text-blue-400 font-bold">
+                <%= ((Participation.where(status: :confirmed).count.to_f / Participation.count) * 100).round(1) %>%
+              </span>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-2 mt-2">
+              <div
+                class="bg-gradient-to-r from-blue-500 to-cyan-600 h-2 rounded-full transition-all duration-500"
+                style="width: <%= ((Participation.where(status: :confirmed).count.to_f / Participation.count) * 100).round(1) %>%"
+              ></div>
+            </div>
+          </div>
+
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Validation films</span>
+              <span class="text-yellow-400 font-bold">
+                <%= ((Movie.where(validation_status: :approved).count.to_f / Movie.count) * 100).round(1) %>%
+              </span>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-2 mt-2">
+              <div
+                class="bg-gradient-to-r from-yellow-500 to-orange-600 h-2 rounded-full transition-all duration-500"
+                style="width: <%= ((Movie.where(validation_status: :approved).count.to_f / Movie.count) * 100).round(1) %>%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </div>
 
-<!-- Dashboard Modals -->
-<div id="dashboard-modals">
-  <%= render 'shared/admin/dashboard/modals' %>
-</div>
-
-<%# Inline styles for dashboard-specific animations %>
 <style>
+  /* Dashboard-specific animations */
   .metric-card {
-    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease-out;
   }
 
-  .metric-card:hover {
-    transform: translateY(-2px);
-  }
-
-  .chart-container {
-    transition: all 0.3s ease;
-  }
-
-  .chart-container:hover {
-    transform: translateY(-1px);
-  }
+  .metric-card:nth-child(1) { animation-delay: 0.1s; }
+  .metric-card:nth-child(2) { animation-delay: 0.2s; }
+  .metric-card:nth-child(3) { animation-delay: 0.3s; }
+  .metric-card:nth-child(4) { animation-delay: 0.4s; }
 
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
@@ -176,12 +553,25 @@
     }
   }
 
-  .admin-dashboard > * {
-    animation: fadeInUp 0.6s ease-out;
+  /* Hover effects */
+  .metric-card:hover {
+    transform: translateY(-2px);
   }
 
-  .admin-dashboard > *:nth-child(2) { animation-delay: 0.1s; }
-  .admin-dashboard > *:nth-child(3) { animation-delay: 0.2s; }
-  .admin-dashboard > *:nth-child(4) { animation-delay: 0.3s; }
-  .admin-dashboard > *:nth-child(5) { animation-delay: 0.4s; }
+  /* Loading states */
+  .chart-wrapper.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .dashboard-header h1 {
+      font-size: 2rem;
+    }
+
+    .metric-card {
+      padding: 1rem;
+    }
+  }
 </style>

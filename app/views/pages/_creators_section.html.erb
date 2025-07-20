@@ -14,7 +14,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <% @creators.each do |creator| %>
         <% initials = "#{creator.first_name.first}#{creator.last_name.first}".upcase %>
-        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card" data-target="#">
+        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card relative" data-target="#">
+          <%= link_to creator_path(creator), class: "absolute inset-0 z-10", data: { turbo: false} do %><% end %>
           <div class="relative h-80 bg-gradient-to-br from-gold-500/20 to-amber-600/20">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-400 via-transparent to-transparent"></div>
 

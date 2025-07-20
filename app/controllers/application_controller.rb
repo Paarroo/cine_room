@@ -2,7 +2,18 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   allow_browser versions: :modern
 
-  before_action :authenticate_user!, except: [ :home, :about, :contact, :legal, :privacy, :terms ]
+  before_action :authenticate_user!, except: [
+      # Static pages
+      :home, :about, :contact, :legal, :privacy, :terms,
+      # Public movie browsing
+      :index, :show, :search, :by_genre, :featured,
+      # Public event browsing
+      :filter, :calendar, :upcoming, :past, :availability,
+      # Public creator profiles
+      :portfolio, :events,
+      # Public reviews reading
+      :recent, :top_rated
+    ]
    before_action :configure_permitted_parameters, if: :devise_controller?
 
    def current_admin_user

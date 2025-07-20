@@ -4,28 +4,30 @@ export default class extends Controller {
   static targets = ["tabButton", "panel"]
 
   connect() {
-    this.showPanel("user") // Show user dashboard by default
+    const savedTab = localStorage.getItem("dashboardTab") || "user"
+    this.switchTab(savedTab)
   }
 
   switch(event) {
     const selectedTab = event.currentTarget.dataset.tab
-
-    this.tabButtonTargets.forEach((btn) => {
-      btn.classList.remove("bg-cinema-blue", "bg-gold-500", "text-white")
-      btn.classList.add("bg-dark-300")
-    })
-
-    event.currentTarget.classList.add(selectedTab === "user" ? "bg-gold-500" : "bg-cinema-blue", "text-white")
-
-    this.panelTargets.forEach((panel) => {
-      panel.classList.add("hidden")
-    })
-
-    this.showPanel(selectedTab)
+    this.switchTab(selectedTab)
+    localStorage.setItem("dashboardTab", selectedTab)
   }
 
-  showPanel(name) {
-    const panel = this.panelTargets.find((el) => el.dataset.panel === name)
-    if (panel) panel.classList.remove("hidden")
+  switchTab(tabName) {
+    this.tabButtonTargets.forEach(button => {
+      const isActive = button.dataset.tab === tabName
+      button.classList.toggle("text-cinema-blue", tabName === "creator" && isActive)
+      button.classList.toggle("text-gold-500", tabName === "user" && isActive)
+      button.classList.toggle("border-b-2", isActive)
+      button.classList.toggle("border-cinema-blue", tabName === "creator" && isActive)
+      button.classList.toggle("border-gold-500", tabName === "user" && isActive)
+    })
+
+    this.panelTargets.forEach(panel => {
+      const isVisible = panel.dataset.panel === tabName
+      panel.classList.toggle("hidden", !isVisible)
+      panel.classList.toggle("block", isVisible)
+    })
   }
 }

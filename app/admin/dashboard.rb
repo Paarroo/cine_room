@@ -33,28 +33,39 @@ ActiveAdmin.register_page "Dashboard" do
       }
     end
 
+    # Fixed syntax error - proper hash closing and error handling
     def calculate_event_stats
       {
         total_events: Event.count,
-        upcoming_events: Event.where(status: :upcoming).count rescue Event.count,
-        completed_events: Event.where(status: :completed).count rescue 0
+        upcoming_events: safe_count { Event.where(status: :upcoming).count },
+        completed_events: safe_count { Event.where(status: :completed).count }
       }
     end
 
     def calculate_user_stats
       {
         total_users: User.count,
-        admin_users: User.where(role: :admin).count rescue 0,
-        regular_users: User.where(role: :user).count rescue User.count
+        admin_users: safe_count { User.where(role: :admin).count },
+        regular_users: safe_count { User.where(role: :user).count }
       }
     end
 
     def calculate_movie_stats
       {
         total_movies: Movie.count,
-        validated_movies: Movie.where(validation_status: :validated).count rescue Movie.count,
-        pending_movies: Movie.where(validation_status: :pending).count rescue 0
+        validated_movies: safe_count { Movie.where(validation_status: :validated).count },
+        pending_movies: safe_count { Movie.where(validation_status: :pending).count }
       }
+    end
+
+    # Helper method for safe counting with error handling
+    def safe_count(default_value = 0)
+      begin
+        yield
+      rescue StandardError => e
+        Rails.logger.warn "Count query failed: #{e.message}"
+        default_value
+      end
     end
   end
 

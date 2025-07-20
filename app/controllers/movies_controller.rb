@@ -1,6 +1,6 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_owner_or_admin!, only: [ :edit, :update, :destroy ]
+  before_action :ensure_owner_or_admin!, only: [:destroy ]
 
   def index
     @movies = Movie.includes(:user, :events)

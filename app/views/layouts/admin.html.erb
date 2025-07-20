@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html data-controller="admin" class="scroll-smooth">
+  <head>
+    <title>🎬<%= content_for(:title) || "CinéRoom Admin - Dashboard" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <!-- Icons -->
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- FONTS - Consistent with main app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS - Application styles + Admin overrides -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "active_admin", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-surface text-content min-h-screen" data-admin-target="body">
+    <!-- Admin Sidebar -->
+    <%= render 'shared/admin/sidebar' %>
+
+    <!-- Main Content Area -->
+    <div class="admin-content" data-admin-target="content">
+      <!-- Admin Header -->
+      <%= render 'shared/admin/header' %>
+
+      <!-- Flash Messages -->
+      <%= render 'shared/admin/flash_messages' if notice || alert %>
+
+      <!-- Page Content -->
+      <main class="admin-main">
+        <%= yield %>
+      </main>
+    </div>
+
+    <!-- Admin Modals Container -->
+    <div id="admin-modals" data-admin-target="modals"></div>
+
+    <!-- Admin Toast Notifications -->
+    <%= render 'shared/admin/toast_notifications' %>
+  </body>
+</html>

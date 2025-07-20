@@ -1,0 +1,63 @@
+<%#
+  Admin Navigation Item Partial
+
+  Required params:
+  - path: String - Route path
+  - icon: String - FontAwesome icon class
+  - label: String - Display label
+
+  Optional params:
+  - active: Boolean - Is current page (default: false)
+  - badge: Integer - Badge count (default: nil)
+  - target: String - Stimulus target (default: nil)
+%>
+
+<%
+  # Default parameters
+  active = local_assigns.fetch(:active, false)
+  badge = local_assigns.fetch(:badge, nil)
+  target = local_assigns.fetch(:target, nil)
+
+  # Dynamique CSS
+  nav_classes = [
+    "nav-item group flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200",
+    active ? "bg-primary text-white shadow-lg" : "text-muted hover:text-content hover:bg-white/5"
+  ].join(" ")
+
+  # Icon
+  icon_classes = [
+    "nav-icon transition-transform duration-200 group-hover:scale-110",
+    active ? "text-white" : "text-primary"
+  ].join(" ")
+%>
+
+<%= link_to path,
+    class: nav_classes,
+    data: {
+      turbo: false,
+      nav_target: target,
+      admin_sidebar_target: "navItem"
+    }.compact do %>
+
+  <div class="flex items-center space-x-3">
+    <!-- Icône -->
+    <i class="<%= icon %> <%= icon_classes %> w-5 text-center"></i>
+
+    <!-- Label -->
+    <span class="nav-label font-medium text-sm">
+      <%= label %>
+    </span>
+  </div>
+
+  <!-- Badge (present? & > 0) -->
+  <% if badge && badge > 0 %>
+    <span class="nav-badge bg-accent text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+      <%= badge > 99 ? '99+' : badge %>
+    </span>
+  <% end %>
+
+  <!-- Indicator -->
+  <% if active %>
+    <div class="nav-active-indicator absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-r-full"></div>
+  <% end %>
+<% end %>

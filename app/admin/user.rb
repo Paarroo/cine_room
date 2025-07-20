@@ -3,7 +3,6 @@ ActiveAdmin.register User do
 
   permit_params :email, :first_name, :last_name, :role, :bio, :password, :password_confirmation
 
-  # Scopes optimisés
   scope :all, default: true
   scope :admin_users, -> { where(role: :admin) }
   scope :regular_users, -> { where(role: :user) }

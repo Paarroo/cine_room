@@ -6,9 +6,9 @@ class Users::DashboardController < ApplicationController
     @user = current_user
     @upcoming_participations = @user.participations.upcoming.includes(:event)
     @past_participations = @user.participations.past.includes(:event)
-
+    @published_movies = @user.movies
+    
     if @user.creator?
-      @published_movies = @user.movies.includes(:events)
       @created_events = @user.created_events
     end
   end

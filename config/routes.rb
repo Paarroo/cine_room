@@ -1,11 +1,4 @@
 Rails.application.routes.draw do
-  namespace :admin do
-    root 'dashboard#index'
-
-    get 'dashboard/refresh', to: 'dashboard#refresh'
-    get 'dashboard/quick_stats', to: 'dashboard#quick_stats'
-    post 'dashboard/export/:type', to: 'dashboard#export', as: :export_data
-  end
   ActiveAdmin.routes(self)
 
   devise_for :users, controllers: {
@@ -23,6 +16,16 @@ Rails.application.routes.draw do
 
   unauthenticated do
     root to: 'pages#home'
+  end
+
+  namespace :admin do
+    resources :dashboard, only: [ :index ] do
+      collection do
+        get :refresh
+        get :quick_stats
+        post 'export/:type', to: 'dashboard#export', as: :export_data
+      end
+    end
   end
 
   namespace :users do

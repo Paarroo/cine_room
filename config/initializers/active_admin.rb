@@ -16,6 +16,4 @@ ActiveAdmin.setup do |config|
   config.default_namespace = :admin
   config.default_per_page = 30
   config.filters = true
-
-  config.default_namespace = false
 end

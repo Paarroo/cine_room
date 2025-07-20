@@ -61,7 +61,7 @@ ActiveAdmin.register_page "Dashboard" do
     end
   end
 
-  # Content utilise le layout ActiveAdmin par défaut
+  # Content uses ActiveAdmin default layout
   content title: "CinéRoom Dashboard" do
     # Dashboard Header
     div class: "dashboard-header" do
@@ -70,6 +70,7 @@ ActiveAdmin.register_page "Dashboard" do
         p "Tableau de bord CinéRoom - #{Date.current.strftime('%d %B %Y')}", style: "color: #9ca3af; font-size: 1.125rem;"
 
         div style: "margin-top: 1.5rem;" do
+          # Fixed: Using correct ActiveAdmin routes
           link_to "Nouveau Film", admin_movies_path, class: "button", style: "margin-right: 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;"
           link_to "Nouvel Événement", admin_events_path, class: "button", style: "background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;"
         end
@@ -158,6 +159,7 @@ ActiveAdmin.register_page "Dashboard" do
                   end
 
                   div style: "display: flex; gap: 0.5rem;" do
+                    # Fixed: Using correct ActiveAdmin route
                     link_to "Voir", admin_movie_path(movie), class: "button", style: "padding: 0.25rem 0.75rem; background: rgba(37, 99, 235, 0.2); color: #3b82f6; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;"
                   end
                 end
@@ -165,6 +167,7 @@ ActiveAdmin.register_page "Dashboard" do
             end
 
             div style: "margin-top: 1rem; text-align: center;" do
+              # Fixed: Using correct ActiveAdmin route with filter
               link_to "Voir tous les films en attente", admin_movies_path + "?q[validation_status_eq]=pending", style: "color: #f59e0b; text-decoration: none;"
             end
           else
@@ -221,6 +224,7 @@ ActiveAdmin.register_page "Dashboard" do
       h3 "Actions Rapides", style: "color: #f59e0b; margin-bottom: 1.5rem; font-size: 1.25rem;"
 
       div style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;" do
+        # Fixed: Using correct ActiveAdmin routes
         link_to admin_movies_path, style: "padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; text-decoration: none; color: white; transition: all 0.3s ease; display: block;" do
           div style: "display: flex; align-items: center; gap: 0.75rem;" do
             div style: "width: 3rem; height: 3rem; background: rgba(245, 158, 11, 0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;" do

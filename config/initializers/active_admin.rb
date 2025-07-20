@@ -5,7 +5,7 @@ ActiveAdmin.setup do |config|
   # Basic site configuration
   config.site_title = "CinéRoom Admin"
   config.site_title_link = "/"
-
+  config.before_action :set_admin_layout
   # Authentication - using your existing Devise setup
   config.authentication_method = :authenticate_admin_user!
   config.current_user_method = :current_admin_user

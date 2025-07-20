@@ -1,5 +1,8 @@
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: "Dashboard"
+  content title: "Dashboard" do
+      render partial: 'admin/dashboard/index', layout: false
+    end
 
   controller do
     before_action :authenticate_user!

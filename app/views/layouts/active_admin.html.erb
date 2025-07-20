@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" class="scroll-smooth bg-dark-400" data-controller="admin">
+  <head>
+    <title>🎬 <%= content_for(:title) || "CinéRoom Admin Dashboard" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <!-- Icons and PWA manifest -->
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Dyslexie-friendly fonts for accessibility -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS stack: ActiveAdmin then Application for proper override hierarchy -->
+    <%= stylesheet_link_tag "active_admin", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <!-- Admin-specific styles matching mockup design -->
+    <style>
+      /* Core admin layout inspired by mockup */
+      .admin-layout {
+        background: #0a0a0a;
+        color: white;
+        min-height: 100vh;
+        font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+      }
+
+      /* Glass effect utility matching mockup aesthetic */
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Gradient text for branding consistency */
+      .gradient-text {
+        background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Admin layout structure */
+      .admin-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar styling matching mockup navigation */
+      .admin-sidebar {
+        width: 256px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 40;
+        transition: transform 0.3s ease;
+      }
+
+      .admin-sidebar.collapsed {
+        transform: translateX(-100%);
+      }
+
+      /* Main content area with proper spacing */
+      .admin-main {
+        margin-left: 256px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      /* Header with glass effect */
+      .admin-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Hide default ActiveAdmin header */
+      #header {
+        display: none !important;
+      }
+
+      /* Override ActiveAdmin body styles */
+      body.active_admin {
+        background: #0a0a0a !important;
+        color: white !important;
+        font-family: "Atkinson Hyperlegible", system-ui, sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* Content area styling */
+      #active_admin_content {
+        background: transparent !important;
+        margin: 0 !important;
+        padding: 2rem !important;
+        flex: 1;
+      }
+
+      /* Navigation styles */
+      .nav-link {
+        color: #9ca3af;
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .nav-link:hover {
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .nav-link.active {
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.2);
+        font-weight: 600;
+      }
+
+      /* User avatar styling */
+      .user-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.875rem;
+      }
+
+      /* Metric cards matching mockup style */
+      .metric-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .metric-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(245, 158, 11, 0.3);
+        box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
+      }
+
+      /* ActiveAdmin component overrides */
+      .index_table {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1rem !important;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .index_table th {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        font-size: 0.875rem;
+      }
+
+      .index_table td {
+        background: transparent !important;
+        color: #e5e7eb !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      }
+
+      .index_table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+      }
+
+      /* Panel styling */
+      .panel {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 1rem !important;
+        backdrop-filter: blur(10px);
+      }
+
+      .panel h3 {
+        color: #f59e0b !important;
+        font-weight: bold !important;
+      }
+
+      /* Button styling */
+      .button, input[type="submit"] {
+        background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 0.75rem !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+      }
+
+      .button:hover, input[type="submit"]:hover {
+        background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3) !important;
+      }
+
+      /* Responsive design for mobile */
+      @media (max-width: 1024px) {
+        .admin-sidebar {
+          transform: translateX(-100%);
+        }
+
+        .admin-sidebar.mobile-open {
+          transform: translateX(0);
+        }
+
+        .admin-main {
+          margin-left: 0;
+        }
+
+        .desktop-nav {
+          display: none;
+        }
+
+        #active_admin_content {
+          padding: 1rem !important;
+        }
+      }
+
+      /* Footer styling */
+      .admin-footer {
+        background: #111111;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: auto;
+      }
+
+      /* Animation keyframes */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      /* Loading states */
+      .loading-skeleton {
+        background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+    </style>
+  </head>
+
+  <body class="admin-layout active_admin" data-admin-target="body">
+    <!-- Admin Container with Sidebar + Main Layout -->
+    <div class="admin-container">
+
+      <!-- Admin Navigation -->
+      <%= render 'shared/navbar' %>
+      <%= render 'shared/admin/sidebar' %>
+
+      <!-- Main Content Area -->
+      <div class="admin-main">
+
+        <!-- Flash Messages System -->
+        <% if notice || alert %>
+          <%= render 'shared/admin/flash_messages' %>
+        <% end %>
+
+        <!-- Main Content Wrapper -->
+        <main class="admin-content" data-admin-target="content">
+          <!-- ActiveAdmin content injection point -->
+          <%= yield %>
+        </main>
+
+        <!-- Admin Footer -->
+        <%= render 'shared/footer' %>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay fixed inset-0 bg-black/50 z-30 lg:hidden hidden"
+         data-admin-target="overlay"
+         data-action="click->admin#closeSidebar"></div>
+
+    <!-- Notification Container for Real-time Updates -->
+    <div id="notification-container"
+         class="fixed top-4 right-4 z-50 space-y-3"
+         data-admin-target="notifications"></div>
+
+    <!-- Loading Overlay for AJAX Operations -->
+    <div id="loading-overlay"
+         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden"
+         data-admin-target="loadingOverlay">
+      <div class="glass-effect rounded-2xl p-8 text-center">
+        <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-white font-medium">Processing...</p>
+      </div>
+    </div>
+
+    <!-- JavaScript Enhancement -->
+    <script>
+      // Initialize admin interface
+      document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide flash messages after 5 seconds
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+          if (!message.classList.contains('error')) {
+            setTimeout(() => {
+              message.style.opacity = '0';
+              message.style.transform = 'translateX(100%)';
+              setTimeout(() => message.remove(), 300);
+            }, 5000);
+          }
+        });
+
+        // Add loading states to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            }
+          });
+        });
+
+        // Enhance table rows with hover effects
+        const tableRows = document.querySelectorAll('.index_table tbody tr');
+        tableRows.forEach(row => {
+          row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+          });
+
+          row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+          });
+        });
+
+        // Real-time clock in admin header
+        function updateClock() {
+          const clockElement = document.querySelector('[data-admin-clock]');
+          if (clockElement) {
+            const now = new Date();
+            clockElement.textContent = now.toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }
+        }
+
+        // Update clock every minute
+        updateClock();
+        setInterval(updateClock, 60000);
+
+        // Add system status indicator
+        const statusIndicator = document.querySelector('[data-system-status]');
+        if (statusIndicator) {
+          // Simulate system health check
+          fetch('/admin/system/status', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            statusIndicator.className = `w-2 h-2 rounded-full ${data.healthy ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`;
+          })
+          .catch(() => {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-yellow-400';
+          });
+        }
+
+        // Performance monitoring
+        if ('performance' in window) {
+          window.addEventListener('load', function() {
+            const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            console.log(`🎬 Admin Dashboard loaded in ${loadTime}ms`);
+          });
+        }
+      });
+
+      // Global error handler for AJAX requests
+      document.addEventListener('turbo:fetch-request-error', function(event) {
+        console.error('Network error:', event.detail.error);
+        // Show user-friendly error message
+        const notification = document.createElement('div');
+        notification.className = 'bg-red-500/20 border border-red-500/30 text-red-300 p-4 rounded-xl';
+        notification.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Network error. Please try again.';
+
+        const container = document.getElementById('notification-container');
+        if (container) {
+          container.appendChild(notification);
+          setTimeout(() => notification.remove(), 5000);
+        }
+      });
+
+      // Keyboard shortcuts for admin efficiency
+      document.addEventListener('keydown', function(event) {
+        // Ctrl+/ - Show keyboard shortcuts
+        if (event.ctrlKey && event.key === '/') {
+          event.preventDefault();
+          alert('Admin Shortcuts:\nCtrl+H: Home\nCtrl+M: Movies\nCtrl+E: Events\nCtrl+U: Users');
+        }
+
+        // Quick navigation shortcuts
+        if (event.ctrlKey && !event.shiftKey) {
+          switch(event.key) {
+            case 'h':
+              event.preventDefault();
+              window.location.href = '/admin';
+              break;
+            case 'm':
+              event.preventDefault();
+              window.location.href = '/admin/movies';
+              break;
+            case 'e':
+              event.preventDefault();
+              window.location.href = '/admin/events';
+              break;
+            case 'u':
+              event.preventDefault();
+              window.location.href = '/admin/users';
+              break;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

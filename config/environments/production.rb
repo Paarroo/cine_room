@@ -8,7 +8,7 @@ Rails.application.configure do
    config.assets.compile = true
    config.assets.digest = true
    config.serve_static_assets = true
-
+   config.action_controller.raise_on_missing_callback_actions = false
    # Desable redentials
    config.require_master_key = false
   # Settings specified here will take precedence over those in config/application.rb.
@@ -93,14 +93,10 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              "in-v3.mailjet.com",
     port:                 587,
-    domain:               "cineroom.com", 
+    domain:               "cineroom.com",
     user_name:            ENV["SMTP_USERNAME"],
     password:             ENV["SMTP_PASSWORD"],
     authentication:       "plain",
     enable_starttls_auto: true
   }
-
-
-
-
 end

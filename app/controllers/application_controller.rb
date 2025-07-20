@@ -2,65 +2,123 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   allow_browser versions: :modern
 
-  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :authenticate_user!, except: [
+      # Static pages
+      :home, :about, :contact, :legal, :privacy, :terms,
+      # Public movie browsing
+      :index, :show, :search, :by_genre, :featured,
+      # Public event browsing
+      :filter, :calendar, :upcoming, :past, :availability,
+      # Public creator profiles
+      :portfolio, :events,
+      # Public reviews reading
+      :recent, :top_rated
+    ]
+   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  def after_sign_in_path_for(resource)
-    if resource.admin?
-      admin_root_path
-    else
-      root_path
-    end
-  end
+   def set_admin_layout
+       if request.path.starts_with?('/admin')
+         self.class.layout 'active_admin'
+       end
+     end
 
-  def after_sign_out_path_for(resource_or_scope)
-    new_user_session_path
-  end
+   def current_admin_user
+     current_user if current_user&.admin?
+   end
 
-  def authenticate_admin_user!
-    authenticate_user!
-    unless current_user&.admin?
-      redirect_to root_path, alert: "Tu n'as pas les permissions pour accéder à cet espace !"
-    end
-  end
+   def authenticate_admin_user!
+     unless current_user&.admin?
+       flash[:alert] = "Accès non autorisé. Droits administrateur requis."
+       redirect_to root_path
+     end
+   end
 
-  def current_admin_user
-    current_user if current_user&.admin?
-  end
+   def admin_logout
+     if current_user&.admin?
+       sign_out(current_user)
+       flash[:notice] = "Déconnexion administrative réussie."
+       redirect_to new_user_session_path
+     else
+       redirect_to root_path, alert: "Action non autorisée."
+     end
+   end
 
-  def ensure_admin!
-    redirect_to root_path, alert: 'Accès refusé !' unless current_user&.admin?
-  end
+   def not_found
+     render 'errors/404', status: :not_found, layout: 'application'
+   end
 
-  def ensure_creator_or_admin!
-    unless current_user&.admin? || current_user&.creator
-      redirect_to root_path, alert: 'Les droits de Créateur te sont requis pour y accéder !'
-    end
-  end
-  private
+   # Global error handler
+   rescue_from ActiveRecord::RecordNotFound, with: :not_found
+   rescue_from ActionController::RoutingError, with: :not_found
 
-    def skip_authentication?
-      devise_controller? || (controller_name == 'pages' && action_name == 'home')
-    end
+   protected
 
-  protected
+   def after_sign_in_path_for(resource)
+     if resource.admin?
+       admin_root_path
+     elsif resource.creator?
+       users_dashboard_path(resource)
+     else
+       users_dashboard_path(resource)
+     end
+   end
 
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [ :first_name, :last_name ])
-    devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name, :bio ])
+   def after_sign_out_path_for(resource_or_scope)
+     root_path
+   end
 
+   def ensure_admin!
+     unless current_user&.admin?
+       flash[:alert] = "Accès administrateur requis."
+       redirect_to root_path
+     end
+   end
 
-    def authenticate_admin_user!
-      authenticate_user!
-      redirect_to root_path unless current_user&.admin?
-    end
+   def ensure_owner_or_admin!(resource)
+     unless resource.user == current_user || current_user&.admin?
+       flash[:alert] = "Vous ne pouvez accéder qu'à vos propres ressources."
+       redirect_to root_path
+     end
+   end
 
-    def current_admin_user
-      current_user if current_user&.admin?
-    end
+   # Set locale (if internationalization is needed)
+   def set_locale
+     I18n.locale = params[:locale] || I18n.default_locale
+   end
 
-    def admin_logout
-      sign_out current_user
-      redirect_to root_path, notice: 'Déconnexion réussie'
-    end
-  end
+   def track_activity
+     return unless current_user
+
+     current_user.update_column(:last_seen_at, Time.current) if current_user.respond_to?(:last_seen_at)
+   end
+
+   private
+
+   # Handle different types of format requests
+   def respond_with_format(object, options = {})
+     respond_to do |format|
+       format.html { redirect_to options[:redirect_to] || object }
+       format.json { render json: object }
+       format.turbo_stream { render options[:turbo_stream] } if options[:turbo_stream]
+     end
+   end
+
+   # Common flash message helper
+   def set_flash_message(type, message)
+     flash[type] = message
+   end
+
+   # Breadcrumb helper for admin pages
+   def add_breadcrumb(name, path = nil)
+     @breadcrumbs ||= []
+     @breadcrumbs << { name: name, path: path }
+   end
+
+   def set_page_title(title)
+     @page_title = title
+   end
+
+   def set_meta_tags(tags = {})
+     @meta_tags = tags
+   end
 end

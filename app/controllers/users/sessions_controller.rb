@@ -20,13 +20,24 @@ class Users::SessionsController < Devise::SessionsController
   def after_sign_in_path_for(resource)
     if resource.respond_to?(:admin?) && resource.admin?
       admin_root_path  # Redirect admins to ActiveAdmin
+    elsif resource.creator?
+      users_dashboard_path(resource)
     else
-      stored_location_for(resource) || root_path  # Regular users to home
+      users_dashboard_path(resource)
     end
   end
 
   # Override Devise's default redirect after sign out
   def after_sign_out_path_for(resource_or_scope)
-    new_user_session_path
+    root_path
+  end
+
+  private
+
+  # Méthode appelée par ApplicationController
+  # Même si pas utilisée ici, elle doit exister pour éviter l'erreur
+  def configure_permitted_parameters
+    # Optionnel : personnaliser les paramètres autorisés pour les sessions
+    # Généralement pas nécessaire pour les sessions, mais requis par l'héritage
   end
 end

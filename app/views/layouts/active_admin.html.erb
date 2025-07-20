@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" class="scroll-smooth bg-dark-400" data-controller="admin">
+  <head>
+    <title>🎬 <%= content_for(:title) || "CinéRoom Admin Dashboard" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <!-- Icons and PWA manifest -->
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Dyslexie-friendly fonts for accessibility -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS stack: ActiveAdmin then Application for proper override hierarchy -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "active_admin", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "admin_dashboard", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+  </head>
+
+  <body class="admin-layout active_admin" data-admin-target="body">
+
+      <!-- Admin Navigation -->
+      <%= render 'shared/navbar' %>
+
+      <!-- Main Content Area -->
+      <div class="admin-main">
+
+        <!-- Flash Messages System -->
+        <% if notice || alert %>
+          <%= render 'shared/admin/flash_messages' %>
+        <% end %>
+
+        <!-- Main Content Wrapper -->
+        <main class="admin-content" data-admin-target="content">
+          <!-- ActiveAdmin content injection point -->
+          <%= yield %>
+        </main>
+
+        <!-- Admin Footer -->
+        <%= render 'shared/footer' %>
+      </div>
+    </div>
+
+
+    <!-- Notification Container for Real-time Updates -->
+    <div id="notification-container"
+         class="fixed top-4 right-4 z-50 space-y-3"
+         data-admin-target="notifications"></div>
+
+    <!-- Loading Overlay for AJAX Operations -->
+    <div id="loading-overlay"
+         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden"
+         data-admin-target="loadingOverlay">
+
+    </div>
+
+    <!-- JavaScript Enhancement -->
+    <script>
+      // Initialize admin interface
+      document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide flash messages after 5 seconds
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+          if (!message.classList.contains('error')) {
+            setTimeout(() => {
+              message.style.opacity = '0';
+              message.style.transform = 'translateX(100%)';
+              setTimeout(() => message.remove(), 300);
+            }, 5000);
+          }
+        });
+
+        // Add loading states to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            }
+          });
+        });
+
+        // Enhance table rows with hover effects
+        const tableRows = document.querySelectorAll('.index_table tbody tr');
+        tableRows.forEach(row => {
+          row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+          });
+
+          row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+          });
+        });
+
+        // Real-time clock in admin header
+        function updateClock() {
+          const clockElement = document.querySelector('[data-admin-clock]');
+          if (clockElement) {
+            const now = new Date();
+            clockElement.textContent = now.toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }
+        }
+
+        // Update clock every minute
+        updateClock();
+        setInterval(updateClock, 60000);
+
+        // Add system status indicator
+        const statusIndicator = document.querySelector('[data-system-status]');
+        if (statusIndicator) {
+          // Simulate system health check
+          fetch('/admin/system/status', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            statusIndicator.className = `w-2 h-2 rounded-full ${data.healthy ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`;
+          })
+          .catch(() => {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-yellow-400';
+          });
+        }
+
+        // Performance monitoring
+        if ('performance' in window) {
+          window.addEventListener('load', function() {
+            const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            console.log(`🎬 Admin Dashboard loaded in ${loadTime}ms`);
+          });
+        }
+      });
+
+      // Global error handler for AJAX requests
+      document.addEventListener('turbo:fetch-request-error', function(event) {
+        console.error('Network error:', event.detail.error);
+        // Show user-friendly error message
+        const notification = document.createElement('div');
+        notification.className = 'bg-red-500/20 border border-red-500/30 text-red-300 p-4 rounded-xl';
+        notification.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Network error. Please try again.';
+
+        const container = document.getElementById('notification-container');
+        if (container) {
+          container.appendChild(notification);
+          setTimeout(() => notification.remove(), 5000);
+        }
+      });
+
+      // Keyboard shortcuts for admin efficiency
+      document.addEventListener('keydown', function(event) {
+        // Ctrl+/ - Show keyboard shortcuts
+        if (event.ctrlKey && event.key === '/') {
+          event.preventDefault();
+          alert('Admin Shortcuts:\nCtrl+H: Home\nCtrl+M: Movies\nCtrl+E: Events\nCtrl+U: Users');
+        }
+
+        // Quick navigation shortcuts
+        if (event.ctrlKey && !event.shiftKey) {
+          switch(event.key) {
+            case 'h':
+              event.preventDefault();
+              window.location.href = '/admin';
+              break;
+            case 'm':
+              event.preventDefault();
+              window.location.href = '/admin/movies';
+              break;
+            case 'e':
+              event.preventDefault();
+              window.location.href = '/admin/events';
+              break;
+            case 'u':
+              event.preventDefault();
+              window.location.href = '/admin/users';
+              break;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

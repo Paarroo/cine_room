@@ -1,0 +1,243 @@
+@import url("./application.css");
+@import url("./active_admin.css");
+
+  /* Core admin layout inspired by mockup */
+  .admin-layout {
+    background: #0a0a0a;
+    color: white;
+    min-height: 100vh;
+    font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+
+  /* Glass effect utility matching mockup aesthetic */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient text for branding consistency */
+  .gradient-text {
+    background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Admin layout structure */
+  .admin-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+
+
+  /* Main content area with proper spacing */
+  .admin-main {
+    margin-left: 256px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Header with glass effect */
+  .admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Hide default ActiveAdmin header */
+  #header {
+    display: none !important;
+  }
+
+  /* Override ActiveAdmin body styles */
+  body.active_admin {
+    background: #0a0a0a !important;
+    color: white !important;
+    font-family: "Atkinson Hyperlegible", system-ui, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Content area styling */
+  #active_admin_content {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 2rem !important;
+    flex: 1;
+  }
+
+  /* Navigation styles */
+  .nav-link {
+    color: #9ca3af;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .nav-link:hover {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .nav-link.active {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.2);
+    font-weight: 600;
+  }
+
+  /* User avatar styling */
+  .user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+  }
+
+  /* Metric cards matching mockup style */
+  .metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
+  }
+
+  /* ActiveAdmin component overrides */
+  .index_table {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 1rem !important;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  .index_table th {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-size: 0.875rem;
+  }
+
+  .index_table td {
+    background: transparent !important;
+    color: #e5e7eb !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .index_table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+  }
+
+  /* Panel styling */
+  .panel {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 1rem !important;
+    backdrop-filter: blur(10px);
+  }
+
+  .panel h3 {
+    color: #f59e0b !important;
+    font-weight: bold !important;
+  }
+
+  /* Button styling */
+  .button, input[type="submit"] {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .button:hover, input[type="submit"]:hover {
+    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3) !important;
+  }
+
+  /* Responsive design for mobile */
+
+    .admin-main {
+      margin-left: 0;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    #active_admin_content {
+      padding: 1rem !important;
+    }
+  }
+
+  /* Footer styling */
+  .admin-footer {
+    background: #111111;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+  }
+
+  /* Animation keyframes */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  /* Loading states */
+  .loading-skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }

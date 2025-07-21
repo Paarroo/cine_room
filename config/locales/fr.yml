@@ -1,0 +1,73 @@
+fr:
+  hello: "Bonjour"
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      long: "%d %B %Y"
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+  activerecord:
+    models:
+      user: "Utilisateur"
+      movie: "Film"
+      event: "Événement"
+      creator: "Créateur"
+    attributes:
+      user:
+        email: "E‑mail"
+        password: "Mot de passe"
+        password_confirmation: "Confirmation"
+        current_password: "Mot de passe actuel"
+        first_name: "Prénom"
+        last_name: "Nom"
+        remember_me: "Se souvenir de moi"
+      movie:
+        title: "Titre"
+        director: "Réalisateur"
+        genre: "Genre"
+        duration: "Durée"
+        year: "Année"
+      event:
+        event_date: "Date"
+        start_time: "Heure de début"
+      creator:
+        bio: "Biographie"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "ne peut pas être vide"
+      too_short: "est trop court (minimum %{count} caractères)"
+      too_long: "est trop long (maximum %{count} caractères)"
+      not_found: "introuvable"
+      invalid: "n’est pas valide"
+  views:
+    actions:
+      save: "Enregistrer"
+      submit: "Soumettre"
+      cancel: "Annuler"
+  active_admin:
+    dashboard:
+      welcome: "Bienvenue sur le tableau de bord d'administration"
+    menu:
+      dashboard: "Tableau de bord"
+      users: "Utilisateurs"
+      movies: "Films"
+      events: "Événements"
+      creators: "Créateurs"
+    headers:
+      filters: "Filtres"
+    actions:
+      new: "Nouveau %{resource}"
+      edit: "Modifier %{resource}"
+      destroy: "Supprimer"
+      confirm: "Êtes-vous sûr ?"
+  devise:
+    shared:
+      links:
+        sign_in: "Se connecter"
+        sign_up: "S'inscrire"
+        forgot_your_password: "Mot de passe oublié ?"
+        didn_t_receive_confirmation_instructions: "Instructions de confirmation non reçues ?"
+        didn_t_receive_unlock_instructions: "Instructions de déblocage non reçues ?"
+        sign_in_with: "Se connecter avec %{provider}"

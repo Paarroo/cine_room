@@ -2,6 +2,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   allow_browser versions: :modern
 
+  before_action :set_locale
+
   before_action :authenticate_user!, except: [
       # Static pages
       :home, :about, :contact, :legal, :privacy, :terms,
@@ -120,5 +122,13 @@ class ApplicationController < ActionController::Base
 
    def set_meta_tags(tags = {})
      @meta_tags = tags
+   end
+
+   def set_locale
+    if !params[:locale]
+      I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales)
+    else
+      I18n.locale = params[:locale]
+    end
    end
 end

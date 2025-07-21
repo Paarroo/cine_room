@@ -24,7 +24,7 @@ ActiveAdmin.setup do |config|
 
   # Namespace
   config.default_namespace = :admin
-  config.filters = true
+  config.filters = false
 
   # Download formats
   config.download_links = [ :csv, :xml, :json ]

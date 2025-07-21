@@ -9,15 +9,6 @@ ActiveAdmin.register User do
   scope :creators, -> { where(role: :creator) }
   scope :movie_creators, -> { joins(:movies).distinct }
 
-  # Filters for search functionality
-  filter :email
-  filter :first_name
-  filter :last_name
-  filter :role, as: :select, collection: User.roles.map { |key, value| [ key.humanize, key ] }
-  filter :created_at
-  filter :updated_at
-
-  # Index page configuration
   index do
     selectable_column
     id_column

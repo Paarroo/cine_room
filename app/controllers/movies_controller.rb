@@ -6,7 +6,6 @@ class MoviesController < ApplicationController
     @movies = Movie.filter_by(params).order(year: :asc).page(params[:page])
   end
 
-
   def show
     @related_events = @movie.events.upcoming.limit(3)
     @reviews = @movie.reviews.includes(:user).order(created_at: :desc).limit(5)

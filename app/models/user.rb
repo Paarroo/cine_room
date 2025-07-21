@@ -2,6 +2,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+
   after_create :send_welcome_email
 
   has_many :participations, dependent: :destroy
@@ -11,6 +12,10 @@ class User < ApplicationRecord
   has_many :created_events, through: :movies, source: :events
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
+  scope :admin_users, -> { where(role: :admin) }
+  scope :regular_users, -> { where(role: :user) }
+  scope :creators, -> { where(role: :creator) }
+  scope :movie_creators, -> { joins(:movies).distinct }
 
   def full_name
     "#{first_name} #{last_name}"

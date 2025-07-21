@@ -9,12 +9,6 @@ ActiveAdmin.register Event do
   scope :completed, -> { where(status: :completed) }
   scope :sold_out, -> { where(status: :sold_out) }
 
-  filter :title
-  filter :venue_name
-  filter :event_date
-  filter :status, as: :select, collection: Event.statuses.map { |key, value| [ key.humanize, key ] }
-  filter :created_at
-
   index do
     selectable_column
     id_column

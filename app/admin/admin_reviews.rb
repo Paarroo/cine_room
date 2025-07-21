@@ -8,12 +8,6 @@ ActiveAdmin.register Review do
   scope :with_comment, -> { where.not(comment: [ nil, "" ]) }
   scope :recent, -> { where("created_at > ?", 1.month.ago) }
 
-  filter :user, as: :select, collection: -> { User.all.map { |u| [ u.full_name, u.id ] } }
-  filter :movie, as: :select, collection: -> { Movie.all.map { |m| [ m.title, m.id ] } }
-  filter :event, as: :select, collection: -> { Event.all.map { |e| [ e.title, e.id ] } }
-  filter :rating, as: :select, collection: (1..5).to_a
-  filter :created_at
-
   index do
     selectable_column
     id_column

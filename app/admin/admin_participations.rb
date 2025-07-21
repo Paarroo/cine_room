@@ -8,12 +8,6 @@ ActiveAdmin.register Participation do
   scope :confirmed, -> { where(status: :confirmed) }
   scope :cancelled, -> { where(status: :cancelled) }
 
-  filter :user, as: :select, collection: -> { User.all.map { |u| [ u.full_name, u.id ] } }
-  filter :event, as: :select, collection: -> { Event.all.map { |e| [ e.title, e.id ] } }
-  filter :status, as: :select, collection: Participation.statuses.map { |key, value| [ key.humanize, key ] }
-  filter :seats
-  filter :created_at
-
   index do
     selectable_column
     id_column

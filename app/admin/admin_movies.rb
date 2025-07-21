@@ -4,19 +4,11 @@ ActiveAdmin.register Movie do
   permit_params :user_id, :title, :synopsis, :director, :duration, :genre, :language,
                 :year, :trailer_url, :poster_url, :validation_status
 
+  # Simple scopes instead of complex filters
   scope :all, default: true
   scope :pending, -> { where(validation_status: :pending) }
-  scope :approved, -> { where(validation_status: :approved) }  # Changed from 'validated'
+  scope :approved, -> { where(validation_status: :approved) }
   scope :rejected, -> { where(validation_status: :rejected) }
-
-  filter :title
-  filter :director
-  filter :genre
-  filter :year
-  filter :language
-  filter :validation_status, as: :select, collection: Movie.validation_statuses.map { |key, value| [ key.humanize, key ] }
-  filter :user, as: :select, collection: -> { User.joins(:movies).distinct.map { |u| [ u.full_name, u.id ] } }
-  filter :created_at
 
   index do
     selectable_column
@@ -92,7 +84,7 @@ ActiveAdmin.register Movie do
 
     f.inputs "Movie Information" do
       f.input :user, as: :select,
-              collection: User.all.map { |u| [ u.full_name, u.id ] },
+              collection: User.order(:first_name).map { |u| [ u.full_name, u.id ] },
               prompt: "Select Creator",
               required: true
       f.input :title, required: true
@@ -117,10 +109,10 @@ ActiveAdmin.register Movie do
     f.actions
   end
 
-  # Fixed: Use 'approved' status instead of 'validated'
+  # Batch actions
   batch_action :approve_movies, confirm: "Approve selected movies?" do |ids|
     Movie.where(id: ids).update_all(
-      validation_status: :approved,  # Changed from :validated
+      validation_status: :approved,
       validated_by_id: current_user.id,
       validated_at: Time.current
     )
@@ -134,5 +126,34 @@ ActiveAdmin.register Movie do
       validated_at: Time.current
     )
     redirect_to collection_path, notice: "#{ids.count} movies rejected!"
+  end
+
+  # Custom member actions
+  member_action :approve, method: :patch do
+    resource.update!(
+      validation_status: :approved,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+    redirect_to admin_movie_path(resource), notice: "Movie approved!"
+  end
+
+  member_action :reject, method: :patch do
+    resource.update!(
+      validation_status: :rejected,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+    redirect_to admin_movie_path(resource), notice: "Movie rejected!"
+  end
+
+  action_item :approve, only: :show, if: proc { resource.pending? } do
+    link_to "Approve Movie", approve_admin_movie_path(resource), method: :patch,
+            class: "button", confirm: "Are you sure you want to approve this movie?"
+  end
+
+  action_item :reject, only: :show, if: proc { resource.pending? } do
+    link_to "Reject Movie", reject_admin_movie_path(resource), method: :patch,
+            class: "button", confirm: "Are you sure you want to reject this movie?"
   end
 end

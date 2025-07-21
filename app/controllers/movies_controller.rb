@@ -1,14 +1,9 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_owner_or_admin!, only: [ :destroy ]
+  before_action :ensure_owner_or_admin!, only: [ :update,:destroy ]
 
   def index
     @movies = Movie.filter_by(params).order(year: :asc).page(params[:page])
-
-    respond_to do |format|
-      format.html
-      format.turbo_stream { render partial: "events/cards", formats: [:html] }
-    end
   end
 
 
@@ -44,7 +39,7 @@ class MoviesController < ApplicationController
 
   def destroy
     @movie.destroy!
-    redirect_to movies_path, notice: 'La fiche du film à bien été supprimé.'
+    redirect_to users_dashboard_path(current_user), notice: 'La fiche du film à bien été supprimé.'
   end
 
   private
@@ -54,7 +49,7 @@ class MoviesController < ApplicationController
   end
 
   def ensure_owner_or_admin!
-    unless current_user.admin? || @movie.creator == current_user
+    unless current_user.admin? || @movie.user == current_user
       redirect_to movies_path, alert: 'Accès refusé.'
     end
   end

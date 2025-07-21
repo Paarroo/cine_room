@@ -32,5 +32,9 @@ module CineRoom
        config.assets.paths << Rails.root.join("app", "assets", "javascripts")
 
        config.assets.css_compressor = nil
+
+    config.i18n.available_locales = [ :fr, :en ]
+    config.i18n.default_locale = :fr
+
   end
 end

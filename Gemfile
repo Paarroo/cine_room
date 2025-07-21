@@ -111,6 +111,11 @@ group :development do
   gem "lograge"
 
   gem "seed_dump"
+
+  gem 'rails-i18n'
+  gem 'devise-i18n'
+  gem 'http_accept_language'
+
 end
 group :test do
   gem "capybara"

@@ -4,11 +4,29 @@ ActiveAdmin.register Movie do
   permit_params :user_id, :title, :synopsis, :director, :duration, :genre, :language,
                 :year, :trailer_url, :poster_url, :validation_status
 
-  # Simple scopes instead of complex filters
   scope :all, default: true
   scope :pending, -> { where(validation_status: :pending) }
   scope :approved, -> { where(validation_status: :approved) }
   scope :rejected, -> { where(validation_status: :rejected) }
+
+  # CUSTOM MEMBER ACTIONS FOR DASHBOARD
+  member_action :validate_movie, method: :patch do
+    resource.update!(
+      validation_status: :approved,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+    redirect_to "/admin", notice: "Film validé avec succès !"
+  end
+
+  member_action :reject_movie, method: :patch do
+    resource.update!(
+      validation_status: :rejected,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+    redirect_to "/admin", notice: "Film rejeté."
+  end
 
   index do
     selectable_column
@@ -46,7 +64,14 @@ ActiveAdmin.register Movie do
       movie.created_at.strftime("%d/%m/%Y")
     end
 
-    actions
+    actions do |movie|
+      if movie.pending?
+        item "Valider", validate_movie_admin_movie_path(movie), method: :patch,
+             class: "button", confirm: "Valider ce film ?"
+        item "Rejeter", reject_movie_admin_movie_path(movie), method: :patch,
+             class: "button", confirm: "Rejeter ce film ?"
+      end
+    end
   end
 
   show do
@@ -128,32 +153,13 @@ ActiveAdmin.register Movie do
     redirect_to collection_path, notice: "#{ids.count} movies rejected!"
   end
 
-  # Custom member actions
-  member_action :approve, method: :patch do
-    resource.update!(
-      validation_status: :approved,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-    redirect_to admin_movie_path(resource), notice: "Movie approved!"
-  end
-
-  member_action :reject, method: :patch do
-    resource.update!(
-      validation_status: :rejected,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-    redirect_to admin_movie_path(resource), notice: "Movie rejected!"
-  end
-
   action_item :approve, only: :show, if: proc { resource.pending? } do
-    link_to "Approve Movie", approve_admin_movie_path(resource), method: :patch,
+    link_to "Approve Movie", validate_movie_admin_movie_path(resource), method: :patch,
             class: "button", confirm: "Are you sure you want to approve this movie?"
   end
 
   action_item :reject, only: :show, if: proc { resource.pending? } do
-    link_to "Reject Movie", reject_admin_movie_path(resource), method: :patch,
+    link_to "Reject Movie", reject_movie_admin_movie_path(resource), method: :patch,
             class: "button", confirm: "Are you sure you want to reject this movie?"
   end
 end

@@ -34,56 +34,6 @@ module Admin::DashboardHelper
     end
   end
 
-  # Generate user growth chart data
-  def user_growth_chart_data
-    @user_growth_chart_data ||= begin
-      (12.months.ago.beginning_of_month..Date.current.end_of_month).group_by(&:month).map do |month, dates|
-        month_start = dates.first.beginning_of_month
-        month_end = dates.first.end_of_month
-
-        new_users = User.where(created_at: month_start..month_end).count
-
-        {
-          month: month_start.strftime("%b %Y"),
-          users: new_users,
-          cumulative: User.where(created_at: ..month_end).count
-        }
-      end
-    end
-  end
-
-  # Generate participation trends data
-  def participation_trends_data
-    @participation_trends_data ||= begin
-      (7.days.ago.to_date..Date.current).map do |date|
-        daily_participations = Participation.where(created_at: date.beginning_of_day..date.end_of_day)
-
-        {
-          date: date.strftime("%a %d"),
-          confirmed: daily_participations.where(status: :confirmed).count,
-          pending: daily_participations.where(status: :pending).count,
-          cancelled: daily_participations.where(status: :cancelled).count
-        }
-      end
-    end
-  end
-
-  # Get status-specific colors for charts
-  def status_color(status)
-    case status.to_s
-    when 'upcoming'
-      '#2563eb' # Blue
-    when 'completed'
-      '#22c55e' # Green
-    when 'sold_out'
-      '#f59e0b' # Gold/Orange
-    when 'cancelled'
-      '#ef4444' # Red
-    else
-      '#6b7280' # Gray
-    end
-  end
-
   # Calculate percentage change between two values
   def percentage_change(current, previous)
     return 0 if previous.zero?
@@ -157,19 +107,6 @@ module Admin::DashboardHelper
          end
   end
 
-  # Get active users count (users who logged in within last 30 days)
-  def active_users_count
-    # This would need to be implemented with proper session tracking
-    # For now, we'll use updated_at as a proxy
-    User.where(updated_at: 30.days.ago..Time.current).count
-  end
-
-  # Calculate average session duration (placeholder)
-  def average_session_duration
-    # This would require session tracking implementation
-    "12:34" # Placeholder
-  end
-
   # Get conversion rate (visitors to participants)
   def conversion_rate
     total_users = User.count
@@ -212,6 +149,58 @@ module Admin::DashboardHelper
       { status: 'warning', message: 'Attention requise', color: 'text-warning' }
     else
       { status: 'healthy', message: 'Système opérationnel', color: 'text-success' }
+    end
+  end
+
+  # Status-specific colors for charts and indicators
+  def status_color(status)
+    case status.to_s
+    when 'upcoming'
+      '#2563eb' # Blue
+    when 'completed'
+      '#22c55e' # Green
+    when 'sold_out'
+      '#f59e0b' # Gold/Orange
+    when 'cancelled'
+      '#ef4444' # Red
+    else
+      '#6b7280' # Gray
+    end
+  end
+
+  # Activity icon mapping
+  def activity_icon(type)
+    case type.to_s
+    when 'participation'
+      'ticket-alt'
+    when 'movie'
+      'film'
+    when 'user'
+      'user-plus'
+    when 'review'
+      'star'
+    when 'event'
+      'calendar-alt'
+    else
+      'bell'
+    end
+  end
+
+  # Activity color mapping
+  def activity_color(type)
+    case type.to_s
+    when 'participation'
+      'primary'
+    when 'movie'
+      'blue-400'
+    when 'user'
+      'green-400'
+    when 'review'
+      'yellow-400'
+    when 'event'
+      'purple-400'
+    else
+      'gray-400'
     end
   end
 

@@ -3,11 +3,24 @@ class MoviesController < ApplicationController
   before_action :ensure_owner_or_admin!, only: [ :destroy ]
 
   def index
-    @movies = @q.result.includes(:user, :events)
-                 .where(validation_status: 'approved')
-                 .order(created_at: :desc)
-  end
+    # Start with approved movies only
+    @movies = Movie.includes(:user, :events)
+                   .where(validation_status: 'approved')
 
+    # Apply simple filters if present
+    @movies = @movies.where("title ILIKE ?", "%#{params[:search]}%") if params[:search].present?
+    @movies = @movies.where(genre: params[:genre]) if params[:genre].present?
+    @movies = @movies.where(year: params[:year]) if params[:year].present?
+    @movies = @movies.where(language: params[:language]) if params[:language].present?
+
+    # Order by most recent
+    @movies = @movies.order(created_at: :desc)
+
+    # For filter dropdowns (optional)
+    @genres = Movie.where(validation_status: 'approved').distinct.pluck(:genre).compact.sort
+    @years = Movie.where(validation_status: 'approved').distinct.pluck(:year).compact.sort.reverse
+    @languages = [ [ 'Français', 'fr' ], [ 'English', 'en' ], [ 'Español', 'es' ], [ 'Autre', 'other' ] ]
+  end
 
   def show
     @related_events = @movie.events.upcoming.limit(3)
@@ -41,7 +54,27 @@ class MoviesController < ApplicationController
 
   def destroy
     @movie.destroy!
-    redirect_to movies_path, notice: 'La fiche du film à bien été supprimé.'
+    redirect_to movies_path, notice: 'La fiche du film a bien été supprimé.'
+  end
+
+  # Additional actions for filtering
+  def search
+    redirect_to movies_path(search: params[:q])
+  end
+
+  def by_genre
+    redirect_to movies_path(genre: params[:genre])
+  end
+
+  def featured
+    @movies = Movie.includes(:user, :events)
+                   .where(validation_status: 'approved')
+                   .joins(:events)
+                   .group('movies.id')
+                   .order('COUNT(events.id) DESC')
+                   .limit(6)
+
+    render :index
   end
 
   private
@@ -51,7 +84,7 @@ class MoviesController < ApplicationController
   end
 
   def ensure_owner_or_admin!
-    unless current_user.admin? || @movie.creator == current_user
+    unless current_user.admin? || @movie.user == current_user
       redirect_to movies_path, alert: 'Accès refusé.'
     end
   end

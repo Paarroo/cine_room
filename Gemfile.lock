@@ -370,19 +370,19 @@ GEM
     net-ssh (7.3.0)
     newrelic_rpm (9.19.0)
     nio4r (2.7.4)
-    nokogiri (1.18.8-aarch64-linux-gnu)
+    nokogiri (1.18.9-aarch64-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.18.8-aarch64-linux-musl)
+    nokogiri (1.18.9-aarch64-linux-musl)
       racc (~> 1.4)
-    nokogiri (1.18.8-arm-linux-gnu)
+    nokogiri (1.18.9-arm-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.18.8-arm-linux-musl)
+    nokogiri (1.18.9-arm-linux-musl)
       racc (~> 1.4)
-    nokogiri (1.18.8-arm64-darwin)
+    nokogiri (1.18.9-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.18.8-x86_64-linux-gnu)
+    nokogiri (1.18.9-x86_64-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.18.8-x86_64-linux-musl)
+    nokogiri (1.18.9-x86_64-linux-musl)
       racc (~> 1.4)
     noticed (2.7.1)
       rails (>= 6.1.0)
@@ -492,7 +492,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.0)
-    ransack (4.1.1)
+    ransack (4.3.0)
       activerecord (>= 6.1.5)
       activesupport (>= 6.1.5)
       i18n
@@ -505,7 +505,7 @@ GEM
     redis-client (0.25.1)
       connection_pool
     regexp_parser (2.10.0)
-    reline (0.6.1)
+    reline (0.6.2)
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
@@ -772,7 +772,6 @@ DEPENDENCIES
   rails_12factor
   rails_panel
   rails_semantic_logger
-  ransack (~> 4.1.1)
   rerun
   rspec-rails
   rubocop-performance

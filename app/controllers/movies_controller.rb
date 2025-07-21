@@ -1,12 +1,13 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_owner_or_admin!, only: [:destroy ]
+  before_action :ensure_owner_or_admin!, only: [ :destroy ]
 
   def index
-    @movies = Movie.includes(:user, :events)
-                   .where(validation_status: 'approved')
-                   .order(created_at: :desc)
+    @movies = @q.result.includes(:user, :events)
+                 .where(validation_status: 'approved')
+                 .order(created_at: :desc)
   end
+
 
   def show
     @related_events = @movie.events.upcoming.limit(3)

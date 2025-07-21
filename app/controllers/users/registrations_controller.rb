@@ -44,4 +44,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def after_inactive_sign_up_path_for(resource)
     root_path
   end
+  def configure_permitted_parameters
+        devise_parameter_sanitizer.permit(:sign_up, keys: [ :attribute1, :attribute2, :attribute3 ])
+
+        devise_parameter_sanitizer.permit(:account_update, keys: [ :attribute1, :attribute2, :attribute3 ])
+end
 end

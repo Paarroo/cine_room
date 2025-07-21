@@ -127,3 +127,4 @@ group :production do
   gem "newrelic_rpm"
   gem "sentry-ruby"
 end
+gem 'ransack', '~> 4.1.1'

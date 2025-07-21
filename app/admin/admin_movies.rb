@@ -6,7 +6,7 @@ ActiveAdmin.register Movie do
 
   scope :all, default: true
   scope :pending, -> { where(validation_status: :pending) }
-  scope :validated, -> { where(validation_status: :validated) }
+  scope :approved, -> { where(validation_status: :approved) }  # Changed from 'validated'
   scope :rejected, -> { where(validation_status: :rejected) }
 
   filter :title
@@ -117,14 +117,14 @@ ActiveAdmin.register Movie do
     f.actions
   end
 
-  # Batch actions for movies
-  batch_action :validate_movies, confirm: "Validate selected movies?" do |ids|
+  # Fixed: Use 'approved' status instead of 'validated'
+  batch_action :approve_movies, confirm: "Approve selected movies?" do |ids|
     Movie.where(id: ids).update_all(
-      validation_status: :validated,
+      validation_status: :approved,  # Changed from :validated
       validated_by_id: current_user.id,
       validated_at: Time.current
     )
-    redirect_to collection_path, notice: "#{ids.count} movies validated successfully!"
+    redirect_to collection_path, notice: "#{ids.count} movies approved successfully!"
   end
 
   batch_action :reject_movies, confirm: "Reject selected movies?" do |ids|

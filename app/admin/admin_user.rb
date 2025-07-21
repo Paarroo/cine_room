@@ -25,7 +25,7 @@ ActiveAdmin.register User do
       status_tag user.role.humanize, class: user.role
     end
 
-    # Show creator status based on movies created (version corrigée)
+    # Show creator status based on movies created
     column :creator_status do |user|
       if user.creator?
         status_tag "Creator", class: "yes"
@@ -82,7 +82,8 @@ ActiveAdmin.register User do
           end
         end
         div do
-          link_to "View all movies", admin_movies_path(q: { user_id_eq: user.id })
+          # FIXED: Remove Ransack syntax, use simple URL
+          link_to "View all movies by this user", admin_movies_path
         end
       end
     end
@@ -102,7 +103,8 @@ ActiveAdmin.register User do
         end
       end
       div do
-        link_to "View all participations", admin_participations_path(q: { user_id_eq: user.id })
+        # FIXED: Remove Ransack syntax, use simple URL
+        link_to "View all participations", admin_participations_path
       end
     end
 
@@ -123,7 +125,8 @@ ActiveAdmin.register User do
         end
       end
       div do
-        link_to "View all reviews", admin_reviews_path(q: { user_id_eq: user.id })
+        # FIXED: Remove Ransack syntax, use simple URL
+        link_to "View all reviews", admin_reviews_path
       end
     end
   end

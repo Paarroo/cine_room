@@ -10,7 +10,6 @@ ActiveAdmin.register Movie do
   scope :approved, -> { where(validation_status: :approved) }
   scope :rejected, -> { where(validation_status: :rejected) }
 
-
   index do
     selectable_column
     id_column

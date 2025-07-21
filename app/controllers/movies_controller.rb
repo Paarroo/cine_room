@@ -1,25 +1,9 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_owner_or_admin!, only: [ :destroy ]
+  before_action :ensure_owner_or_admin!, only: [ :update,:destroy ]
 
   def index
-    # Start with approved movies only
-    @movies = Movie.includes(:user, :events)
-                   .where(validation_status: 'approved')
-
-    # Apply simple filters if present
-    @movies = @movies.where("title ILIKE ?", "%#{params[:search]}%") if params[:search].present?
-    @movies = @movies.where(genre: params[:genre]) if params[:genre].present?
-    @movies = @movies.where(year: params[:year]) if params[:year].present?
-    @movies = @movies.where(language: params[:language]) if params[:language].present?
-
-    # Order by most recent
-    @movies = @movies.order(created_at: :desc)
-
-    # For filter dropdowns (optional)
-    @genres = Movie.where(validation_status: 'approved').distinct.pluck(:genre).compact.sort
-    @years = Movie.where(validation_status: 'approved').distinct.pluck(:year).compact.sort.reverse
-    @languages = [ [ 'Français', 'fr' ], [ 'English', 'en' ], [ 'Español', 'es' ], [ 'Autre', 'other' ] ]
+    @movies = Movie.filter_by(params).order(year: :asc).page(params[:page])
   end
 
   def show
@@ -54,27 +38,7 @@ class MoviesController < ApplicationController
 
   def destroy
     @movie.destroy!
-    redirect_to movies_path, notice: 'La fiche du film a bien été supprimé.'
-  end
-
-  # Additional actions for filtering
-  def search
-    redirect_to movies_path(search: params[:q])
-  end
-
-  def by_genre
-    redirect_to movies_path(genre: params[:genre])
-  end
-
-  def featured
-    @movies = Movie.includes(:user, :events)
-                   .where(validation_status: 'approved')
-                   .joins(:events)
-                   .group('movies.id')
-                   .order('COUNT(events.id) DESC')
-                   .limit(6)
-
-    render :index
+    redirect_to users_dashboard_path(current_user), notice: 'La fiche du film à bien été supprimé.'
   end
 
   private
@@ -92,5 +56,20 @@ class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :synopsis, :director, :duration,
                                    :genre, :language, :year, :trailer_url, :poster_url)
+  end
+
+  def filter_movies(scope)
+    scope = scope.where(genre: params[:genre]) if params[:genre].present?
+
+    if params[:year].present?
+      scope = scope.where(year: params[:year].to_i)
+    end
+
+    if params[:q].present?
+      query = "%#{params[:q].downcase}%"
+      scope = scope.where("LOWER(title) LIKE :q OR LOWER(director) LIKE :q", q: query)
+    end
+
+    scope
   end
 end

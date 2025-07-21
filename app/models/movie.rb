@@ -15,6 +15,32 @@ class Movie < ApplicationRecord
 
   scope :approved, -> { where(validation_status: :approved) }
 
+  scope :by_title, ->(title) {
+    where("title ILIKE ?", "%#{title.strip}%") if title.present?
+  }
+
+  scope :by_genre, ->(genre) {
+    where(genre: genre) if genre.present?
+  }
+
+  scope :by_year, ->(year) {
+    where(year: year) if year.present?
+  }
+
+  scope :by_director, ->(director) {
+    where(director: director) if director.present?
+  }
+
+   # Combined filters
+  def self.filter_by(params)
+    approved
+      .by_title(params[:q])
+      .by_genre(params[:genre])
+      .by_year(params[:year])
+      .by_director(params[:director])
+      .order(created_at: :desc)
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     %w[title synopsis director duration genre language year validation_status]
   end

@@ -3,9 +3,12 @@ class MoviesController < ApplicationController
   before_action :ensure_owner_or_admin!, only: [ :destroy ]
 
   def index
-    @movies = @q.result.includes(:user, :events)
-                 .where(validation_status: 'approved')
-                 .order(created_at: :desc)
+    @movies = Movie.filter_by(params).order(year: :asc).page(params[:page])
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render partial: "events/cards", formats: [:html] }
+    end
   end
 
 
@@ -59,5 +62,20 @@ class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :synopsis, :director, :duration,
                                    :genre, :language, :year, :trailer_url, :poster_url)
+  end
+
+  def filter_movies(scope)
+    scope = scope.where(genre: params[:genre]) if params[:genre].present?
+
+    if params[:year].present?
+      scope = scope.where(year: params[:year].to_i)
+    end
+
+    if params[:q].present?
+      query = "%#{params[:q].downcase}%"
+      scope = scope.where("LOWER(title) LIKE :q OR LOWER(director) LIKE :q", q: query)
+    end
+
+    scope
   end
 end

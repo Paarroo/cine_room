@@ -22,5 +22,13 @@
     <div class="text-center mt-16">
       <%= link_to "Proposer un film", new_movie_path, class: "px-8 py-4 bg-gradient-to-r from-cinema-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
     </div>
+
+    <%= search_form_for @q do |f| %>
+      <div>
+        <%= f.label :language_cont, "Language Contains" %>
+        <%= f.search_field :language_cont %>
+      </div>
+      <%= f.submit "Search" %>
+    <% end %>
   </div>
 </section>

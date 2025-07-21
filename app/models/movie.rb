@@ -14,4 +14,12 @@ class Movie < ApplicationRecord
   enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
   scope :approved, -> { where(validation_status: :approved) }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[title synopsis director duration genre language year validation_status]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[reviews events]
+  end
 end

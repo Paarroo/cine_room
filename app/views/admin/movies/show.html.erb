@@ -1,3 +1,4 @@
+<!-- app/views/admin/movies/show.html.erb -->
 <%= render 'admin/dashboard/navbar' %>
 
 <div class="admin-dashboard min-h-screen bg-dark-400">
@@ -101,38 +102,47 @@
                 </div>
               </div>
 
-              <!-- Synopsis -->
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-3">
-                  <i class="fas fa-file-alt text-primary mr-2"></i>Synopsis
-                </h3>
-                <div class="glass-subtle rounded-xl p-6">
-                  <p class="text-gray-300 leading-relaxed">
-                    <%= simple_format(@movie.synopsis) %>
-                  </p>
-                </div>
-              </div>
-
-              <!-- Creator Info -->
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-3">
-                  <i class="fas fa-user-plus text-primary mr-2"></i>Créateur
-                </h3>
-                <div class="glass-subtle rounded-xl p-6">
-                  <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold">
-                      <%= @movie.user&.full_name&.first(2)&.upcase || 'U' %>
-                    </div>
-                    <div>
-                      <div class="text-lg font-semibold text-white">
-                        <%= @movie.user&.full_name || 'Utilisateur inconnu' %>
+              <!-- Validation Info -->
+              <% if @movie.validated_by.present? %>
+                <div>
+                  <h3 class="text-xl font-semibold text-white mb-3">
+                    <i class="fas fa-user-check text-primary mr-2"></i>Validation
+                  </h3>
+                  <div class="glass-subtle rounded-xl p-6">
+                    <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <%= @movie.validated_by.full_name.first(2).upcase %>
                       </div>
-                      <div class="text-sm text-gray-400">
-                        <%= @movie.user&.email || 'Email non disponible' %>
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        Soumis le <%= @movie.created_at.strftime("%d %B %Y à %H:%M") %>
+                      <div>
+                        <div class="text-lg font-semibold text-white">
+                          <%= @movie.validated_by.full_name %>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                          Validé le <%= @movie.validated_at&.strftime("%d %B %Y à %H:%M") %>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Section -->
+  <% if @events.any? %>
+    <section class="events-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-calendar-alt text-primary mr-3"></i>
+              Événements associés
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @events.count %> événement<%= 's' if @events.count > 1 %>
+            </span>
+          </div>

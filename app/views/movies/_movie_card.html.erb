@@ -3,11 +3,16 @@
 
   <!-- Card Image / Background -->
   <div class="relative h-72 w-full overflow-hidden">
-    <% if movie.poster_url.present? %>
-      <%= image_tag movie.poster_url,
+    <% if movie.poster.attached?%>
+      <%= image_tag movie.poster,
         alt: "#{movie.title} poster",
         class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
         style: "min-width: 100%; min-height: 100%;" %>
+    <% else %>
+      <%= image_tag "default-poster.jpg",
+        alt: "#{movie.title} poster",
+        class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
+        style: "min-width: 100%; min-height: 100%;" %>  
     <% end %>
 
     <!-- Gradient overlays -->

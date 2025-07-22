@@ -115,6 +115,9 @@ group :development do
   gem 'rails-i18n'
   gem 'devise-i18n'
   gem 'http_accept_language'
+
+  gem 'cloudinary'
+  gem 'activestorage-cloudinary-service'
 end
 group :test do
   gem "capybara"

@@ -1,4 +1,43 @@
-def export_data
+class Admin::DashboardController < Admin::ApplicationController
+  include ActionView::Helpers::NumberHelper
+  include ActionView::Helpers::DateHelper
+
+  # Main dashboard page with all metrics and data
+  def index
+    @metrics = calculate_metrics
+    @revenue_chart_data = revenue_chart_data
+    @events_chart_data = events_status_chart_data
+    @pending_movies = Movie.where(validation_status: :pending).limit(5)
+    @recent_activities = recent_activities
+    @quick_stats = quick_stats
+  end
+
+  # AJAX endpoint for real-time dashboard refresh
+  def refresh
+    respond_to do |format|
+      format.json do
+        render json: {
+          metrics: calculate_metrics,
+          charts: {
+            revenue: revenue_chart_data,
+            events: events_status_chart_data
+          },
+          activities: recent_activities,
+          status: 'success'
+        }
+      end
+      format.html { redirect_to admin_dashboard_index_path }
+    end
+  rescue StandardError => e
+    Rails.logger.error "Dashboard refresh error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { error: e.message }, status: 500 }
+      format.html { redirect_to admin_dashboard_index_path, alert: "Erreur de rafraîchissement" }
+    end
+  end
+
+  # Export data functionality for various entity types
+  def export_data
     data_type = params[:type] || 'users'
 
     respond_to do |format|
@@ -27,10 +66,10 @@ def export_data
     end
   end
 
+  # Database backup functionality
   def backup_database
     respond_to do |format|
       format.json do
-        # Simulate backup process
         backup_result = perform_backup
 
         if backup_result[:success]
@@ -48,46 +87,11 @@ def export_data
     respond_to do |format|
       format.json { render json: { error: e.message }, status: 500 }
     end
-  end# app/controllers/admin/dashboard_controller.rb
-class Admin::DashboardController < Admin::ApplicationController
-  include ActionView::Helpers::NumberHelper
-  include ActionView::Helpers::DateHelper
-
-  def index
-    @metrics = calculate_metrics
-    @revenue_chart_data = revenue_chart_data
-    @events_chart_data = events_status_chart_data
-    @pending_movies = Movie.where(validation_status: :pending).limit(5)
-    @recent_activities = recent_activities
-    @quick_stats = quick_stats
-  end
-
-  def refresh
-    # AJAX endpoint for real-time refresh
-    respond_to do |format|
-      format.json do
-        render json: {
-          metrics: calculate_metrics,
-          charts: {
-            revenue: revenue_chart_data,
-            events: events_status_chart_data
-          },
-          activities: recent_activities,
-          status: 'success'
-        }
-      end
-      format.html { redirect_to admin_dashboard_path }
-    end
-  rescue StandardError => e
-    Rails.logger.error "Dashboard refresh error: #{e.message}"
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: 500 }
-      format.html { redirect_to admin_dashboard_path, alert: "Erreur de rafraîchissement" }
-    end
   end
 
   private
 
+  # Calculate key business metrics for dashboard display
   def calculate_metrics
     {
       total_revenue: confirmed_participations.sum("events.price_cents * participations.seats") / 100.0,
@@ -97,6 +101,7 @@ class Admin::DashboardController < Admin::ApplicationController
     }
   end
 
+  # Generate revenue chart data for the last 30 days
   def revenue_chart_data
     (30.days.ago.to_date..Date.current).map do |date|
       revenue = confirmed_participations
@@ -110,6 +115,7 @@ class Admin::DashboardController < Admin::ApplicationController
     end
   end
 
+  # Generate events status distribution data for charts
   def events_status_chart_data
     Event.group(:status).count.map do |status, count|
       total = Event.count
@@ -121,6 +127,7 @@ class Admin::DashboardController < Admin::ApplicationController
     end
   end
 
+  # Aggregate recent activities from participations and movies
   def recent_activities
     activities = []
 
@@ -157,6 +164,7 @@ class Admin::DashboardController < Admin::ApplicationController
     activities.sort_by { |a| a[:time_ago] }.first(5)
   end
 
+  # Quick statistics for action cards
   def quick_stats
     {
       pending_movies: Movie.where(validation_status: :pending).count,
@@ -166,16 +174,19 @@ class Admin::DashboardController < Admin::ApplicationController
     }
   end
 
+  # Helper method for confirmed participations with event joins
   def confirmed_participations
     Participation.where(status: :confirmed).joins(:event)
   end
 
+  # Export users data to CSV format
   def export_users_data
     User.select(:id, :email, :first_name, :last_name, :role, :created_at)
         .limit(1000)
         .map(&:attributes)
   end
 
+  # Export events data to CSV format
   def export_events_data
     Event.includes(:movie)
          .select(:id, :title, :venue_name, :event_date, :max_capacity, :status)
@@ -183,6 +194,7 @@ class Admin::DashboardController < Admin::ApplicationController
          .map(&:attributes)
   end
 
+  # Export movies data to CSV format
   def export_movies_data
     Movie.includes(:user)
          .select(:id, :title, :director, :year, :validation_status, :created_at)
@@ -190,11 +202,11 @@ class Admin::DashboardController < Admin::ApplicationController
          .map(&:attributes)
   end
 
+  # Simulate database backup process
   def perform_backup
-    # Simulate backup process
     filename = "backup_#{Time.current.strftime('%Y%m%d_%H%M%S')}.sql"
 
-    # In real implementation, you would:
+    # In real implementation, you would use:
     # system("pg_dump #{database_name} > #{backup_path}/#{filename}")
 
     {

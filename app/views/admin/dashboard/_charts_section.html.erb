@@ -15,7 +15,7 @@
           class="chart-wrapper h-64"
           data-controller="admin-chart"
           data-admin-chart-type-value="line"
-          data-admin-chart-data-value='<%= revenue_data.to_json %>'
+          data-admin-chart-data-value='<%= @revenue_chart_data.to_json %>'
           data-admin-dashboard-target="revenueChart"
         >
           <!-- Chart placeholder -->
@@ -43,7 +43,7 @@
           class="chart-wrapper h-64"
           data-controller="admin-chart"
           data-admin-chart-type-value="doughnut"
-          data-admin-chart-data-value='<%= events_data.to_json %>'
+          data-admin-chart-data-value='<%= @events_chart_data.to_json %>'
           data-admin-dashboard-target="eventsChart"
         >
           <!-- Chart placeholder -->

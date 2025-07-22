@@ -29,7 +29,7 @@ class Users::SessionsController < Devise::SessionsController
 
   # Override Devise's default redirect after sign out
   def after_sign_out_path_for(resource_or_scope)
-    root_path
+    public_site_path
   end
 
   private

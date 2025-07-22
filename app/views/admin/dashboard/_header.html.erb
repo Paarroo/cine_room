@@ -1,81 +1,87 @@
 <div class="dashboard-header">
-  <div class="welcome-section" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+  <!-- Welcome Section -->
+  <div class="welcome-section glass-effect rounded-3xl p-8 mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       <!-- Welcome Content -->
-      <div style="flex: 1; min-width: 300px;">
-        <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fbbf24, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      <div class="flex-1 min-width-0">
+        <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
           Bonjour Admin !
         </h1>
-        <p style="color: #9ca3af; font-size: 1.125rem; margin-bottom: 0.5rem;">
+        <p class="text-xl text-gray-300 mb-2">
           Tableau de bord CinéRoom
         </p>
-        <p style="color: #6b7280; font-size: 0.875rem;">
+        <p class="text-gray-400 text-base">
           <%= Date.current.strftime("%A %d %B %Y").capitalize %>
         </p>
       </div>
 
       <!-- Quick Stats Summary -->
-      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-        <div style="text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">
+      <div class="mt-6 lg:mt-0 flex flex-wrap gap-6">
+        <div class="text-center">
+          <div class="text-3xl font-bold gradient-text mb-1">
             <%= @metrics[:total_users] %>
           </div>
-          <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
             Utilisateurs
           </div>
         </div>
 
-        <div style="text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #2563eb;">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-accent mb-1">
             <%= @metrics[:upcoming_events] %>
           </div>
-          <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
             Événements
           </div>
         </div>
 
-        <div style="text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #22c55e;">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-400 mb-1">
             <%= number_to_currency(@metrics[:total_revenue], precision: 0) %>
           </div>
-          <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
             Revenus
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Action Buttons -->
-    <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-      <%= link_to admin_movies_path, style: "background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;" do %>
-        <i class="fas fa-film"></i>
-        <span>Nouveau Film</span>
-      <% end %>
+    <!-- System Status Indicator -->
+    <div class="mt-8 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center">
+          <div class="status-indicator online mr-2"></div>
+          <span class="text-sm text-green-400 font-medium">Système opérationnel</span>
+        </div>
 
-      <%= link_to admin_events_path, style: "background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.2);" do %>
-        <i class="fas fa-calendar-plus"></i>
-        <span>Nouvel Événement</span>
-      <% end %>
+        <% if @quick_stats[:pending_movies] > 0 || @quick_stats[:pending_participations] > 0 %>
+          <div class="flex items-center space-x-1">
+            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            <span class="text-sm text-yellow-400">Attention requise</span>
+          </div>
+        <% end %>
+      </div>
 
-      <%= link_to admin_users_path, style: "background: rgba(255, 255, 255, 0.05); color: #9ca3af; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.1);" do %>
-        <i class="fas fa-users-cog"></i>
-        <span>Gérer Utilisateurs</span>
-      <% end %>
+      <!-- Last Update Time -->
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-clock mr-1"></i>
+        Dernière mise à jour : <%= Time.current.strftime("%H:%M:%S") %>
+      </div>
     </div>
 
-    <!-- Notification Badges (if applicable) -->
+    <!-- Notification Badges -->
     <% if @quick_stats[:pending_movies] > 0 || @quick_stats[:pending_participations] > 0 %>
-      <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <div class="mt-6 flex flex-wrap gap-3">
         <% if @quick_stats[:pending_movies] > 0 %>
-          <div style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-exclamation-circle"></i>
-            <span><%= @quick_stats[:pending_movies] %> film<%= @quick_stats[:pending_movies] > 1 ? 's' : '' %> en attente</span>
+          <div class="notification-badge">
+            <i class="fas fa-film mr-2 text-primary"></i>
+            <span><%= @quick_stats[:pending_movies] %> film<%= @quick_stats[:pending_movies] > 1 ? 's' : '' %> en attente de validation</span>
           </div>
         <% end %>
 
         <% if @quick_stats[:pending_participations] > 0 %>
-          <div style="background: rgba(37, 99, 235, 0.1); color: #2563eb; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-clock"></i>
+          <div class="notification-badge notification-badge--blue">
+            <i class="fas fa-clock mr-2 text-accent"></i>
             <span><%= @quick_stats[:pending_participations] %> réservation<%= @quick_stats[:pending_participations] > 1 ? 's' : '' %> en attente</span>
           </div>
         <% end %>
@@ -84,13 +90,13 @@
   </div>
 
   <!-- Quick Navigation Breadcrumb -->
-  <div style="margin-bottom: 1.5rem;">
-    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #9ca3af;">
-      <%= link_to "Accueil", root_path, style: "color: #9ca3af; text-decoration: none; hover: color: #f59e0b;" %>
-      <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
-      <%= link_to "Administration", admin_dashboard_index_path, style: "color: #f59e0b; text-decoration: none;" %>
-      <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
-      <span style="color: white;">Tableau de bord</span>
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-400">
+      <%= link_to "Accueil", public_site_path, class: "hover:text-primary transition-colors" %>
+      <i class="fas fa-chevron-right text-xs"></i>
+      <%= link_to "Administration", admin_dashboard_index_path, class: "text-primary" %>
+      <i class="fas fa-chevron-right text-xs"></i>
+      <span class="text-white">Tableau de bord</span>
     </nav>
   </div>
 </div>

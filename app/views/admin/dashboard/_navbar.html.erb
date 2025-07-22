@@ -1,0 +1,132 @@
+<!-- Admin Navbar - Combined with positioning fix -->
+<nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50">
+  <div class="h-16 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-around items-center h-full">
+
+      <!-- Logo Section - Admin Version -->
+      <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0", style: "margin-left: 0rem;" do %>
+        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
+          <i class="fas fa-cog text-white text-lg"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-bold tracking-tight text-white">CinéRoom</span>
+          <span class="text-xs text-primary uppercase tracking-widest">Administration</span>
+        </div>
+      <% end %>
+
+
+      <!-- Admin Navigation Links -->
+      <div class="hidden lg:flex items-center space-x-6 flex-1 justify-start">
+
+
+        <!-- Dashboard -->
+        <%= link_to admin_dashboard_index_path,
+            class: "admin-nav-link #{'active' if current_page?(admin_dashboard_index_path)}" do %>
+          <i class="fas fa-tachometer-alt mr-2"></i>
+          Dashboard
+        <% end %>
+
+        <!-- Films Management -->
+        <%= link_to admin_movies_path,
+            class: "admin-nav-link #{'active' if controller_name == 'movies' && params[:namespace] == 'admin'}" do %>
+          <i class="fas fa-film mr-2"></i>
+          Films
+        <% end %>
+
+        <!-- Events Management -->
+        <%= link_to admin_events_path,
+            class: "admin-nav-link #{'active' if controller_name == 'events' && params[:namespace] == 'admin'}" do %>
+          <i class="fas fa-calendar-alt mr-2"></i>
+          Événements
+        <% end %>
+
+        <!-- Users Management -->
+        <%= link_to admin_users_path,
+            class: "admin-nav-link #{'active' if controller_name == 'users' && params[:namespace] == 'admin'}" do %>
+          <i class="fas fa-users mr-2"></i>
+          Utilisateurs
+        <% end %>
+
+        <!-- Participations -->
+        <%= link_to admin_participations_path,
+            class: "admin-nav-link #{'active' if controller_name == 'participations' && params[:namespace] == 'admin'}" do %>
+          <i class="fas fa-ticket-alt mr-2"></i>
+          Réservations
+        <% end %>
+
+      <!-- Admin Actions Section -->
+
+
+        <!-- User Profile Admin -->
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+            <i class="fas fa-user-shield text-white text-sm"></i>
+          </div>
+          <div class="hidden xl:block">
+            <div class="text-sm font-medium text-white"><%= current_user.full_name %></div>
+            <div class="text-xs text-primary">Administrateur</div>
+          </div>
+        </div>
+
+        <!-- Back to Site -->
+        <%= link_to "Retour au site", public_site_path,
+            class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
+
+        <!-- Logout -->
+        <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-xl transition-colors duration-200 font-medium" %>
+      </div>
+
+      <!-- Mobile menu toggle for admin -->
+      <button class="lg:hidden w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+              data-action="click->navigation#toggleMenu">
+        <i class="fas fa-bars text-white"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Admin Menu -->
+  <div data-navigation-target="mobileMenu" class="lg:hidden hidden admin-mobile-menu">
+    <div class="px-4 py-6 space-y-2">
+
+      <%= link_to admin_dashboard_index_path,
+          class: "admin-mobile-nav-link" do %>
+        <i class="fas fa-tachometer-alt mr-3"></i>
+        Dashboard
+      <% end %>
+
+      <%= link_to admin_movies_path,
+          class: "admin-mobile-nav-link" do %>
+        <i class="fas fa-film mr-3"></i>
+        Films
+      <% end %>
+
+      <%= link_to admin_events_path,
+          class: "admin-mobile-nav-link" do %>
+        <i class="fas fa-calendar-alt mr-3"></i>
+        Événements
+      <% end %>
+
+      <%= link_to admin_users_path,
+          class: "admin-mobile-nav-link" do %>
+        <i class="fas fa-users mr-3"></i>
+        Utilisateurs
+      <% end %>
+
+      <%= link_to admin_participations_path,
+          class: "admin-mobile-nav-link" do %>
+        <i class="fas fa-ticket-alt mr-3"></i>
+        Réservations
+      <% end %>
+
+      <!-- Mobile Admin Actions -->
+      <div class="border-t border-white/20 mt-4 pt-4">
+        <%= link_to "Retour au site", public_site_path,
+            class: "admin-mobile-nav-link text-accent" %>
+
+        <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            class: "w-full text-left admin-mobile-nav-link text-red-300 bg-red-500/10" %>
+      </div>
+    </div>
+  </div>
+</nav>

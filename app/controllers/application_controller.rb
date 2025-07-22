@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  
+
 
   def set_admin_layout
       if request.path.starts_with?('/admin')
@@ -68,7 +68,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource_or_scope)
-    root_path
+    public_site_path
   end
 
   def ensure_admin!

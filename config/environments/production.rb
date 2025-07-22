@@ -87,27 +87,28 @@ Rails.application.configure do
   # config/environments/production.rb
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'cineroom-95309b4cb0ca.herokuapp.com', protocol: 'https' }
+  config.action_mailer.default_url_options = { host: 'cineroom-95309b4cb0ca.herokuapp.com/', protocol: 'https' }
 
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #   address:              "in-v3.mailjet.com",
-  #   port:                 587,
-  #   domain:               "cineroom.com",
-  #   user_name:            ENV["SMTP_USERNAME"],
-  #   password:             ENV["SMTP_PASSWORD"],
-  #   authentication:       "plain",
-  #   enable_starttls_auto: true
-  # }
+    # config.action_mailer.delivery_method = :smtp
+    # config.action_mailer.smtp_settings = {
+    #   address:              "in-v3.mailjet.com",
+    #   port:                 587,
+    #   domain:               "cineroom.com",
+    #   user_name:            ENV["SMTP_USERNAME"],
+    #   password:             ENV["SMTP_PASSWORD"],
+    #   authentication:       "plain",
+    #   enable_starttls_auto: true
+    # }
 
 
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
-      address: "smtp.gmail.com", port: 587, domain: "gmail.com",
-      authentication: "plain", enable_starttls_auto: true,
-      user_name: ENV["GMAIL_USERNAME"], password: ENV["GMAIL_PASSWORD"]
+      address: "smtp.gmail.com",
+      port: 587,
+      domain: "https://cineroom-95309b4cb0ca.herokuapp.com/",
+      authentication: "plain",
+      enable_starttls_auto: true,
+      user_name: ENV["GMAIL_USERNAME"],
+      password: ENV["GMAIL_PASSWORD"]
     }
-    puts "📧 SMTP Gmail"
-  
-  
 end

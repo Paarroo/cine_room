@@ -29,9 +29,10 @@ module CineRoom
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.assets.paths << Rails.root.join("app", "assets", "stylesheets")
-       config.assets.paths << Rails.root.join("app", "assets", "javascripts")
+    config.assets.paths << Rails.root.join("app", "assets", "javascripts")
+    config.assets.paths << Rails.root.join("app/assets/images")
 
-       config.assets.css_compressor = nil
+    config.assets.css_compressor = nil
 
     config.i18n.available_locales = [ :fr, :en ]
     config.i18n.default_locale = :fr

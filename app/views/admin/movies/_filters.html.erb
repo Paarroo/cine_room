@@ -1,0 +1,76 @@
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-2xl p-6">
+      <%= form_tag admin_movies_path, method: :get, local: true, class: "space-y-4" do %>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Rechercher
+            </label>
+            <%= text_field_tag :q, params[:q],
+                placeholder: "Titre ou réalisateur...",
+                class: "form-input" %>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Statut
+            </label>
+            <%= select_tag :status,
+                options_for_select([
+                  ['Tous les statuts', ''],
+                  ['En attente', 'pending'],
+                  ['Validé', 'approved'],
+                  ['Rejeté', 'rejected']
+                ], params[:status]),
+                class: "form-input" %>
+          </div>
+
+          <!-- Genre Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Genre
+            </label>
+            <%= select_tag :genre,
+                options_for_select([['Tous les genres', '']] +
+                  @genres.map { |genre| [genre, genre] }, params[:genre]),
+                class: "form-input" %>
+          </div>
+
+          <!-- Year Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Année
+            </label>
+            <%= select_tag :year,
+                options_for_select([['Toutes les années', '']] +
+                  @years.map { |year| [year, year] }, params[:year]),
+                class: "form-input" %>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="flex items-center justify-between pt-4 border-t border-white/10">
+          <div class="flex space-x-3">
+            <%= button_tag type: 'submit', class: "btn-primary" do %>
+              <i class="fas fa-search mr-2"></i>
+              Filtrer
+            <% end %>
+
+            <%= link_to admin_movies_path, class: "btn-secondary" do %>
+              <i class="fas fa-times mr-2"></i>
+              Réinitialiser
+            <% end %>
+          </div>
+
+          <div class="text-sm text-gray-400">
+            <i class="fas fa-info-circle mr-1"></i>
+            <%= @movies.count %> film<%= 's' if @movies.count > 1 %> trouvé<%= 's' if @movies.count > 1 %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

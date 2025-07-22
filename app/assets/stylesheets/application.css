@@ -174,6 +174,16 @@ img {
   height: auto;
 }
 
+.avatar-circle {
+  width: 96px;             /* Taille fixe : 96px (équivalent à w-24) */
+  height: 96px;
+  border-radius: 50%;      /* Cercle parfait */
+  object-fit: cover;       /* Remplit sans déformation */
+  border: 2px solid #ffbb00; /* Or — tu peux adapter */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Optionnel */
+}
+
+
 /* LOADING SHIMMER */
 .loading-shimmer {
   background: linear-gradient(

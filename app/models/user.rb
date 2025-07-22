@@ -11,6 +11,7 @@ class User < ApplicationRecord
   has_many :events, through: :participations
   has_many :movies
   has_many :created_events, through: :movies, source: :events
+  has_one_attached :avatar
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
   scope :admin_users, -> { where(role: :admin) }

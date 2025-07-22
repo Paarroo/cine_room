@@ -5,8 +5,9 @@ class Movie < ApplicationRecord
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_one_attached :poster
 
-  validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
+  validates :title, :synopsis, :director, :duration, :genre, :year, :poster, presence: true
   validates :duration, numericality: { greater_than: 0, less_than: 300 }
   validates :year, numericality: {
     greater_than: 1900,

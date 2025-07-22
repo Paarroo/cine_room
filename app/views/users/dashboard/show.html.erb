@@ -1,19 +1,38 @@
-<div class="relative mt-20 min-h-screen" data-controller="dashboard-tabs">
+<div class="relative mt-10 min-h-screen" data-controller="dashboard-tabs">
   <!-- SECTION HEADER AND TABS -->
   <section class="relative bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 pt-16 pb-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Header -->
-      <div class="text-center mb-4">
-        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-2 mb-2">
+      <div class="text-center mb-12 flex flex-col items-center gap-4">
+        <!-- Badge -->
+        <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-2">
           <div class="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
           <span class="text-gold-400 font-medium">Espace personnel</span>
         </div>
-        <h2 class="text-4xl lg:text-6xl font-bold mb-2 text-white">
+
+        <!-- Avatar -->
+        <% if @user.avatar.attached? %>
+          <%= image_tag url_for(@user.avatar), class: "avatar-circle shadow-md" %>
+        <% else %>
+          <div class="w-20 h-20 rounded-full flex items-center justify-center bg-dark-400 border-2 border-gold-500 shadow-md overflow-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-gold-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+            </svg>
+          </div>
+        <% end %>
+
+
+
+        <!-- Title -->
+        <h2 class="text-4xl lg:text-6xl font-bold text-white">
           Bienvenue <span class="gradient-text"><%= @user.first_name %></span>
         </h2>
-        <p class="text-xl text-gray-300">Gérez vos réservations et informations</p>
+
+        <!-- Secondary title -->
+        <p class="text-lg text-gray-400">Gérez vos réservations et informations</p>
       </div>
+
 
       <!-- Tabs Switch -->
       <div class="flex justify-center mt-4 mb-2">

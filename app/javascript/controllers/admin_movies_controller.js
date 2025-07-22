@@ -173,3 +173,92 @@ export default class extends Controller {
       button.disabled = false
     }
   }
+
+  // Helper methods
+  getSelectedMovieIds() {
+    return this.movieCheckboxTargets
+      .filter(checkbox => checkbox.checked)
+      .map(checkbox => checkbox.dataset.movieId)
+  }
+
+  async performBulkAction(url, movieIds, actionType) {
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': this.getCSRFToken()
+        },
+        body: JSON.stringify({ movie_ids: movieIds })
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        this.showToast(result.message, 'success')
+
+        // Refresh the page to show updated status
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      } else {
+        throw new Error(result.message || `Erreur lors du ${actionType}`)
+      }
+    } catch (error) {
+      console.error(`Bulk ${actionType} error:`, error)
+      this.showToast(error.message, 'error')
+    }
+  }
+
+  refreshMovieCard(movieId, newStatus) {
+    const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`).closest('.movie-card')
+
+    if (movieCard) {
+      // Update status badge
+      const statusBadge = movieCard.querySelector('.status-badge span')
+      if (statusBadge) {
+        if (newStatus === 'approved') {
+          statusBadge.className = 'px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium'
+          statusBadge.innerHTML = '<i class="fas fa-check mr-1"></i>Validé'
+        } else if (newStatus === 'rejected') {
+          statusBadge.className = 'px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-medium'
+          statusBadge.innerHTML = '<i class="fas fa-times mr-1"></i>Rejeté'
+        }
+      }
+
+      // Remove action buttons and show processed status
+      const actionsDiv = movieCard.querySelector('.flex.space-x-2')
+      if (actionsDiv) {
+        actionsDiv.innerHTML = `
+          <span class="text-xs text-gray-500 flex items-center">
+            <i class="fas fa-info-circle mr-1"></i>
+            Traité par vous
+          </span>
+        `
+      }
+
+      // Uncheck the checkbox
+      const checkbox = movieCard.querySelector('[data-admin-movies-target="movieCheckbox"]')
+      if (checkbox) {
+        checkbox.checked = false
+      }
+
+      // Update bulk actions
+      this.updateBulkActions()
+    }
+  }
+
+  getCSRFToken() {
+    const token = document.querySelector('[name="csrf-token"]')
+    return token ? token.content : ''
+  }
+
+  showToast(message, type = 'info') {
+    // Dispatch event for admin-flash controller
+    this.dispatch('toast', {
+      detail: { message, type }
+    })
+  }
+}

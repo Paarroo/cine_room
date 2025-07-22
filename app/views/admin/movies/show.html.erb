@@ -146,3 +146,114 @@
               <%= @events.count %> événement<%= 's' if @events.count > 1 %>
             </span>
           </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% @events.each do |event| %>
+              <div class="glass-subtle rounded-xl p-6 hover:bg-white/10 transition-colors">
+                <!-- Event Header -->
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-semibold text-white truncate">
+                    <%= event.title %>
+                  </h4>
+                  <span class="px-2 py-1 bg-<%= event.status == 'upcoming' ? 'blue' : event.status == 'completed' ? 'green' : event.status == 'sold_out' ? 'yellow' : 'red' %>-500/20 text-<%= event.status == 'upcoming' ? 'blue' : event.status == 'completed' ? 'green' : event.status == 'sold_out' ? 'yellow' : 'red' %>-400 rounded-lg text-xs font-medium">
+                    <%= event.status.humanize %>
+                  </span>
+                </div>
+
+                <!-- Event Details -->
+                <div class="space-y-2 mb-4">
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-calendar mr-2 w-4"></i>
+                    <%= event.event_date.strftime("%d %B %Y") %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-clock mr-2 w-4"></i>
+                    <%= event.start_time.strftime("%H:%M") %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-map-marker-alt mr-2 w-4"></i>
+                    <%= event.venue_name %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-users mr-2 w-4"></i>
+                    <%= event.participations.where(status: :confirmed).sum(:seats) %> / <%= event.max_capacity %> places
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-euro-sign mr-2 w-4"></i>
+                    <%= number_to_currency(event.price_cents / 100.0) %>
+                  </div>
+                </div>
+
+                <!-- Event Actions -->
+                <div class="pt-4 border-t border-white/10">
+                  <%= link_to "/admin/events/#{event.id}",
+                      class: "inline-flex items-center px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors" do %>
+                    <i class="fas fa-eye mr-2"></i>Voir l'événement
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Reviews Section -->
+  <% if @reviews.any? %>
+    <section class="reviews-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-star text-primary mr-3"></i>
+              Avis récents
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @movie.reviews.count %> avis au total
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <% @reviews.each do |review| %>
+              <div class="glass-subtle rounded-xl p-6">
+                <div class="flex items-start justify-between mb-3">
+                  <!-- User Info -->
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <%= review.user.full_name.first(2).upcase %>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-white">
+                        <%= review.user.full_name %>
+                      </div>
+                      <div class="text-xs text-gray-400">
+                        <%= time_ago_in_words(review.created_at) %> •
+                        <%= review.event.title %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rating -->
+                  <div class="flex items-center space-x-1">
+                    <% review.rating.times do %>
+                      <i class="fas fa-star text-yellow-400"></i>
+                    <% end %>
+                    <% (5 - review.rating).times do %>
+                      <i class="fas fa-star text-gray-600"></i>
+                    <% end %>
+                    <span class="text-sm text-gray-400 ml-2">
+                      <%= review.rating %>/5
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Comment -->
+                <% if review.comment.present? %>
+                  <p class="text-gray-300 text-sm leading-relaxed">
+                    <%= simple_format(review.comment) %>
+                  </p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>

@@ -186,8 +186,6 @@ module Admin
 
     def perform_backup
       filename = "backup_#{Time.current.strftime('%Y%m%d_%H%M%S')}.sql"
-      # In real implementation, you would use:
-      # system("pg_dump #{database_name} > #{backup_path}/#{filename}")
       {
         success: true,
         filename: filename,

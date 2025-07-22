@@ -1,5 +1,4 @@
 module Admin::DashboardHelper
-  # Generate revenue chart data for the last 30 days
   def revenue_chart_data
     @revenue_chart_data ||= begin
       (30.days.ago.to_date..Date.current).map do |date|

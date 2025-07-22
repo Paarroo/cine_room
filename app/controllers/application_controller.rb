@@ -17,17 +17,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  def authenticate_user!
-    super
-  end
-
-  def current_user
-    super
-  end
-
-  def user_signed_in?
-    super
-  end
+  
 
   def set_admin_layout
       if request.path.starts_with?('/admin')

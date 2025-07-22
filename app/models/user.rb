@@ -4,6 +4,7 @@ class User < ApplicationRecord
 
 
   after_create :send_welcome_email
+  after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
   has_many :participations, dependent: :destroy
   has_many :reviews, dependent: :destroy
@@ -37,5 +38,13 @@ class User < ApplicationRecord
 
   def send_welcome_email
     UserMailer.welcome_email(self).deliver_later
+  end
+
+  def saved_change_to_name?
+    saved_change_to_first_name? || saved_change_to_last_name?
+  end
+
+  def sync_director_name_to_movies
+    movies.update_all(director: full_name)
   end
 end

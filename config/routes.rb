@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+      resources :dashboard, only: [ :index ]
     get 'dashboard/refresh', to: 'dashboard#refresh'
     get 'dashboard/quick_stats', to: 'dashboard#quick_stats'
     post 'dashboard/export', to: 'dashboard#export'
@@ -39,6 +40,7 @@ Rails.application.routes.draw do
     get 'reports/revenue', to: 'reports#revenue'
     get 'reports/users', to: 'reports#users'
     get 'reports/events', to: 'reports#events'
+
 
     get 'system/status', to: 'system#status'
     post 'system/backup', to: 'system#backup'

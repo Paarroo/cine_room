@@ -1,8 +1,3 @@
-<%#
-  CinéRoom Admin Dashboard - Vue principale sans sidebar
-  Structure: Header + Métriques + Graphiques + Tables de gestion
-%>
-
 <div
   class="admin-dashboard min-h-screen bg-dark-400"
   data-controller="admin-dashboard admin-chart admin-flash"

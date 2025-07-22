@@ -8,8 +8,8 @@
   </div>
 
   <div class="space-y-4 recent-activity">
-    <% if activities.any? %>
-      <% activities.each do |activity| %>
+    <% if @recent_activities.any? %>
+      <% @recent_activities.each do |activity| %>
         <div class="activity-item flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
           <div class="w-10 h-10 bg-<%= activity[:color] %>/20 rounded-xl flex items-center justify-center">
             <i class="fas fa-<%= activity[:icon] %> text-<%= activity[:color] %>"></i>

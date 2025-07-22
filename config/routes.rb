@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   end
 
   get '/home', to: 'pages#home', as: :public_site
+  root 'controller_name#action_name'
+
 
   namespace :admin do
       resources :dashboard, only: [ :index ]

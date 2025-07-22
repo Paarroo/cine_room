@@ -16,7 +16,7 @@
             <div>
               <div class="font-medium text-white">Gérer Films</div>
               <div class="text-sm text-gray-400">
-                <%= stats[:pending_movies] %> en attente
+                <%= @quick_stats[:pending_movies] %> en attente
               </div>
             </div>
           </div>
@@ -31,7 +31,7 @@
             <div>
               <div class="font-medium text-white">Événements</div>
               <div class="text-sm text-gray-400">
-                <%= stats[:upcoming_events] %> à venir
+                <%= @quick_stats[:upcoming_events] %> à venir
               </div>
             </div>
           </div>
@@ -46,7 +46,7 @@
             <div>
               <div class="font-medium text-white">Utilisateurs</div>
               <div class="text-sm text-gray-400">
-                <%= stats[:total_users] %> total
+                <%= @quick_stats[:total_users] %> total
               </div>
             </div>
           </div>
@@ -61,7 +61,7 @@
             <div>
               <div class="font-medium text-white">Réservations</div>
               <div class="text-sm text-gray-400">
-                <%= stats[:pending_participations] %> en attente
+                <%= @quick_stats[:pending_participations] %> en attente
               </div>
             </div>
           </div>

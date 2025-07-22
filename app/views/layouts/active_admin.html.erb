@@ -30,36 +30,6 @@
 
   <body class="active_admin admin-layout" data-admin-target="body">
 
-    <!-- Custom Admin Hero Section -->
-    <section class="admin-hero-section">
-      <div class="admin-hero-content">
-        <div>
-          <h1 class="admin-hero-title gradient-text">
-            Bonjour <%= current_user&.first_name || 'Admin' %> !
-          </h1>
-          <p class="admin-hero-subtitle">
-            Panel d'administration CinéRoom - <%= Date.current.strftime("%d %B %Y") %>
-          </p>
-          <div class="admin-hero-status">
-            <div class="status-dot"></div>
-            <span>Système opérationnel • Dernière mise à jour: <%= Time.current.strftime("%H:%M") %></span>
-          </div>
-        </div>
-
-        <div class="admin-quick-nav">
-          <%= link_to admin_movies_path, class: "admin-nav-btn primary" do %>
-            <i class="fas fa-film"></i> Films
-          <% end %>
-          <%= link_to admin_events_path, class: "admin-nav-btn secondary" do %>
-            <i class="fas fa-calendar-alt"></i> Événements
-          <% end %>
-          <%= link_to admin_users_path, class: "admin-nav-btn secondary" do %>
-            <i class="fas fa-users"></i> Utilisateurs
-          <% end %>
-        </div>
-      </div>
-    </section>
-
     <!-- Flash Messages -->
     <% if notice || alert %>
       <div class="flash-messages">
@@ -103,17 +73,7 @@
           </p>
         </div>
 
-        <!-- Navigation Links -->
-        <div>
-          <h4>Navigation</h4>
-          <ul class="footer-links">
-            <li><%= link_to "Dashboard", admin_root_path %></li>
-            <li><%= link_to "Films", admin_movies_path %></li>
-            <li><%= link_to "Événements", admin_events_path %></li>
-            <li><%= link_to "Utilisateurs", admin_users_path %></li>
-            <li><%= link_to "Participations", admin_participations_path %></li>
-          </ul>
-        </div>
+
 
         <!-- System Status -->
         <div>

@@ -42,7 +42,7 @@
                 class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" %>
         </div>
 
-        <div data-controller="avatar-preview" class="mb-8">
+        <div data-controller="image-preview" class="mb-8">
           <%= f.label :avatar, "Photo de profil", class: "block text-sm font-semibold text-gray-300 mb-2" %>
 
           <!-- Stylised button -->
@@ -55,17 +55,17 @@
                 class: "hidden",
                 accept: "image/*",
                 data: {
-                  "avatar-preview-target": "input",
-                  action: "avatar-preview#previewFile"
+                  "image-preview-target": "input",
+                  action: "image-preview#previewFile"
                 } %>
 
           <!-- File name -->
-          <p data-avatar-preview-target="filename" class="text-sm text-gray-400 mt-2">Aucun fichier sélectionné</p>
+          <p data-image-preview-target="filename" class="text-sm text-gray-400 mt-2">Aucun fichier sélectionné</p>
 
           <!-- Avatar preview -->
-          <div data-avatar-preview-target="preview" class="mt-4 hidden">
+          <div data-image-preview-target="preview" class="mt-4 hidden">
             <div class="">
-              <img data-avatar-preview-target="image"
+              <img data-image-preview-target="image"
                   src="https://via.placeholder.com/150"
                   alt="Aperçu de l'image"
                   class="avatar-circle" />

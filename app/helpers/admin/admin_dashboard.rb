@@ -70,7 +70,6 @@ ActiveAdmin.register_page "Dashboard" do
         p "Tableau de bord CinéRoom - #{Date.current.strftime('%d %B %Y')}", style: "color: #9ca3af; font-size: 1.125rem;"
 
         div style: "margin-top: 1.5rem;" do
-          # Fixed: Using correct ActiveAdmin routes
           link_to "Nouveau Film", admin_movies_path, class: "button", style: "margin-right: 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;"
           link_to "Nouvel Événement", admin_events_path, class: "button", style: "background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;"
         end

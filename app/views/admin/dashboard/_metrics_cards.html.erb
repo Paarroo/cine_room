@@ -1,0 +1,99 @@
+<section class="metrics-overview py-8">
+  <div class="container-app">
+    <h2 class="text-2xl font-bold text-white mb-6">
+      <i class="fas fa-chart-line text-primary mr-3"></i>
+      Métriques Clés
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" data-admin-dashboard-target="metrics">
+      <!-- Revenue Metric -->
+      <div class="metric-card glass-effect rounded-2xl p-6 hover:border-primary/30 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <i class="fas fa-euro-sign text-primary text-xl"></i>
+          </div>
+          <div class="text-green-400 text-sm font-medium">
+            <i class="fas fa-arrow-up mr-1"></i>+12.5%
+          </div>
+        </div>
+
+        <div class="text-3xl font-bold gradient-text mb-2" data-metric="revenue">
+          <%= number_to_currency(metrics[:total_revenue]) %>
+        </div>
+
+        <div class="text-sm text-gray-400">Revenus Total</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= number_to_currency(
+            Participation.where(status: :confirmed)
+                        .where(created_at: Time.current.beginning_of_month..Time.current.end_of_month)
+                        .joins(:event)
+                        .sum("events.price_cents * participations.seats") / 100.0
+          ) %> ce mois
+        </div>
+      </div>
+
+      <!-- Active Events Metric -->
+      <div class="metric-card glass-effect rounded-2xl p-6 hover:border-accent/30 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+            <i class="fas fa-calendar-alt text-accent text-xl"></i>
+          </div>
+          <div class="text-green-400 text-sm font-medium">
+            <i class="fas fa-arrow-up mr-1"></i>+3
+          </div>
+        </div>
+
+        <div class="text-3xl font-bold text-accent mb-2" data-metric="events">
+          <%= metrics[:upcoming_events] %>
+        </div>
+
+        <div class="text-sm text-gray-400">Événements Actifs</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= Event.where(status: :sold_out).count %> complets
+        </div>
+      </div>
+
+      <!-- Users Metric -->
+      <div class="metric-card glass-effect rounded-2xl p-6 hover:border-green-400/30 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-green-400/10 rounded-xl flex items-center justify-center">
+            <i class="fas fa-users text-green-400 text-xl"></i>
+          </div>
+          <div class="text-green-400 text-sm font-medium">
+            <i class="fas fa-arrow-up mr-1"></i>+<%= User.where(created_at: 1.week.ago..Time.current).count %>
+          </div>
+        </div>
+
+        <div class="text-3xl font-bold text-green-400 mb-2" data-metric="users">
+          <%= metrics[:total_users] %>
+        </div>
+
+        <div class="text-sm text-gray-400">Utilisateurs Total</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= User.joins(:participations).where(participations: { status: :confirmed }).distinct.count %> actifs
+        </div>
+      </div>
+
+      <!-- Satisfaction Metric -->
+      <div class="metric-card glass-effect rounded-2xl p-6 hover:border-yellow-400/30 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center">
+            <i class="fas fa-star text-yellow-400 text-xl"></i>
+          </div>
+          <div class="text-green-400 text-sm font-medium">
+            <i class="fas fa-arrow-up mr-1"></i>+0.2
+          </div>
+        </div>
+
+        <div class="text-3xl font-bold text-yellow-400 mb-2" data-metric="satisfaction">
+          <%= metrics[:satisfaction] %>/5
+        </div>
+
+        <div class="text-sm text-gray-400">Satisfaction</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= Review.count %> avis
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

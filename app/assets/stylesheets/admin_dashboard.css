@@ -1,243 +1,407 @@
+/* Import main application styles for consistency */
 @import url("./application.css");
-@import url("./active_admin.css");
 
-  /* Core admin layout inspired by mockup */
-  .admin-layout {
-    background: #0a0a0a;
-    color: white;
-    min-height: 100vh;
-    font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+/* Admin Dashboard Variables */
+:root {
+  --admin-primary: #f59e0b;
+  --admin-surface: #0a0a0a;
+  --admin-content: #ffffff;
+  --admin-muted: #6b7280;
+  --admin-accent: #2563eb;
+  --admin-success: #22c55e;
+  --admin-warning: #f59e0b;
+  --admin-error: #ef4444;
+
+  --admin-glass-bg: rgba(255, 255, 255, 0.05);
+  --admin-glass-border: rgba(255, 255, 255, 0.1);
+
+  --admin-transition-fast: 0.15s ease-out;
+  --admin-transition-normal: 0.3s ease-out;
+  --admin-transition-slow: 0.6s ease-out;
+}
+
+/* Base admin layout */
+.admin-dashboard {
+  background: var(--admin-surface);
+  color: var(--admin-content);
+  min-height: 100vh;
+  font-family: var(--font-primary);
+}
+
+/* Glass effect utility - enhanced */
+.glass-effect {
+  background: var(--admin-glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--admin-glass-border);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, var(--admin-primary), #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary;
+  @apply text-white font-semibold px-6 py-3 rounded-xl;
+  @apply transition-all duration-300 hover:scale-105;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary/50;
+  @apply inline-flex items-center gap-2;
+}
+
+.btn-secondary {
+  @apply glass-effect hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-xl;
+  @apply transition-all duration-300 hover:scale-105;
+  @apply focus:outline-none focus:ring-2 focus:ring-white/20;
+  @apply inline-flex items-center gap-2;
+}
+
+/* Metric cards - enhanced with hover effects */
+.metric-card {
+  background: var(--admin-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--admin-glass-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all var(--admin-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--admin-primary), transparent);
+  transition: left 0.5s ease;
+}
+
+.metric-card:hover::before {
+  left: 100%;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
+}
+
+/* Value change animations */
+.metric-card .value-updating {
+  transition: all 0.2s ease;
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.metric-card .value-updated {
+  animation: valueUpdate 0.6s ease-out;
+}
+
+@keyframes valueUpdate {
+  0% {
+    transform: scale(1);
   }
-
-  /* Glass effect utility matching mockup aesthetic */
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  50% {
+    transform: scale(1.1);
   }
+  100% {
+    transform: scale(1);
+  }
+}
 
-  /* Gradient text for branding consistency */
-  .gradient-text {
+/* Chart containers */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 16rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--admin-transition-normal);
+}
+
+.chart-wrapper:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chart-wrapper.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Activity feed */
+.activity-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  transition: all var(--admin-transition-fast);
+}
+
+.activity-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 158, 11, 0.3);
+  transform: translateX(4px);
+}
+
+.activity-item .activity-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+/* Quick actions grid */
+.quick-actions .group {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all var(--admin-transition-normal);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.quick-actions .group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--admin-primary), var(--admin-accent));
+  transform: scaleX(0);
+  transition: transform var(--admin-transition-normal);
+}
+
+.quick-actions .group:hover::before {
+  transform: scaleX(1);
+}
+
+.quick-actions .group:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Progress bars */
+.progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--admin-primary), var(--admin-accent));
+  border-radius: 0.25rem;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Loading skeleton */
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Dashboard header animations */
+.dashboard-header .gradient-text {
+  animation: gradientShift 3s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+  0% {
     background: linear-gradient(135deg, #fbbf24, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
+  }
+  100% {
+    background: linear-gradient(135deg, #8b5cf6, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.status-indicator.online {
+  background: var(--admin-success);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.warning {
+  background: var(--admin-warning);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.error {
+  background: var(--admin-error);
+  animation: pulse 1s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 1rem;
   }
 
-  /* Admin layout structure */
-  .admin-container {
-    display: flex;
-    min-height: 100vh;
+  .chart-wrapper {
+    height: 12rem;
   }
 
-
-
-  /* Main content area with proper spacing */
-  .admin-main {
-    margin-left: 256px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  .dashboard-header h1 {
+    font-size: 2rem;
   }
 
-  /* Header with glass effect */
-  .admin-header {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .quick-actions .group {
+    padding: 0.75rem;
   }
 
-  /* Hide default ActiveAdmin header */
-  #header {
+  .activity-item {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .metric-card {
+    padding: 0.75rem;
+  }
+
+  .glass-effect {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    padding: 1rem 0;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-effect,
+  .metric-card {
+    border-width: 2px;
+    border-color: var(--admin-content);
+  }
+
+  .activity-item:hover {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .metric-card:hover,
+  .quick-actions .group:hover {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .btn-primary,
+  .btn-secondary,
+  .quick-actions {
     display: none !important;
   }
 
-  /* Override ActiveAdmin body styles */
-  body.active_admin {
-    background: #0a0a0a !important;
-    color: white !important;
-    font-family: "Atkinson Hyperlegible", system-ui, sans-serif !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  .metric-card,
+  .glass-effect {
+    border: 1px solid #000;
+    break-inside: avoid;
   }
 
-  /* Content area styling */
-  #active_admin_content {
-    background: transparent !important;
-    margin: 0 !important;
-    padding: 2rem !important;
-    flex: 1;
+  body {
+    background: white !important;
+    color: black !important;
   }
-
-  /* Navigation styles */
-  .nav-link {
-    color: #9ca3af;
-    text-decoration: none;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    transition: all 0.2s ease;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .nav-link:hover {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
-    transform: translateY(-1px);
-  }
-
-  .nav-link.active {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.2);
-    font-weight: 600;
-  }
-
-  /* User avatar styling */
-  .user-avatar {
-    width: 2.5rem;
-    height: 2.5rem;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.875rem;
-  }
-
-  /* Metric cards matching mockup style */
-  .metric-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .metric-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 158, 11, 0.3);
-    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
-  }
-
-  /* ActiveAdmin component overrides */
-  .index_table {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 1rem !important;
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-  }
-
-  .index_table th {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: white !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    font-size: 0.875rem;
-  }
-
-  .index_table td {
-    background: transparent !important;
-    color: #e5e7eb !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  }
-
-  .index_table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03) !important;
-  }
-
-  /* Panel styling */
-  .panel {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 1rem !important;
-    backdrop-filter: blur(10px);
-  }
-
-  .panel h3 {
-    color: #f59e0b !important;
-    font-weight: bold !important;
-  }
-
-  /* Button styling */
-  .button, input[type="submit"] {
-    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 0.75rem !important;
-    padding: 0.75rem 1.5rem !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-  }
-
-  .button:hover, input[type="submit"]:hover {
-    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3) !important;
-  }
-
-  /* Responsive design for mobile */
-
-    .admin-main {
-      margin-left: 0;
-    }
-
-    .desktop-nav {
-      display: none;
-    }
-
-    #active_admin_content {
-      padding: 1rem !important;
-    }
-  }
-
-  /* Footer styling */
-  .admin-footer {
-    background: #111111;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: auto;
-  }
-
-  /* Animation keyframes */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
-  }
-
-  /* Loading states */
-  .loading-skeleton {
-    background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-  }
-
-  @keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
+}

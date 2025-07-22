@@ -17,9 +17,10 @@ class MoviesController < ApplicationController
 
   def create
     @movie = current_user.movies.build(movie_params)
+    @movie.director = current_user.full_name
 
     if @movie.save
-      redirect_to @movie, notice: 'Film bien déposé pour validation.'
+      redirect_to @movie, notice: 'Film publié pour validation.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,6 +31,7 @@ class MoviesController < ApplicationController
 
   def update
     if @movie.update(movie_params)
+      @movie.update(director: current_user.full_name)
       redirect_to @movie, notice: 'La fiche du film a bien été mis à jour.'
     else
       render :edit, status: :unprocessable_entity
@@ -54,8 +56,8 @@ class MoviesController < ApplicationController
   end
 
   def movie_params
-    params.require(:movie).permit(:title, :synopsis, :director, :duration,
-                                   :genre, :language, :year, :trailer_url, :poster_url)
+    params.require(:movie).permit(:title, :synopsis, :duration,
+                                   :genre, :language, :year, :trailer_url, :poster_url, :authorship_confirmed)
   end
 
   def filter_movies(scope)

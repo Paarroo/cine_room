@@ -1,4 +1,6 @@
 class Movie < ApplicationRecord
+  attr_accessor :authorship_confirmed
+
   belongs_to :user
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
@@ -10,6 +12,7 @@ class Movie < ApplicationRecord
     greater_than: 1900,
     less_than_or_equal_to: Date.current.year
   }
+  validate :authorship_must_be_confirmed, on: :create
 
   enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
@@ -47,5 +50,13 @@ class Movie < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[reviews events]
+  end
+
+  private
+
+  def authorship_must_be_confirmed
+    if authorship_confirmed != "1"
+      errors.add(:base, "Tu dois confirmer être l’auteur ou l’autrice de cette vidéo pour pouvoir la publier.")
+    end
   end
 end

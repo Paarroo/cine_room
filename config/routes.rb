@@ -15,8 +15,10 @@ Rails.application.routes.draw do
   end
 
   unauthenticated do
-    root to: 'pages#home'
+    root to: 'pages#home', as: :public_home
   end
+
+  get '/home', to: 'pages#home', as: :public_site
 
   namespace :admin do
       resources :dashboard, only: [ :index ]

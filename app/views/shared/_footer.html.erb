@@ -4,7 +4,7 @@
 
       <!-- Logo et description -->
       <div class="md:col-span-1">
-        <%= link_to root_path,
+        <%= link_to public_site_path,
             class: "flex items-center space-x-3 mb-8 group",
             data: { turbo: false } do %>
           <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
@@ -25,7 +25,7 @@
       <div>
         <h4 class="font-semibold text-white mb-8 font-display text-lg">Navigation</h4>
         <div class="space-y-4">
-          <%= link_to "Accueil", root_path,
+          <%= link_to "Accueil", public_site_path,
               class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
               data: { turbo: false } %>
 

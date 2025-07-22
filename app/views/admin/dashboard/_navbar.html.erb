@@ -1,7 +1,7 @@
 <!-- Admin Navbar - Combined with positioning fix -->
 <nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50">
   <div class="h-16 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-full">
+    <div class="flex justify-around items-center h-full">
 
       <!-- Logo Section - Admin Version -->
       <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0", style: "margin-left: 0rem;" do %>
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Back to Site -->
-        <%= link_to "Retour au site", root_path,
+        <%= link_to "Retour au site", public_site_path,
             class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
 
         <!-- Logout -->
@@ -121,7 +121,7 @@
 
       <!-- Mobile Admin Actions -->
       <div class="border-t border-white/20 mt-4 pt-4">
-        <%= link_to "Retour au site", root_path,
+        <%= link_to "Retour au site", public_site_path,
             class: "admin-mobile-nav-link text-accent" %>
 
         <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,

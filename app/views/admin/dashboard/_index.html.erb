@@ -1,19 +1,15 @@
-<!-- Dashboard Header Section -->
 <div class="dashboard-header">
   <div class="welcome-section" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
     <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fbbf24, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-      Bonjour <%= current_user&.first_name || 'Admin' %> !
+      Bonjour Admin !
     </h1>
     <p style="color: #9ca3af; font-size: 1.125rem;">
-      Tableau de bord CinéRoom - <%= Date.current.strftime('%d %B %Y') %>
+      Tableau de bord CinéRoom - 22 juillet 2025
     </p>
-
     <!-- Quick Action Buttons -->
     <div style="margin-top: 1.5rem;">
-      <%= link_to "Nouveau Film", admin_movies_path, class: "button",
-          style: "margin-right: 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;" %>
-      <%= link_to "Nouvel Événement", admin_events_path, class: "button",
-          style: "background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;" %>
+      <a href="/admin_movies_path" style="margin-right: 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;">Nouveau Film</a>
+      <a href="/admin_events_path" style="background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;">Nouvel Événement</a>
     </div>
   </div>
 </div>
@@ -34,13 +30,12 @@
         </div>
       </div>
 
-      <% revenue_stats = controller.send(:calculate_revenue_stats) %>
       <div style="font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #fbbf24, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
-        <%= number_to_currency(revenue_stats[:total_revenue]) %>
+        <%= number_to_currency(@metrics[:total_revenue]) %>
       </div>
       <div style="color: #9ca3af; font-size: 0.875rem;">Revenus Total</div>
       <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
-        <%= number_to_currency(revenue_stats[:monthly_revenue]) %> ce mois
+        Ce mois
       </div>
     </div>
 
@@ -52,13 +47,12 @@
         </div>
       </div>
 
-      <% event_stats = controller.send(:calculate_event_stats) %>
       <div style="font-size: 2rem; font-weight: bold; color: #2563eb; margin-bottom: 0.5rem;">
-        <%= event_stats[:upcoming_events] %>
+        <%= @metrics[:upcoming_events] %>
       </div>
       <div style="color: #9ca3af; font-size: 0.875rem;">Événements Actifs</div>
       <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
-        <%= event_stats[:sold_out_events] %> complets
+        <%= Event.where(status: :sold_out).count %> complets
       </div>
     </div>
 
@@ -70,13 +64,12 @@
         </div>
       </div>
 
-      <% user_stats = controller.send(:calculate_user_stats) %>
       <div style="font-size: 2rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">
-        <%= user_stats[:total_users] %>
+        <%= @metrics[:total_users] %>
       </div>
       <div style="color: #9ca3af; font-size: 0.875rem;">Utilisateurs Total</div>
       <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
-        <%= user_stats[:active_participants] %> actifs
+        <%= Participation.joins(:user).distinct.count('users.id') %> actifs
       </div>
     </div>
 
@@ -88,9 +81,8 @@
         </div>
       </div>
 
-      <% avg_rating = Review.average(:rating) || 0 %>
       <div style="font-size: 2rem; font-weight: bold; color: #f59e0b; margin-bottom: 0.5rem;">
-        <%= avg_rating.round(1) %>/5
+        <%= @metrics[:satisfaction] %>/5
       </div>
       <div style="color: #9ca3af; font-size: 0.875rem;">Satisfaction</div>
       <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
@@ -108,10 +100,9 @@
     <div class="panel">
       <h3 style="color: #f59e0b; margin-bottom: 1rem;">Films en Attente de Validation</h3>
 
-      <% pending_movies = Movie.where(validation_status: :pending).limit(5) %>
-      <% if pending_movies.any? %>
+      <% if @pending_movies.any? %>
         <div style="space-y: 0.75rem;">
-          <% pending_movies.each do |movie| %>
+          <% @pending_movies.each do |movie| %>
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.75rem; margin-bottom: 0.75rem;">
               <!-- Movie Info -->
               <div>
@@ -153,46 +144,23 @@
       <h3 style="color: #2563eb; margin-bottom: 1rem;">Activité Récente</h3>
 
       <div style="space-y: 1rem;">
-        <!-- Recent Participations -->
-        <% Participation.includes(:user, :event).order(created_at: :desc).limit(3).each do |participation| %>
+        <% @recent_activities.each do |activity| %>
           <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 0.5rem; margin-bottom: 0.75rem;">
             <div style="width: 2.5rem; height: 2.5rem; background: rgba(245, 158, 11, 0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
-              <i class="fas fa-ticket-alt" style="color: #f59e0b; font-size: 0.875rem;"></i>
+              <i class="fas fa-<%= activity[:icon] %>" style="color: #f59e0b; font-size: 0.875rem;"></i>
             </div>
 
             <div style="flex: 1;">
               <div style="font-size: 0.875rem; font-weight: 500; color: white; margin-bottom: 0.25rem;">
-                Nouvelle réservation
+                <%= activity[:title] %>
               </div>
               <div style="font-size: 0.75rem; color: #9ca3af;">
-                <%= participation.user&.full_name || 'Utilisateur' %> • <%= participation.event&.title || 'Événement' %>
+                <%= activity[:description] %>
               </div>
             </div>
 
             <div style="font-size: 0.75rem; color: #6b7280;">
-              <%= time_ago_in_words(participation.created_at) %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Recent Movies -->
-        <% Movie.includes(:user).order(created_at: :desc).limit(2).each do |movie| %>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 0.5rem; margin-bottom: 0.75rem;">
-            <div style="width: 2.5rem; height: 2.5rem; background: rgba(37, 99, 235, 0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
-              <i class="fas fa-film" style="color: #3b82f6; font-size: 0.875rem;"></i>
-            </div>
-
-            <div style="flex: 1;">
-              <div style="font-size: 0.875rem; font-weight: 500; color: white; margin-bottom: 0.25rem;">
-                Nouveau film ajouté
-              </div>
-              <div style="font-size: 0.75rem; color: #9ca3af;">
-                "<%= movie.title %>" par <%= movie.user&.full_name || 'Créateur' %>
-              </div>
-            </div>
-
-            <div style="font-size: 0.75rem; color: #6b7280;">
-              <%= time_ago_in_words(movie.created_at) %>
+              <%= activity[:time_ago] %>
             </div>
           </div>
         <% end %>
@@ -216,7 +184,7 @@
         <div>
           <div style="font-weight: 600; margin-bottom: 0.25rem;">Gérer Films</div>
           <div style="font-size: 0.875rem; color: #9ca3af;">
-            <%= Movie.where(validation_status: :pending).count %> en attente
+            <%= @quick_stats[:pending_movies] %> en attente
           </div>
         </div>
       </div>
@@ -231,7 +199,7 @@
         <div>
           <div style="font-weight: 600; margin-bottom: 0.25rem;">Événements</div>
           <div style="font-size: 0.875rem; color: #9ca3af;">
-            <%= Event.where(status: :upcoming).count %> à venir
+            <%= @quick_stats[:upcoming_events] %> à venir
           </div>
         </div>
       </div>
@@ -246,7 +214,7 @@
         <div>
           <div style="font-weight: 600; margin-bottom: 0.25rem;">Utilisateurs</div>
           <div style="font-size: 0.875rem; color: #9ca3af;">
-            <%= User.count %> total
+            <%= @quick_stats[:total_users] %> total
           </div>
         </div>
       </div>
@@ -260,4 +228,12 @@
         </div>
         <div>
           <div style="font-weight: 600; margin-bottom: 0.25rem;">Réservations</div>
-          <div style="font-size: 0.875rem; color
+          <div style="font-size: 0.875rem; color: #9ca3af;">
+            <%= Participation.count %> total
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

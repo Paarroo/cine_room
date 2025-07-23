@@ -324,7 +324,7 @@ class Admin::ReviewsController < Admin::ApplicationController
     review_info = review ? "review_id:#{review.id}" : 'multiple_reviews'
     Rails.logger.info "Admin Review Management: #{current_user.email} #{action} #{review_info} - #{details}"
 
-    # TODO: Implement audit logging for RGPD compliance
+    # FOR RGPD
     # AuditLog.create(
     #   admin_user: current_user,
     #   action: action,

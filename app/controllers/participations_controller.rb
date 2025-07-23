@@ -227,3 +227,46 @@ class Admin::ParticipationsController < Admin::ApplicationController
       end
     end
   end
+
+  # Check if participation can be modified based on event status and date
+  def can_modify_participation?(participation)
+    return false unless participation
+    return false if participation.event&.completed? || participation.event&.cancelled?
+    return false if participation.event&.event_date && participation.event.event_date < Date.current
+
+    true
+  end
+
+  # Send CSV data as download
+  def send_csv_data(export_data)
+    csv_content = generate_csv_content(export_data)
+    filename = "participations_export_#{Date.current.strftime('%Y%m%d')}.csv"
+
+    send_data csv_content,
+              filename: filename,
+              type: 'text/csv',
+              disposition: 'attachment'
+  end
+
+  # Generate CSV content from export data
+  def generate_csv_content(export_data)
+    return '' if export_data.empty?
+
+    require 'csv'
+
+    CSV.generate(headers: true) do |csv|
+      # Add headers
+      csv << export_data.first.keys.map(&:to_s).map(&:humanize)
+
+      # Add data rows
+      export_data.each do |row|
+        csv << row.values
+      end
+    end
+  end
+
+  # Strong parameters for participation updates - mirrors ActiveAdmin permit_params
+  def participation_params
+    params.require(:participation).permit(:user_id, :event_id, :status, :seats, :stripe_payment_id)
+  end
+end

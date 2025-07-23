@@ -1,0 +1,124 @@
+<% return if user.nil? || !user.respond_to?(:id) %>
+
+<div class="user-card glass-effect rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+  <!-- Card Header with Checkbox -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center space-x-3">
+      <input
+        type="checkbox"
+        class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+        data-admin-users-target="userCheckbox"
+        data-user-id="<%= user.id %>"
+        data-action="change->admin-users#updateBulkActions"
+      >
+
+      <!-- User Avatar -->
+      <div class="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-lg">
+        <%= user.full_name.present? ? user.full_name.first(2).upcase : user.email.first(2).upcase %>
+      </div>
+    </div>
+
+    <!-- Role Badge -->
+    <div class="role-badge">
+      <% case user.role %>
+      <% when 'admin' %>
+        <span class="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-medium">
+          <i class="fas fa-crown mr-1"></i>Administrateur
+        </span>
+      <% when 'creator' %>
+        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium">
+          <i class="fas fa-palette mr-1"></i>Créateur
+        </span>
+      <% else %>
+        <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
+          <i class="fas fa-user mr-1"></i>Utilisateur
+        </span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- User Info -->
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold text-white mb-2">
+      <%= user.full_name.present? ? user.full_name : 'Nom non renseigné' %>
+    </h4>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-envelope mr-1"></i>
+      <%= user.email %>
+    </p>
+    <p class="text-sm text-gray-400 mb-2">
+      <i class="fas fa-calendar mr-1"></i>
+      Inscrit le <%= user.created_at.strftime("%d/%m/%Y") %>
+    </p>
+
+    <!-- Bio Preview -->
+    <% if user.bio.present? %>
+      <p class="text-sm text-gray-300 line-clamp-2 italic">
+        "<%= truncate(user.bio, length: 80) %>"
+      </p>
+    <% end %>
+  </div>
+
+  <!-- Activity Stats -->
+  <div class="mb-4 grid grid-cols-3 gap-4">
+    <div class="text-center">
+      <div class="text-lg font-bold text-primary"><%= user.movies.count %></div>
+      <div class="text-xs text-gray-400">Films</div>
+    </div>
+    <div class="text-center">
+      <div class="text-lg font-bold text-green-400"><%= user.participations.where(status: :confirmed).count %></div>
+      <div class="text-xs text-gray-400">Réservations</div>
+    </div>
+    <div class="text-center">
+      <div class="text-lg font-bold text-yellow-400"><%= user.reviews.count %></div>
+      <div class="text-xs text-gray-400">Avis</div>
+    </div>
+  </div>
+
+  <!-- Total Spent -->
+  <% total_spent = user.participations.joins(:event).where(status: :confirmed).sum("events.price_cents * participations.seats") / 100.0 %>
+  <div class="mb-4 p-3 bg-white/5 rounded-lg">
+    <div class="text-sm text-gray-400">Total dépensé</div>
+    <div class="text-lg font-semibold text-green-400">
+      <%= number_to_currency(total_spent) %>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between pt-4 border-t border-white/10">
+    <!-- View Button -->
+    <%= link_to admin_user_path(user),
+        class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors flex items-center" do %>
+      <i class="fas fa-eye mr-2"></i>Voir
+    <% end %>
+
+    <!-- Role Action Buttons -->
+    <div class="flex space-x-2">
+      <% if user.user? %>
+        <!-- Promote to Creator -->
+        <%= button_to admin_user_path(user, role: 'creator'),
+            method: :patch,
+            class: "px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Promouvoir en créateur ?" } do %>
+          <i class="fas fa-arrow-up mr-1"></i>Créateur
+        <% end %>
+      <% elsif user.creator? %>
+        <!-- Promote to Admin -->
+        <%= button_to admin_user_path(user, role: 'admin'),
+            method: :patch,
+            class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Promouvoir en admin ?" } do %>
+          <i class="fas fa-crown mr-1"></i>Admin
+        <% end %>
+      <% elsif user.admin? && user != current_user %>
+        <!-- Demote from Admin -->
+        <%= button_to admin_user_path(user, role: 'user'),
+            method: :patch,
+            class: "px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Rétrograder cet admin ?" } do %>
+          <i class="fas fa-arrow-down mr-1"></i>Rétrograder
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

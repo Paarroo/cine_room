@@ -269,3 +269,70 @@ class Admin::ReviewsController < Admin::ApplicationController
       end
     end
   end
+
+  # Review quality report
+  def quality_report
+    @reviews_with_scores = Review.includes(:user, :movie, :event)
+                                .limit(100)
+                                .map do |review|
+      {
+        review: review,
+        quality_score: calculate_review_quality_score(review),
+        sentiment: analyze_review_sentiment(review)
+      }
+    end.sort_by { |item| -item[:quality_score] }
+
+    @quality_distribution = @reviews_with_scores.group_by do |item|
+      score = item[:quality_score]
+      case score
+      when 0..30 then 'Poor'
+      when 31..60 then 'Average'
+      when 61..80 then 'Good'
+      when 81..100 then 'Excellent'
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: { reviews: @reviews_with_scores, distribution: @quality_distribution } }
+    end
+  end
+
+  private
+
+  def set_review
+    @review = Review.find(params[:id])
+  end
+
+  def review_params
+    params.require(:review).permit(:rating, :comment, :status)
+  end
+
+  # Generate CSV from export data
+  def generate_csv(data)
+    return '' if data.empty?
+
+    headers = data.first.keys
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+      data.each { |row| csv << headers.map { |h| row[h] } }
+    end
+  end
+
+  # Enhanced logging with admin context
+  def log_review_action(action, review, details = {})
+    review_info = review ? "review_id:#{review.id}" : 'multiple_reviews'
+    Rails.logger.info "Admin Review Management: #{current_user.email} #{action} #{review_info} - #{details}"
+
+    # TODO: Implement audit logging for RGPD compliance
+    # AuditLog.create(
+    #   admin_user: current_user,
+    #   action: action,
+    #   target_type: 'Review',
+    #   target_id: review&.id,
+    #   details: details,
+    #   ip_address: request.remote_ip,
+    #   user_agent: request.user_agent
+    # )
+  end
+end

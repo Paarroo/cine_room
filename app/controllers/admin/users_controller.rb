@@ -1,7 +1,7 @@
 class Admin::UsersController < Admin::ApplicationController
   include UserManagement
 
-  before_action :set_user, only: [:show, :update, :toggle_role, :reset_password]
+  before_action :set_user, only: [ :show, :update, :toggle_role, :reset_password ]
 
   def index
     @users_query = User.includes(:movies, :participations, :reviews)
@@ -279,14 +279,14 @@ class Admin::UsersController < Admin::ApplicationController
 
 
     # ok RGPD Obligation
-    In production, you might want to store this in an audit log table
-    AuditLog.create(
-      admin_user: current_user,
-      action: action,
-      target_user: target_user,
-      details: details,
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent
-    )
+    # In production, you might want to store this in an audit log table
+    # AuditLog.create(
+    #   admin_user: current_user,
+    #   action: action,
+    #   target_user: target_user,
+    #   details: details,
+    #   ip_address: request.remote_ip,
+    #   user_agent: request.user_agent
+    # )
   end
 end

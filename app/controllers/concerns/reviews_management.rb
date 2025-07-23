@@ -244,3 +244,82 @@ module ReviewsManagement
       }
     end
   end
+
+  # Get filter options for forms
+  def get_review_filter_options
+    {
+      ratings: (1..5).map { |r| [ r, r ] },
+      content_types: [
+        [ 'All Reviews', '' ],
+        [ 'With Comments', 'with_comment' ],
+        [ 'Rating Only', 'rating_only' ],
+        [ 'With Rating', 'with_rating' ]
+      ],
+      time_periods: [
+        [ 'All Time', '' ],
+        [ 'Today', 'today' ],
+        [ 'This Week', 'week' ],
+        [ 'This Month', 'month' ],
+        [ 'Recent (30 days)', 'recent' ]
+      ],
+      genres: Movie.joins(:reviews).distinct.pluck(:genre).compact.sort.map { |g| [ g, g ] },
+      user_roles: User.roles.keys.map { |role| [ role.humanize, role ] },
+      event_statuses: Event.statuses.keys.map { |status| [ status.humanize, status ] },
+      sort_options: [
+        [ 'Newest First', 'newest' ],
+        [ 'Oldest First', 'oldest' ],
+        [ 'Highest Rating', 'rating_desc' ],
+        [ 'Lowest Rating', 'rating_asc' ]
+      ]
+    }
+  end
+
+  # Review insights for dashboard
+  def review_insights
+    recent_reviews = Review.where(created_at: 1.month.ago..Time.current)
+
+    {
+      monthly_growth: calculate_monthly_growth,
+      average_rating_trend: calculate_rating_trend,
+      top_rated_movies_this_month: top_reviewed_movies(5).where(reviews: { created_at: 1.month.ago..Time.current }),
+      sentiment_distribution: calculate_sentiment_distribution(recent_reviews),
+      review_quality_average: calculate_average_quality_score(recent_reviews),
+      response_time_after_events: calculate_average_response_time
+    }
+  end
+
+  private
+
+  # Calculate monthly growth in reviews
+  def calculate_monthly_growth
+    current_month = Review.where(created_at: 1.month.ago..Time.current).count
+    previous_month = Review.where(created_at: 2.months.ago..1.month.ago).count
+
+    return 0 if previous_month.zero?
+
+    ((current_month - previous_month).to_f / previous_month * 100).round(1)
+  end
+
+  # Calculate rating trend over time
+  def calculate_rating_trend
+    last_month = Review.where(created_at: 1.month.ago..Time.current).average(:rating) || 0
+    previous_month = Review.where(created_at: 2.months.ago..1.month.ago).average(:rating) || 0
+
+    {
+      current: last_month.round(2),
+      previous: previous_month.round(2),
+      trend: last_month > previous_month ? 'up' : (last_month < previous_month ? 'down' : 'stable')
+    }
+  end
+
+  # Calculate sentiment distribution
+  def calculate_sentiment_distribution(reviews_scope)
+    sentiments = { positive: 0, negative: 0, neutral: 0 }
+
+    reviews_scope.find_each do |review|
+      sentiment = analyze_review_sentiment(review)[:sentiment]
+      sentiments[sentiment.to_sym] += 1
+    end
+
+    sentiments
+  end

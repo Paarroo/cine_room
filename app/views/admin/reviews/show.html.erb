@@ -100,3 +100,145 @@
               </div>
             </div>
           </div>
+
+          <!-- Review Metadata -->
+          <div class="lg:col-span-1">
+            <div class="space-y-6">
+              <!-- User Information -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-4">
+                  <i class="fas fa-user text-primary mr-2"></i>Auteur de l'avis
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl">
+                      <%= @review.user&.full_name&.first(2)&.upcase || @review.user&.email&.first(2)&.upcase || 'U' %>
+                    </div>
+                    <div>
+                      <div class="text-lg font-semibold text-white">
+                        <%= @review.user&.full_name || 'Utilisateur inconnu' %>
+                      </div>
+                      <div class="text-sm text-gray-400">
+                        <%= @review.user&.email %>
+                      </div>
+                      <div class="text-xs text-gray-500 mt-1">
+                        <% case @review.user&.role %>
+                        <% when 'admin' %>
+                          <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded">Administrateur</span>
+                        <% when 'creator' %>
+                          <span class="px-2 py-1 bg-purple-500/20 text-purple-400 rounded">Créateur</span>
+                        <% else %>
+                          <span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded">Utilisateur</span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-sm text-gray-400">
+                    <div class="flex justify-between mb-1">
+                      <span>Total d'avis :</span>
+                      <span class="text-primary"><%= @review.user&.reviews&.count || 0 %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Note moyenne donnée :</span>
+                      <span class="text-yellow-400">
+                        <%= @review.user&.reviews&.average(:rating)&.round(1) || 0 %>/5
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Movie Information -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-4">
+                  <i class="fas fa-film text-primary mr-2"></i>Film évalué
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <h4 class="text-lg font-semibold text-white mb-2">
+                    <%= @review.movie&.title || 'Film inconnu' %>
+                  </h4>
+                  <div class="space-y-2 text-sm text-gray-400">
+                    <div class="flex justify-between">
+                      <span>Réalisateur :</span>
+                      <span><%= @review.movie&.director || 'Inconnu' %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Année :</span>
+                      <span><%= @review.movie&.year || 'Inconnue' %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Genre :</span>
+                      <span><%= @review.movie&.genre || 'Inconnu' %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Note moyenne :</span>
+                      <span class="text-yellow-400">
+                        <%= @review.movie&.reviews&.average(:rating)&.round(1) || 0 %>/5
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Event Information -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-4">
+                  <i class="fas fa-calendar-alt text-primary mr-2"></i>Événement
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <h4 class="text-lg font-semibold text-white mb-2">
+                    <%= @review.event&.title || 'Événement inconnu' %>
+                  </h4>
+                  <div class="space-y-2 text-sm text-gray-400">
+                    <div class="flex justify-between">
+                      <span>Date :</span>
+                      <span><%= @review.event&.event_date&.strftime("%d %B %Y") || 'Inconnue' %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Lieu :</span>
+                      <span><%= @review.event&.venue_name || 'Inconnu' %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Délai d'écriture :</span>
+                      <span>
+                        <% if @review.event&.event_date %>
+                          <% days_diff = (@review.created_at.to_date - @review.event.event_date).to_i %>
+                          <%= days_diff %> jour<%= 's' if days_diff.abs > 1 %>
+                          <%= days_diff >= 0 ? 'après' : 'avant' %> l'événement
+                        <% else %>
+                          Inconnu
+                        <% end %>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review Metadata -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-4">
+                  <i class="fas fa-info-circle text-primary mr-2"></i>Informations
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="space-y-2 text-sm text-gray-400">
+                    <div class="flex justify-between">
+                      <span>Écrit le :</span>
+                      <span><%= @review.created_at.strftime("%d %B %Y à %H:%M") %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Modifié le :</span>
+                      <span><%= @review.updated_at.strftime("%d %B %Y à %H:%M") %></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Longueur commentaire :</span>
+                      <span><%= @review.comment&.length || 0 %> caractères</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

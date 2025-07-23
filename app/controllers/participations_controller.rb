@@ -1,75 +1,50 @@
-class ParticipationsController < ApplicationController
-  before_action :authenticate_user!  
-  before_action :set_participation, only: [:show, :destroy]
-  before_action :set_event, only: [:create]
+module ParticipationManagement
+  extend ActiveSupport::Concern
 
-  def index
-    @participations = current_user.participations
-                                  .includes(event: :movie)
-                                  .order(created_at: :desc)
+  # Get all scopes for participation filtering - mirrors ActiveAdmin scopes
+  def participation_scopes
+    {
+      all: Participation.all,
+      pending: Participation.where(status: :pending),
+      confirmed: Participation.where(status: :confirmed),
+      cancelled: Participation.where(status: :cancelled)
+    }
   end
 
-  def show
+  # Build participation query with includes for performance - mirrors ActiveAdmin index
+  def build_participation_query
+    Participation.includes(:user, :event, event: :movie)
+                 .order(created_at: :desc)
   end
 
-  def new
-    @event = Event.find(params[:event_id])
-    @participation = Participation.new
+  # Calculate total price for a participation - mirrors ActiveAdmin total_price column
+  def calculate_participation_total_price(participation)
+    return 0 unless participation.event&.price_cents && participation.seats
+
+    (participation.event.price_cents * participation.seats) / 100.0
   end
 
-  def create
-    @event = Event.find(params[:event_id])
-    seats = participation_params[:seats].to_i
-
-    if seats <= 0 || seats > @event.available_spots
-      redirect_to new_event_participation_path(@event), alert: "Nombre de places invalide." and return
-    end
-
-    if current_user.participations.exists?(event: @event)
-      redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
-    end
-
-    session = Stripe::Checkout::Session.create(
-      payment_method_types: ['card'],
-      line_items: [{
-        price_data: {
-          currency: 'eur',
-          unit_amount: @event.price_cents*100,
-          product_data: {
-            name: @event.title
-          }
-        },
-        quantity: seats
-      }],
-      metadata: {
-        user_id: current_user.id,
-        event_id: @event.id,
-        seats: seats
-      },
-      mode: 'payment',
-      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}", 
-      cancel_url: stripe_cancel_url(event_id: @event.id)
-    )
-
-    redirect_to session.url, allow_other_host: true
+  # Format participation display data - mirrors ActiveAdmin columns
+  def format_participation_data(participation)
+    {
+      id: participation.id,
+      user_name: participation.user&.full_name || 'Unknown User',
+      user_link: participation.user,
+      event_title: participation.event&.title || 'Unknown Event',
+      event_link: participation.event,
+      movie_title: participation.event&.movie&.title,
+      movie_link: participation.event&.movie,
+      event_date: participation.event&.event_date,
+      seats: participation.seats,
+      total_price: calculate_participation_total_price(participation),
+      formatted_total_price: format_currency(calculate_participation_total_price(participation)),
+      status: participation.status,
+      status_humanized: participation.status.humanize,
+      has_payment: participation.stripe_payment_id.present?,
+      payment_indicator: participation.stripe_payment_id.present? ? "✓" : "✗",
+      stripe_payment_id: participation.stripe_payment_id,
+      formatted_created_at: participation.created_at.strftime("%d/%m/%Y"),
+      created_at: participation.created_at,
+      updated_at: participation.updated_at
+    }
   end
-
-  def destroy
-    @participation.destroy!
-    redirect_to participations_path, notice: "Reservation cancelled successfully."
-  end
-
-  private
-
-  def set_participation
-    @participation = current_user.participations.find(params[:id])
-  end
-
-  def set_event
-    @event = Event.find(params[:event_id])
-  end
-
-  def participation_params
-    params.require(:participation).permit(:seats)
-  end
-end

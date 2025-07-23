@@ -65,4 +65,8 @@ module ApplicationHelper
         end
       end
     end
+    def number_to_percentage(number, options = {})
+      precision = options[:precision] || 0
+      "#{number.round(precision)}%"
+    end
 end

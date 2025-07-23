@@ -9,12 +9,18 @@ class Admin::ParticipationsController < Admin::ApplicationController
     # Apply filters using concern method
     @participations = filter_participations(params).limit(50).to_a
 
+      # FORMAT DATA for view consumption
+      @formatted_participations = @participations.map do |participation|
+        format_participation_data(participation)
+      end
+
     # Calculate stats using concern method - FIX: use correct method name
     @stats = calculate_participation_statistics
     @insights = participation_insights
-
-    # Get filter options for form
     @filter_options = get_participation_filter_options
+    @revenue_data = calculate_participation_revenue
+
+    @revenue_data = calculate_participation_revenue
 
     # Additional data for dashboard
     @top_events = top_events_by_participation(5)

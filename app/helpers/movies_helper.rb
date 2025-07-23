@@ -1,4 +1,4 @@
-module Admin::MoviesHelper
+module MoviesHelper
   def default_filter_options(resource)
     case resource
     when :movies
@@ -94,4 +94,17 @@ module Admin::MoviesHelper
         end
       end
     end
+    def default_filter_options(resource)
+        case resource
+        when :movies
+          {
+            search: true,
+            genres: Movie.approved.distinct.pluck(:genre).compact,
+            years: Movie.approved.distinct.pluck(:year).compact.sort.reverse,
+            directors: Movie.approved.distinct.pluck(:director).compact
+          }
+        else
+          {}
+        end
+      end
 end

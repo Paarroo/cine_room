@@ -1,43 +1,85 @@
 Rails.application.routes.draw do
-  ActiveAdmin.routes(self)
+  # ActiveAdmin.routes(self)
+
 
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
 
+
   authenticated :user, ->(user) { user.admin? } do
-    root to: redirect('/admin'), as: :admin_authenticated_root
+    root to: 'admin/dashboard#index', as: :admin_authenticated_root
   end
+
 
   authenticated :user do
     root to: 'pages#home', as: :authenticated_root
   end
 
+
   unauthenticated do
     root to: 'pages#home', as: :public_home
   end
+
+
   root 'pages#home'
+
 
   get '/home', to: 'pages#home', as: :public_site
 
+
   namespace :admin do
-    resources :dashboard, only: [ :index ]
+    root 'dashboard#index'
 
-    resources :movies, only: [ :index, :show, :update ]
-    resources :events, only: [ :index, :show, :update ]
-    resources :users, only: [ :index, :show, :update ]
-    resources :participations, only: [ :index, :show, :update ]
+    resources :dashboard, only: [ :index ] do
+      collection do
+        get :refresh
+        get :quick_stats
+        post :export
+      end
+    end
 
-    get 'dashboard/refresh', to: 'dashboard#refresh'
-    get 'dashboard/quick_stats', to: 'dashboard#quick_stats'
-    post 'dashboard/export', to: 'dashboard#export'
+    resources :movies, only: [ :index, :show, :update ] do
+      member do
+        patch :validate_movie
+        patch :reject_movie
+      end
+
+      collection do
+        patch :bulk_validate
+        patch :bulk_reject
+      end
+    end
+
+    resources :events, only: [ :index, :show, :update ] do
+      member do
+        patch :toggle_status
+      end
+    end
+
+    resources :users, only: [ :index, :show, :update ] do
+      member do
+        patch :toggle_role
+      end
+    end
+
+    resources :participations, only: [ :index, :show, :update ] do
+      collection do
+        patch :bulk_confirm
+        patch :bulk_cancel
+      end
+    end
+
+    resources :reviews, only: [ :index, :show, :update ]
 
     get 'notifications/poll', to: 'notifications#poll'
+
     get 'reports', to: 'reports#index'
     get 'reports/revenue', to: 'reports#revenue'
     get 'reports/users', to: 'reports#users'
     get 'reports/events', to: 'reports#events'
+
     get 'system/status', to: 'system#status'
     post 'system/backup', to: 'system#backup'
     post 'system/maintenance', to: 'system#toggle_maintenance'
@@ -45,9 +87,9 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :dashboard, only: [ :show ] do
-      get :edit_profile
-      patch :update_profile
       member do
+        get :edit_profile
+        patch :update_profile
         get :upcoming_participations
         get :past_participations
         get :favorite_events
@@ -63,6 +105,7 @@ Rails.application.routes.draw do
   get '/about', to: 'pages#about', as: :about
 
   delete '/admin/logout', to: 'application#admin_logout'
+
   devise_scope :user do
     get '/users/sign_out', to: 'devise/sessions#destroy'
   end
@@ -71,7 +114,17 @@ Rails.application.routes.draw do
   get "stripe_checkout/cancel", to: "stripe_checkout#cancel", as: :stripe_cancel
 
   resources :movies do
-    resources :reviews, except: [ :index ]
+    resources :reviews, except: [ :index ] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+
+    member do
+      patch :validate_movie
+      patch :reject_movie
+    end
 
     collection do
       get :search
@@ -81,10 +134,16 @@ Rails.application.routes.draw do
   end
 
   resources :events do
-    resources :participations, only: [ :new, :create, :destroy ]
+    resources :participations, only: [ :new, :create, :destroy ] do
+      member do
+        patch :confirm
+        patch :cancel
+      end
+    end
 
     member do
       get :availability
+      patch :toggle_status
     end
 
     collection do
@@ -108,10 +167,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :participations, only: [ :index, :show, :update ] do
+  resources :participations, only: [ :index, :show ] do
     member do
       get :qr_code
       get :ticket
+      patch :check_in
     end
 
     collection do
@@ -121,17 +181,24 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :reviews, only: [ :index, :show, :update ] do
+  resources :reviews, only: [ :index, :show ] do
+    member do
+      patch :like
+      patch :unlike
+      patch :report
+    end
+
     collection do
       get :recent
       get :top_rated
     end
   end
 
-  resources :reservations, only: [ :show, :create, :update ] do
+  resources :reservations, only: [ :show, :create ] do
     member do
       get :confirmation
       get :qr_code
+      patch :cancel
     end
   end
 
@@ -153,7 +220,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # WEBHOOKS
   namespace :webhooks do
     post 'stripe', to: 'stripe#handle'
   end
@@ -164,7 +230,6 @@ Rails.application.routes.draw do
     get "/rails/mailers/*path", to: "rails/mailers#preview"
   end
 
-  # HEALTH & PWA
   get "up" => "rails/health#show", as: :rails_health_check
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

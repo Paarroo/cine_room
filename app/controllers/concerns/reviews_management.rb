@@ -187,3 +187,60 @@ module ReviewsManagement
         .order('reviews_count DESC, avg_rating_given DESC')
         .limit(limit)
   end
+
+  # Review quality scoring
+  def calculate_review_quality_score(review)
+    score = 0
+
+    # Rating provided (+20 points)
+    score += 20 if review.rating.present?
+
+    # Comment length (up to 40 points)
+    if review.comment.present?
+      comment_length = review.comment.length
+      score += [ comment_length / 5, 40 ].min # 1 point per 5 characters, max 40
+    end
+
+    # Helpfulness votes (if implemented in future)
+    # score += (review.helpful_votes || 0) * 2
+
+    # Sentiment analysis bonus
+    sentiment = analyze_review_sentiment(review)
+    score += 10 if sentiment[:sentiment] != 'neutral'
+
+    # Recent review bonus (within 48h of event)
+    if review.event.event_date.present?
+      time_diff = review.created_at - review.event.event_date
+      score += 20 if time_diff <= 2.days && time_diff >= 0
+    end
+
+    [ score, 100 ].min # Cap at 100
+  end
+
+  # Export reviews data
+  def export_reviews_data(reviews_scope = Review.all)
+    reviews_scope.includes(:user, :movie, :event)
+                 .limit(1000)
+                 .map do |review|
+      sentiment = analyze_review_sentiment(review)
+      quality_score = calculate_review_quality_score(review)
+
+      {
+        id: review.id,
+        user_name: review.user&.full_name,
+        user_email: review.user&.email,
+        movie_title: review.movie&.title,
+        movie_genre: review.movie&.genre,
+        event_title: review.event&.title,
+        event_date: review.event&.event_date&.strftime('%Y-%m-%d'),
+        rating: review.rating,
+        comment: review.comment,
+        comment_length: review.comment&.length || 0,
+        sentiment: sentiment[:sentiment],
+        sentiment_score: sentiment[:score],
+        quality_score: quality_score,
+        created_at: review.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        days_after_event: review.event&.event_date ? (review.created_at.to_date - review.event.event_date).to_i : nil
+      }
+    end
+  end

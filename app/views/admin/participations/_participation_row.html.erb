@@ -1,0 +1,82 @@
+<tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+  <!-- Checkbox -->
+  <td class="py-4 px-4">
+    <input
+      type="checkbox"
+      class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+      data-admin-participations-target="participationCheckbox"
+      data-participation-id="<%= data[:id] %>"
+      data-action="change->admin-participations#updateBulkActions"
+    >
+  </td>
+
+  <!-- User -->
+  <td class="py-4 px-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xs">
+        <%= data[:user_name].present? ? data[:user_name].first(2).upcase : 'U' %>
+      </div>
+      <div>
+        <div class="text-white font-medium text-sm">
+          <%= data[:user_name] %>
+        </div>
+        <% if data[:user_link]&.email %>
+          <div class="text-gray-400 text-xs">
+            <%= data[:user_link].email %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </td>
+
+  <!-- Event -->
+  <td class="py-4 px-4">
+    <div>
+      <div class="text-white font-medium text-sm">
+        <%= link_to data[:event_title], admin_participation_path(data[:id]),
+            class: "hover:text-primary transition-colors" %>
+      </div>
+      <% if data[:event_link]&.venue_name %>
+        <div class="text-gray-400 text-xs">
+          <%= data[:event_link].venue_name %>
+        </div>
+      <% end %>
+    </div>
+  </td>
+
+  <!-- Movie -->
+  <td class="py-4 px-4">
+    <% if data[:movie_title].present? %>
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs">
+          <%= data[:movie_title].first %>
+        </div>
+        <div>
+          <div class="text-white text-sm">
+            <%= truncate(data[:movie_title], length: 20) %>
+          </div>
+          <% if data[:movie_link]&.year %>
+            <div class="text-gray-400 text-xs">
+              <%= data[:movie_link].year %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <span class="text-gray-500 text-sm">-</span>
+    <% end %>
+  </td>
+
+  <!-- Event Date -->
+  <td class="py-4 px-4">
+    <% if data[:event_date] %>
+      <div class="text-white text-sm">
+        <%= data[:event_date].strftime("%d/%m/%Y") %>
+      </div>
+      <div class="text-gray-400 text-xs">
+        <%= data[:event_link]&.start_time&.strftime("%H:%M") %>
+      </div>
+    <% else %>
+      <span class="text-gray-500 text-sm">-</span>
+    <% end %>
+  </td>

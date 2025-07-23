@@ -85,3 +85,110 @@
               </div>
             <% end %>
           </div>
+
+          <!-- User Information -->
+          <div class="lg:col-span-1">
+            <div class="space-y-6">
+              <!-- Name & Email -->
+              <div>
+                <h1 class="text-4xl font-bold gradient-text mb-3">
+                  <%= @user.full_name.present? ? @user.full_name : 'Nom non renseigné' %>
+                </h1>
+                <p class="text-xl text-gray-300">
+                  <i class="fas fa-envelope mr-2"></i><%= @user.email %>
+                </p>
+              </div>
+
+              <!-- User Details Grid -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Inscription</div>
+                  <div class="text-lg font-semibold text-white"><%= @user.created_at.strftime("%d/%m/%Y") %></div>
+                </div>
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Dernière connexion</div>
+                  <div class="text-lg font-semibold text-white">
+                    <%= @user.last_sign_in_at&.strftime("%d/%m/%Y") || 'Jamais' %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bio -->
+              <% if @user.bio.present? %>
+                <div>
+                  <h3 class="text-xl font-semibold text-white mb-3">
+                    <i class="fas fa-quote-left text-primary mr-2"></i>Bio
+                  </h3>
+                  <div class="glass-subtle rounded-xl p-6">
+                    <p class="text-gray-300 leading-relaxed">
+                      <%= simple_format(@user.bio) %>
+                    </p>
+                  </div>
+                </div>
+              <% end %>
+
+              <!-- Profile Completion -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-tasks text-primary mr-2"></i>Complétude du profil
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-300">Progression</span>
+                    <span class="text-primary font-semibold"><%= @profile_completion[:percentage] %>%</span>
+                  </div>
+                  <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300"
+                         style="width: <%= @profile_completion[:percentage] %>%"></div>
+                  </div>
+                  <div class="text-sm text-gray-400 mt-2">
+                    <%= @profile_completion[:completed_fields] %>/<%= @profile_completion[:total_fields] %> champs remplis
+                  </div>
+                </div>
+              </div>
+
+              <!-- Activity Summary -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-chart-bar text-primary mr-2"></i>Résumé d'activité
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-primary mb-1"><%= @user_activity[:movies_created] %></div>
+                    <div class="text-sm text-gray-400">Films créés</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-green-400 mb-1"><%= @user_activity[:events_attended] %></div>
+                    <div class="text-sm text-gray-400">Événements</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-400 mb-1"><%= @user_activity[:reviews_written] %></div>
+                    <div class="text-sm text-gray-400">Avis écrits</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-accent mb-1"><%= number_to_currency(@user_activity[:total_spent]) %></div>
+                    <div class="text-sm text-gray-400">Total dépensé</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Movies Section -->
+  <% if @recent_movies.any? %>
+    <section class="movies-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-film text-primary mr-3"></i>
+              Films récents
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @user.movies.count %> film<%= 's' if @user.movies.count > 1 %> au total
+            </span>
+          </div>

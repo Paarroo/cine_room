@@ -133,3 +133,97 @@ class Admin::ParticipationsController < Admin::ApplicationController
       end
     end
   end
+
+  # GET /admin/participations/export - export functionality
+  def export
+    @participations = filter_participations(params)
+    @export_data = export_participation_data(@participations)
+
+    respond_to do |format|
+      format.csv { send_csv_data(@export_data) }
+      format.json { render json: { data: @export_data, count: @export_data.length } }
+    end
+  end
+
+  private
+
+  # Find participation by ID with error handling
+  def set_participation
+    @participation = Participation.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.json { render json: { error: 'Participation not found' }, status: :not_found }
+      format.html { redirect_to admin_participations_path, alert: 'Participation not found' }
+    end
+  end
+
+  # Confirm single participation - uses concern method
+  def confirm_participation_action
+    result = update_participation_status(@participation, 'confirmed')
+
+    respond_to do |format|
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
+    end
+  end
+
+  # Cancel single participation - uses concern method
+  def cancel_participation_action
+    result = update_participation_status(@participation, 'cancelled')
+
+    respond_to do |format|
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
+    end
+  end
+
+  # Set participation to pending - uses concern method
+  def set_pending_participation_action
+    result = update_participation_status(@participation, 'pending')
+
+    respond_to do |format|
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
+    end
+  end
+
+  # Update participation with custom attributes - includes validation
+  def update_participation_attributes
+    # Validate data before update
+    validation_result = validate_participation_data(participation_params)
+
+    unless validation_result[:valid]
+      respond_to do |format|
+        format.json { render json: { status: 'error', errors: validation_result[:errors] } }
+        format.html { redirect_to admin_participation_path(@participation), alert: validation_result[:errors].join(', ') }
+      end
+      return
+    end
+
+    if @participation.update(participation_params)
+      respond_to do |format|
+        format.json { render json: { status: 'success', message: 'Participation updated successfully' } }
+        format.html { redirect_to admin_participation_path(@participation), notice: 'Participation updated successfully' }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { status: 'error', errors: @participation.errors.full_messages } }
+        format.html { render :show, alert: @participation.errors.full_messages.join(', ') }
+      end
+    end
+  end

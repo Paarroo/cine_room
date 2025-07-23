@@ -191,3 +191,92 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Movie Information -->
+              <% if @movie %>
+                <div>
+                  <h3 class="text-xl font-semibold text-white mb-3">
+                    <i class="fas fa-film text-primary mr-2"></i>Film
+                  </h3>
+                  <div class="glass-subtle rounded-xl p-6">
+                    <div class="flex space-x-4">
+                      <div class="w-16 h-20 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xs">
+                        <%= @movie.title.first(2).upcase %>
+                      </div>
+                      <div class="flex-1">
+                        <h4 class="text-lg font-semibold text-white mb-2">
+                          <%= @participation_data[:movie_title] %>
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span class="text-gray-400">Réalisateur:</span>
+                            <span class="text-white ml-2"><%= @movie.director %></span>
+                          </div>
+                          <div>
+                            <span class="text-gray-400">Année:</span>
+                            <span class="text-white ml-2"><%= @movie.year %></span>
+                          </div>
+                          <div>
+                            <span class="text-gray-400">Genre:</span>
+                            <span class="text-white ml-2"><%= @movie.genre %></span>
+                          </div>
+                          <div>
+                            <span class="text-gray-400">Durée:</span>
+                            <span class="text-white ml-2"><%= @movie.duration %> min</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+
+              <!-- Technical Information -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-cog text-primary mr-2"></i>Informations Techniques
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span class="text-gray-400">ID Réservation:</span>
+                      <span class="text-white ml-2">#<%= @participation.id %></span>
+                    </div>
+                    <div>
+                      <span class="text-gray-400">ID Stripe:</span>
+                      <span class="text-white ml-2">
+                        <%= @participation_data[:stripe_payment_id] || 'Non renseigné' %>
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-gray-400">Créée le:</span>
+                      <span class="text-white ml-2">
+                        <%= @participation_data[:created_at]&.strftime("%d/%m/%Y à %H:%M") %>
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-gray-400">Modifiée le:</span>
+                      <span class="text-white ml-2">
+                        <%= @participation_data[:updated_at]&.strftime("%d/%m/%Y à %H:%M") %>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Back to List Button -->
+  <section class="back-section py-8">
+    <div class="container-app text-center">
+      <%= link_to admin_participations_path, class: "btn-secondary" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Retour à la liste des réservations
+      <% end %>
+    </div>
+  </section>
+</div>

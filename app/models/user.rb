@@ -42,7 +42,7 @@ class User < ApplicationRecord
   def name_cannot_be_changed_after_publishing
     return unless movies.exists?
 
-    if first_name_changed? || last_name_changed?*
+    if first_name_changed? || last_name_changed?
       errors.add(:base, "Impossible de modifier votre nom après publication d’un film approuvé.")
     end
   end

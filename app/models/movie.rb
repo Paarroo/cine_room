@@ -1,6 +1,9 @@
 class Movie < ApplicationRecord
   attr_accessor :authorship_confirmed
 
+  before_update :prevent_update_if_approved
+  after_update :promote_user_to_creator_if_approved
+
   belongs_to :user
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
@@ -58,6 +61,20 @@ class Movie < ApplicationRecord
   def authorship_must_be_confirmed
     if authorship_confirmed != "1"
       errors.add(:base, "Tu dois confirmer être l’auteur ou l’autrice de cette vidéo pour pouvoir la publier.")
+    end
+  end
+
+  # Promote user to creator if this movie is approved
+  def promote_user_to_creator_if_approved
+    if saved_change_to_validation_status? && validation_status == "approved"
+      user.update(role: "creator") unless user.creator?
+    end
+  end
+
+  def prevent_update_if_approved
+    if self.approved?
+      errors.add(:base, "Un film approuvé ne peut plus être modifié.")
+      throw(:abort)
     end
   end
 end

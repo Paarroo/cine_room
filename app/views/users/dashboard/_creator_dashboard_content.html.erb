@@ -2,10 +2,23 @@
   <section class="bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 min-h-screen pb-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Publish movie button -->
-      <div class="flex justify-end mb-12">
+      <!-- 🔄 Creator status + Publish movie button -->
+      <div class="flex justify-between items-center mb-12">
+        <% if current_user.movies.exists? %>
+          <% if current_user.creator? %>
+            <span class="inline-flex items-center px-4 py-2 bg-green-600/20 text-green-300 text-sm font-medium rounded-full border border-green-600/30">
+              <i class="fas fa-check-circle mr-2"></i>Statut de créateur : Validé
+            </span>
+          <% else %>
+            <span class="inline-flex items-center px-4 py-2 bg-red-600/20 text-red-300 text-sm font-medium rounded-full border border-red-600/30">
+              <i class="fas fa-times-circle mr-2"></i>Statut de créateur : Non validé
+            </span>
+          <% end %>
+        <% end %>
+
         <%= link_to "Publier un nouveau film", new_movie_path, class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg" %>
       </div>
+
 
       <% sections = {
         approved: ["Mes films publiés", "fas fa-check-circle text-green-400"],
@@ -34,7 +47,9 @@
 
                   <div class="flex justify-between items-center mt-auto">
                     <%= link_to "Voir", movie_path(movie), class: "text-xs px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition" %>
-                    <%= link_to "Modifier", edit_movie_path(movie), class: "text-xs px-4 py-2 bg-cinema-blue hover:bg-blue-600 rounded-full text-white transition" %>
+                    <% unless status == :approved %>
+                      <%= link_to "Modifier", edit_movie_path(movie), class: "text-xs px-4 py-2 bg-cinema-blue hover:bg-blue-600 rounded-full text-white transition" %>
+                    <% end %>
                   </div>
                 </div>
               <% end %>
@@ -45,7 +60,7 @@
         </div>
       <% end %>
 
-      <!-- Events section -->
+      <!-- 📅 Events section (only for creators) -->
       <% if current_user.creator? %>
         <div class="glass-effect p-6 rounded-2xl">
           <h3 class="text-2xl font-semibold text-white mb-4">
@@ -71,7 +86,7 @@
     </div>
   </section>
 <% else %>
-  <!-- Non creator user -->
+  <!-- 🧑‍💼 Non-creator user CTA -->
   <section class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 px-6 text-center">
     <div>
       <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Vous souhaitez devenir créateur ?</h2>

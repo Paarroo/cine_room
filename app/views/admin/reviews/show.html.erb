@@ -1,0 +1,102 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section pt-20 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_reviews_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Avis
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white">Avis #<%= @review.id %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Review Header -->
+  <section class="review-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Review Content -->
+          <div class="lg:col-span-1">
+            <!-- Rating Display -->
+            <div class="text-center mb-8">
+              <div class="flex items-center justify-center space-x-2 mb-4">
+                <% if @review.rating %>
+                  <% @review.rating.times do %>
+                    <i class="fas fa-star text-yellow-400 text-4xl"></i>
+                  <% end %>
+                  <% (5 - @review.rating).times do %>
+                    <i class="fas fa-star text-gray-600 text-4xl"></i>
+                  <% end %>
+                <% else %>
+                  <span class="text-2xl text-gray-500">Pas de note attribuée</span>
+                <% end %>
+              </div>
+              <% if @review.rating %>
+                <div class="text-3xl font-bold text-yellow-400 mb-2">
+                  <%= @review.rating %>/5
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Comment Content -->
+            <% if @review.comment.present? %>
+              <div class="bg-white/5 rounded-2xl p-6 mb-6">
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                  <i class="fas fa-quote-left text-primary mr-2"></i>
+                  Commentaire
+                </h3>
+                <div class="prose prose-invert max-w-none">
+                  <p class="text-gray-300 leading-relaxed text-lg">
+                    <%= simple_format(@review.comment) %>
+                  </p>
+                </div>
+              </div>
+            <% else %>
+              <div class="bg-gray-800/50 rounded-2xl p-6 mb-6 text-center">
+                <i class="fas fa-comment-slash text-4xl text-gray-600 mb-4"></i>
+                <p class="text-gray-500 text-lg">Aucun commentaire fourni</p>
+                <p class="text-sm text-gray-600 mt-2">L'utilisateur a seulement attribué une note</p>
+              </div>
+            <% end %>
+
+            <!-- Quality & Sentiment Analysis -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-2">Score de qualité</div>
+                <div class="flex items-center">
+                  <div class="text-2xl font-bold text-primary mr-2">
+                    <%= @quality_score %>/100
+                  </div>
+                  <div class="flex-1 bg-gray-700 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-primary to-accent h-2 rounded-full"
+                         style="width: <%= @quality_score %>%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-2">Analyse sentiment</div>
+                <div class="flex items-center">
+                  <% case @sentiment_analysis[:sentiment] %>
+                  <% when 'positive' %>
+                    <i class="fas fa-smile text-green-400 text-2xl mr-2"></i>
+                    <span class="text-green-400 font-semibold">Positif</span>
+                  <% when 'negative' %>
+                    <i class="fas fa-frown text-red-400 text-2xl mr-2"></i>
+                    <span class="text-red-400 font-semibold">Négatif</span>
+                  <% else %>
+                    <i class="fas fa-meh text-gray-400 text-2xl mr-2"></i>
+                    <span class="text-gray-400 font-semibold">Neutre</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>

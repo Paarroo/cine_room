@@ -61,3 +61,137 @@
       </div>
     </div>
   </div>
+
+  <!-- Stats Cards -->
+  <section class="stats-overview py-6">
+    <div class="container-app">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-star text-blue-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-blue-400 mb-2">
+            <%= @stats[:total] %>
+          </div>
+          <div class="text-sm text-gray-400">Total Avis</div>
+        </div>
+
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-star-half-alt text-yellow-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-yellow-400 mb-2">
+            <%= @stats[:average_rating] %>
+          </div>
+          <div class="text-sm text-gray-400">Note Moyenne</div>
+        </div>
+
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-green-400/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-comment text-green-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-green-400 mb-2">
+            <%= @stats[:with_comment] %>
+          </div>
+          <div class="text-sm text-gray-400">Avec Commentaire</div>
+        </div>
+
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-clock text-purple-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-purple-400 mb-2">
+            <%= @stats[:recent] %>
+          </div>
+          <div class="text-sm text-gray-400">Récents (30j)</div>
+        </div>
+
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-flag text-red-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-red-400 mb-2">
+            <%= @stats[:flagged] %>
+          </div>
+          <div class="text-sm text-gray-400">Signalés</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters Section -->
+  <%= render 'filters' %>
+
+  <!-- Reviews List -->
+  <section class="reviews-list py-8">
+    <div class="container-app">
+      <div
+        class="glass-effect rounded-3xl p-6"
+        data-controller="admin-reviews"
+      >
+        <!-- List Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-list text-primary mr-2"></i>
+            Liste des Avis
+          </h3>
+
+          <!-- Select All Checkbox -->
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+                data-admin-reviews-target="selectAll"
+                data-action="change->admin-reviews#toggleSelectAll"
+              >
+              <span class="text-sm text-gray-400">Tout sélectionner</span>
+            </label>
+
+            <span class="text-sm text-gray-400">
+              <%= @reviews.count %> résultats
+            </span>
+          </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <% if @reviews.any? %>
+            <% @reviews.each do |review| %>
+              <%= render 'review_card', review: review %>
+            <% end %>
+          <% else %>
+            <!-- Empty State -->
+            <div class="col-span-full text-center py-12">
+              <i class="fas fa-star text-6xl text-gray-600 mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucun avis trouvé</h3>
+              <p class="text-gray-500">
+                <% if params[:q].present? || params[:rating].present? %>
+                  Essayez de modifier vos critères de recherche
+                <% else %>
+                  Aucun avis n'a encore été publié
+                <% end %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Pagination -->
+        <% if @reviews.respond_to?(:total_pages) && @reviews.total_pages > 1 %>
+          <div class="mt-8 flex justify-center">
+            <%= paginate @reviews, theme: 'twitter_bootstrap_4' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>

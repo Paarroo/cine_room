@@ -1,129 +1,155 @@
-<!-- app/views/admin/movies/_movie_card.html.erb - Version corrigée -->
-<div class="movie-card glass-effect rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-  <!-- Card Header with Checkbox -->
-  <div class="flex items-start justify-between mb-4">
-    <div class="flex items-center space-x-3">
-      <input
-        type="checkbox"
-        class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-        data-admin-movies-target="movieCheckbox"
-        data-movie-id="<%= @movie.id %>"
-        data-action="change->admin-movies#updateBulkActions"
-      >
+<!-- Filters Section for Admin Movies -->
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-filter text-primary mr-2"></i>
+          Filtres et Recherche
+        </h3>
 
-      <!-- Movie Poster Placeholder -->
-      <div class="w-16 h-20 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-xs">
-        <%= movie.title.first(2).upcase %>
+        <!-- Clear Filters Button -->
+        <%= link_to admin_movies_path,
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
+          <i class="fas fa-times mr-2"></i>Effacer les filtres
+        <% end %>
       </div>
-    </div>
 
-    <!-- Status Badge -->
-    <div class="status-badge">
-      <% case movie.validation_status %>
-      <% when 'pending' %>
-        <span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-medium">
-          <i class="fas fa-clock mr-1"></i>En attente
-        </span>
-      <% when 'approved' %>
-        <span class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
-          <i class="fas fa-check mr-1"></i>Validé
-        </span>
-      <% when 'rejected' %>
-        <span class="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-medium">
-          <i class="fas fa-times mr-1"></i>Rejeté
-        </span>
+      <!-- Search and Filter Form -->
+      <%= form_with url: admin_movies_path, method: :get,
+          class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+          data: { turbo_frame: "_top" } do |form| %>
+
+        <!-- Search by Title -->
+        <div class="form-group">
+          <%= form.label :q, "Recherche", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.text_field :q,
+              value: params[:q],
+              placeholder: "Titre du film...",
+              class: "form-input" %>
+        </div>
+
+        <!-- Filter by Status -->
+        <div class="form-group">
+          <%= form.label :status, "Statut", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :status,
+              options_for_select([
+                ['Tous les statuts', ''],
+                ['En attente', 'pending'],
+                ['Validé', 'approved'],
+                ['Rejeté', 'rejected']
+              ], params[:status]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Genre -->
+        <div class="form-group">
+          <%= form.label :genre, "Genre", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :genre,
+              options_for_select([
+                ['Tous les genres', '']
+              ] + Movie.distinct.pluck(:genre).compact.map { |g| [g, g] }, params[:genre]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Year -->
+        <div class="form-group">
+          <%= form.label :year, "Année", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :year,
+              options_for_select([
+                ['Toutes les années', '']
+              ] + Movie.distinct.pluck(:year).compact.sort.reverse.map { |y| [y, y] }, params[:year]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="form-group">
+          <%= form.label :sort, "Trier par", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :sort,
+              options_for_select([
+                ['Plus récent', 'created_at_desc'],
+                ['Plus ancien', 'created_at_asc'],
+                ['Titre A-Z', 'title_asc'],
+                ['Titre Z-A', 'title_desc'],
+                ['Année récente', 'year_desc'],
+                ['Année ancienne', 'year_asc']
+              ], params[:sort]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Director -->
+        <div class="form-group">
+          <%= form.label :director, "Réalisateur", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.text_field :director,
+              value: params[:director],
+              placeholder: "Nom du réalisateur...",
+              class: "form-input" %>
+        </div>
+
+        <!-- Filter by Creator -->
+        <div class="form-group">
+          <%= form.label :creator, "Créateur", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.text_field :creator,
+              value: params[:creator],
+              placeholder: "Nom du créateur...",
+              class: "form-input" %>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group flex items-end">
+          <%= form.submit "Appliquer les filtres",
+              class: "w-full btn-primary" %>
+        </div>
+      <% end %>
+
+      <!-- Active Filters Display -->
+      <% if params.slice(:q, :status, :genre, :year, :director, :creator, :sort).values.any?(&:present?) %>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="text-sm text-gray-400 mr-2">Filtres actifs :</span>
+
+            <% if params[:q].present? %>
+              <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs">
+                Recherche: "<%= params[:q] %>"
+              </span>
+            <% end %>
+
+            <% if params[:status].present? %>
+              <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+                Statut: <%= params[:status].humanize %>
+              </span>
+            <% end %>
+
+            <% if params[:genre].present? %>
+              <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+                Genre: <%= params[:genre] %>
+              </span>
+            <% end %>
+
+            <% if params[:year].present? %>
+              <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs">
+                Année: <%= params[:year] %>
+              </span>
+            <% end %>
+
+            <% if params[:director].present? %>
+              <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">
+                Réalisateur: <%= params[:director] %>
+              </span>
+            <% end %>
+
+            <% if params[:creator].present? %>
+              <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">
+                Créateur: <%= params[:creator] %>
+              </span>
+            <% end %>
+          </div>
+        </div>
       <% end %>
     </div>
   </div>
-
-  <!-- Movie Info -->
-  <div class="mb-4">
-    <h4 class="text-lg font-semibold text-white mb-2 truncate">
-      <%= movie.title %>
-    </h4>
-    <p class="text-sm text-gray-400 mb-1">
-      <i class="fas fa-user mr-1"></i>
-      <%= movie.director %>
-    </p>
-    <p class="text-sm text-gray-400 mb-1">
-      <i class="fas fa-calendar mr-1"></i>
-      <%= movie.year %> • <%= movie.duration %> min
-    </p>
-    <p class="text-sm text-gray-400 mb-2">
-      <i class="fas fa-tag mr-1"></i>
-      <%= movie.genre %>
-    </p>
-
-    <!-- Creator Info -->
-    <p class="text-xs text-gray-500">
-      <i class="fas fa-user-plus mr-1"></i>
-      Créé par <%= movie.user&.full_name || 'Utilisateur inconnu' %>
-      • <%= time_ago_in_words(movie.created_at) %>
-    </p>
-  </div>
-
-  <!-- Synopsis Preview -->
-  <% if movie.synopsis.present? %>
-    <div class="mb-4">
-      <p class="text-sm text-gray-300 line-clamp-2">
-        <%= truncate(movie.synopsis, length: 120) %>
-      </p>
-    </div>
-  <% end %>
-
-  <!-- Events Count -->
-  <div class="mb-4 flex items-center space-x-4">
-    <div class="flex items-center text-xs text-gray-400">
-      <i class="fas fa-calendar-alt mr-1"></i>
-      <%= movie.events.count %> événement<%= 's' if movie.events.count > 1 %>
-    </div>
-    <div class="flex items-center text-xs text-gray-400">
-      <i class="fas fa-star mr-1"></i>
-      <%= movie.reviews.count %> avis
-    </div>
-  </div>
-
-  <!-- Actions -->
-  <div class="flex items-center justify-between pt-4 border-t border-white/10">
-    <!-- View Button -->
-    <%= link_to admin_movie_path(movie),
-        class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors flex items-center" do %>
-      <i class="fas fa-eye mr-2"></i>Voir
-    <% end %>
-
-    <!-- Action Buttons based on status -->
-    <div class="flex space-x-2">
-      <% if movie.pending? %>
-        <!-- Validate Button -->
-        <%= link_to admin_movie_path(movie, status: 'approved'),
-            method: :patch,
-            remote: true,
-            class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors",
-            data: {
-              confirm: "Valider ce film ?",
-              admin_movies_target: "validateBtn"
-            } do %>
-          <i class="fas fa-check mr-1"></i>Valider
-        <% end %>
-
-        <!-- Reject Button -->
-        <%= link_to admin_movie_path(movie, status: 'rejected'),
-            method: :patch,
-            remote: true,
-            class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors",
-            data: {
-              confirm: "Rejeter ce film ?",
-              admin_movies_target: "rejectBtn"
-            } do %>
-          <i class="fas fa-times mr-1"></i>Rejeter
-        <% end %>
-      <% else %>
-        <!-- Already processed indicator -->
-        <span class="text-xs text-gray-500 flex items-center">
-          <i class="fas fa-info-circle mr-1"></i>
-          Traité par <%= movie.validated_by&.full_name || 'Admin' %>
-        </span>
-      <% end %>
-    </div>
-  </div>
-</div>
+</section>

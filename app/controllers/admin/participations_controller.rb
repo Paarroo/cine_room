@@ -129,3 +129,72 @@ class Admin::ParticipationsController < Admin::ApplicationController
       format.html { redirect_to admin_participations_path, alert: 'Error cancelling participations' }
     end
   end
+
+  private
+
+  # Find participation by ID
+  def set_participation
+    @participation = Participation.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.json { render json: { error: 'Participation not found' }, status: :not_found }
+      format.html { redirect_to admin_participations_path, alert: 'Participation not found' }
+    end
+  end
+
+  # Confirm single participation
+  def confirm_participation_action
+    @participation.update!(
+      status: :confirmed,
+      updated_at: Time.current
+    )
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Participation confirmed successfully' } }
+      format.html { redirect_to admin_participations_path, notice: 'Participation confirmed successfully' }
+    end
+  rescue StandardError => e
+    Rails.logger.error "Confirm participation error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_participations_path, alert: 'Error confirming participation' }
+    end
+  end
+
+  # Cancel single participation
+  def cancel_participation_action
+    @participation.update!(
+      status: :cancelled,
+      updated_at: Time.current
+    )
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Participation cancelled successfully' } }
+      format.html { redirect_to admin_participations_path, notice: 'Participation cancelled successfully' }
+    end
+  rescue StandardError => e
+    Rails.logger.error "Cancel participation error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_participations_path, alert: 'Error cancelling participation' }
+    end
+  end
+
+  # Set participation to pending
+  def set_pending_participation_action
+    @participation.update!(
+      status: :pending,
+      updated_at: Time.current
+    )
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Participation set to pending' } }
+      format.html { redirect_to admin_participations_path, notice: 'Participation set to pending' }
+    end
+  rescue StandardError => e
+    Rails.logger.error "Set pending participation error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_participations_path, alert: 'Error updating participation' }
+    end
+  end

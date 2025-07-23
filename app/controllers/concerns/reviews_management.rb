@@ -323,3 +323,42 @@ module ReviewsManagement
 
     sentiments
   end
+
+  # Calculate average quality score
+  def calculate_average_quality_score(reviews_scope)
+    total_score = 0
+    count = 0
+
+    reviews_scope.find_each do |review|
+      total_score += calculate_review_quality_score(review)
+      count += 1
+    end
+
+    count.zero? ? 0 : (total_score.to_f / count).round(1)
+  end
+
+  # Calculate average response time after events
+  def calculate_average_response_time
+    reviews_with_events = Review.joins(:event)
+                               .where.not(events: { event_date: nil })
+                               .where('reviews.created_at > events.event_date')
+
+    return 0 if reviews_with_events.empty?
+
+    total_hours = 0
+    count = 0
+
+    reviews_with_events.find_each do |review|
+      hours_diff = (review.created_at - review.event.event_date) / 1.hour
+      total_hours += hours_diff
+      count += 1
+    end
+
+    (total_hours / count).round(1)
+  end
+
+  # Log review actions for audit
+  def log_review_action(action, review, details = {})
+    Rails.logger.info "Review Management: #{current_user.email} #{action} review #{review.id} - #{details}"
+  end
+end

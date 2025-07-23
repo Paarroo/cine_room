@@ -8,7 +8,7 @@
     <p class="text-gray-300 mb-2"><strong>Bio :</strong> <%= user.bio %></p>
     <p class="text-gray-300 mb-2"><strong>Email :</strong> <%= user.email %></p>
     <%= link_to "Modifier mon compte", edit_user_registration_path, class: "text-sm text-gold-400 hover:underline block" %>
-    <%= link_to "Modifier mon profil", users_dashboard_edit_profile_path(user), class: "text-sm text-gold-400 hover:underline block mt-1" %>
+    <%= link_to "Modifier mon profil", edit_profile_users_dashboard_path(user), class: "text-sm text-gold-400 hover:underline block mt-1" %>
   </div>
 
   <!-- Upcoming events -->

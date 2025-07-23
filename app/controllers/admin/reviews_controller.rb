@@ -188,3 +188,84 @@ class Admin::ReviewsController < Admin::ApplicationController
         avg_rating: month_reviews.average(:rating)&.round(2) || 0
       }
     end
+
+    # Sentiment analysis over time
+    @sentiment_trends = (6.months.ago.to_date..Date.current).group_by(&:month).map do |month, dates|
+      month_reviews = Review.where(created_at: dates.first.beginning_of_month..dates.first.end_of_month)
+      sentiment_dist = calculate_sentiment_distribution(month_reviews)
+
+      {
+        month: dates.first.strftime('%B'),
+        positive: sentiment_dist[:positive],
+        negative: sentiment_dist[:negative],
+        neutral: sentiment_dist[:neutral]
+      }
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: { stats: @comprehensive_stats, insights: @insights } }
+    end
+  end
+
+  # Export functionality
+  def export
+    reviews_scope = filter_reviews(params)
+    @export_data = export_reviews_data(reviews_scope)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          success: true,
+          data: @export_data,
+          filename: "reviews_export_#{Date.current.strftime('%Y%m%d')}.csv"
+        }
+      end
+      format.csv do
+        send_data generate_csv(@export_data),
+                  filename: "reviews_export_#{Date.current.strftime('%Y%m%d')}.csv"
+      end
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_reviews_path, alert: 'Erreur lors de l\'export' }
+    end
+  end
+
+  # Sentiment analysis endpoint
+  def sentiment_analysis
+    review_id = params[:id]
+    review = Review.find(review_id)
+    analysis = analyze_review_sentiment(review)
+    quality_score = calculate_review_quality_score(review)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          sentiment: analysis,
+          quality_score: quality_score,
+          review_id: review.id
+        }
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.json { render json: { error: 'Review not found' }, status: 404 }
+    end
+  end
+
+  # Get statistics for dashboard widgets
+  def stats
+    respond_to do |format|
+      format.json do
+        render json: {
+          stats: calculate_review_stats,
+          insights: review_insights,
+          recent_flagged: Review.where(status: :flagged).count,
+          pending_moderation: Review.where(status: :pending).count,
+          daily_reviews: Review.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day).count
+        }
+      end
+    end
+  end

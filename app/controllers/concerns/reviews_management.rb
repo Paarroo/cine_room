@@ -1,114 +1,89 @@
-ActiveAdmin.register Review do
-  menu priority: 6, label: "Reviews"
+module ReviewsManagement
+  extend ActiveSupport::Concern
 
-  permit_params :user_id, :movie_id, :event_id, :rating, :comment
-
-  scope :all, default: true
-  scope :with_rating, -> { where.not(rating: nil) }
-  scope :with_comment, -> { where.not(comment: [ nil, "" ]) }
-  scope :recent, -> { where("created_at > ?", 1.month.ago) }
-
-  index do
-    selectable_column
-    id_column
-
-    column :user do |review|
-      link_to review.user.full_name, admin_user_path(review.user)
-    end
-
-    column :movie do |review|
-      link_to review.movie.title, admin_movie_path(review.movie)
-    end
-
-    column :event do |review|
-      link_to review.event.title, admin_event_path(review.event)
-    end
-
-    column :rating do |review|
-      if review.rating
-        content_tag :span, "⭐" * review.rating, title: "#{review.rating}/5 stars"
-      else
-        "-"
-      end
-    end
-
-    column :comment do |review|
-      if review.comment.present?
-        truncate(review.comment, length: 80)
-      else
-        content_tag :span, "No comment", class: "empty"
-      end
-    end
-
-    column :event_date do |review|
-      review.event.event_date
-    end
-
-    column :created_at do |review|
-      review.created_at.strftime("%d/%m/%Y")
-    end
-
-    actions
+  def approve_review_action(review)
+    review.update!(
+      status: :approved,
+      moderated_by: current_user,
+      moderated_at: Time.current
+    )
   end
 
-  show do
-    attributes_table do
-      row :id
-      row :user do |review|
-        link_to review.user.full_name, admin_user_path(review.user)
-      end
-      row :movie do |review|
-        link_to review.movie.title, admin_movie_path(review.movie)
-      end
-      row :event do |review|
-        link_to review.event.title, admin_event_path(review.event)
-      end
-      row :rating do |review|
-        if review.rating
-          content_tag :span, "⭐" * review.rating + " (#{review.rating}/5)",
-                      style: "font-size: 1.2em;"
-        else
-          "No rating given"
-        end
-      end
-      row :comment do |review|
-        if review.comment.present?
-          simple_format(review.comment)
-        else
-          content_tag :span, "No comment provided", class: "empty"
-        end
-      end
-      row :created_at
-      row :updated_at
-    end
+  def reject_review_action(review)
+    review.update!(
+      status: :rejected,
+      moderated_by: current_user,
+      moderated_at: Time.current
+    )
   end
 
-  form do |f|
-    f.semantic_errors
+  def flag_review_action(review, reason = 'inappropriate_content')
+    review.update!(
+      status: :flagged,
+      flag_reason: reason,
+      flagged_by: current_user,
+      flagged_at: Time.current
+    )
+  end
 
-    f.inputs "Review Information" do
-      f.input :user, as: :select,
-              collection: User.all.map { |u| [ u.full_name, u.id ] },
-              prompt: "Select User",
-              required: true
-      f.input :movie, as: :select,
-              collection: Movie.where(validation_status: :validated).map { |m| [ m.title, m.id ] },
-              prompt: "Select Movie",
-              required: true
-      f.input :event, as: :select,
-              collection: Event.all.map { |e| [ "#{e.title} - #{e.event_date}", e.id ] },
-              prompt: "Select Event",
-              required: true,
-              hint: "Event must match the selected movie"
-      f.input :rating, as: :select,
-              collection: (1..5).map { |r| [ r, r ] },
-              prompt: "Select Rating (1-5 stars)",
-              hint: "1 = Poor, 5 = Excellent"
-      f.input :comment, as: :text,
-              input_html: { rows: 6 },
-              hint: "Optional comment about the movie/event"
+  # Bulk review operations
+  def bulk_approve_reviews(review_ids)
+    Review.where(id: review_ids).update_all(
+      status: :approved,
+      moderated_by_id: current_user.id,
+      moderated_at: Time.current
+    )
+  end
+
+  def bulk_reject_reviews(review_ids)
+    Review.where(id: review_ids).update_all(
+      status: :rejected,
+      moderated_by_id: current_user.id,
+      moderated_at: Time.current
+    )
+  end
+
+  def bulk_delete_reviews(review_ids)
+    Review.where(id: review_ids).destroy_all
+  end
+
+  # Review statistics and analytics
+  def calculate_review_stats
+    {
+      total: Review.count,
+      with_rating: Review.where.not(rating: nil).count,
+      with_comment: Review.where.not(comment: [ nil, '' ]).count,
+      recent: Review.where(created_at: 1.month.ago..Time.current).count,
+      average_rating: Review.average(:rating)&.round(2) || 0,
+      rating_distribution: Review.group(:rating).count,
+      pending_moderation: Review.where(status: :pending).count,
+      flagged: Review.where(status: :flagged).count
+    }
+  end
+
+  # Advanced filtering and search
+  def filter_reviews(params)
+    reviews = Review.includes(:user, :movie, :event)
+
+    # Filter by rating
+    if params[:rating].present?
+      reviews = reviews.where(rating: params[:rating])
     end
 
-    f.actions
-  end
-end
+    # Filter by rating range
+    if params[:min_rating].present?
+      reviews = reviews.where('rating >= ?', params[:min_rating])
+    end
+    if params[:max_rating].present?
+      reviews = reviews.where('rating <= ?', params[:max_rating])
+    end
+
+    # Filter by content type
+    case params[:content_type]
+    when 'with_comment'
+      reviews = reviews.where.not(comment: [ nil, '' ])
+    when 'rating_only'
+      reviews = reviews.where(comment: [ nil, '' ])
+    when 'with_rating'
+      reviews = reviews.where.not(rating: nil)
+    end

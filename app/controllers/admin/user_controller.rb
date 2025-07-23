@@ -81,3 +81,75 @@ class Admin::UsersController < Admin::ApplicationController
       format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la promotion' }
     end
   end
+
+  def demote_to_user
+    return unless can_modify_user?(@user)
+
+    demote_to_user_action(@user)
+    log_user_action('demoted_to_user', @user)
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Utilisateur rétrogradé' } }
+      format.html { redirect_to admin_user_path(@user), notice: 'Utilisateur rétrogradé vers utilisateur standard' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la rétrogradation' }
+    end
+  end
+
+  def reset_password
+    return unless can_modify_user?(@user)
+
+    new_password = reset_password_action(@user)
+    log_user_action('password_reset', @user)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          status: 'success',
+          message: 'Mot de passe réinitialisé',
+          new_password: new_password
+        }
+      end
+      format.html do
+        redirect_to admin_user_path(@user),
+                    notice: "Mot de passe réinitialisé. Nouveau mot de passe: #{new_password}"
+      end
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la réinitialisation' }
+    end
+  end
+
+  # Bulk operations
+  def bulk_promote
+    user_ids = params[:user_ids]
+    return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
+
+    users_to_promote = User.where(id: user_ids)
+    return redirect_to admin_users_path, alert: 'Utilisateurs non trouvés' if users_to_promote.empty?
+
+    # Check permissions for each user
+    unauthorized_users = users_to_promote.reject { |user| can_modify_user?(user) }
+    if unauthorized_users.any?
+      return redirect_to admin_users_path,
+                        alert: "Vous n'avez pas les permissions pour modifier certains utilisateurs"
+    end
+
+    bulk_promote_users(user_ids)
+    log_user_action('bulk_promoted', nil, { count: user_ids.count, ids: user_ids })
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs promus" } }
+      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs promus administrateurs" }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la promotion en masse' }
+    end
+  end

@@ -36,3 +36,100 @@ class Admin::ParticipationsController < Admin::ApplicationController
       return
     end
   end
+
+  # GET /admin/participations/:id - mirrors ActiveAdmin show page
+  def show
+    # Format participation data using concern method - mirrors ActiveAdmin attributes_table
+    @participation_data = format_participation_data(@participation)
+
+    # Get related objects for display
+    @user = @participation.user
+    @event = @participation.event
+    @movie = @event&.movie
+
+    # Calculate additional metrics for this participation
+    @total_price = @participation_data[:total_price]
+    @formatted_total_price = @participation_data[:formatted_total_price]
+
+    # Check if participation can be modified
+    @can_modify = can_modify_participation?(@participation)
+  end
+
+  # PATCH /admin/participations/:id - handles status updates
+  def update
+    case params[:status]
+    when 'confirmed'
+      confirm_participation_action
+    when 'cancelled'
+      cancel_participation_action
+    when 'pending'
+      set_pending_participation_action
+    else
+      # Regular participation update with validation
+      update_participation_attributes
+    end
+  end
+
+  # PATCH /admin/participations/bulk_confirm - mirrors ActiveAdmin batch_action
+  def bulk_confirm
+    participation_ids = params[:participation_ids] || params[:ids] || []
+
+    if participation_ids.any?
+      # Use concern method - mirrors ActiveAdmin batch_action logic
+      result = bulk_confirm_participations(participation_ids)
+
+      respond_to do |format|
+        format.json do
+          render json: {
+            status: result[:success] ? 'success' : 'error',
+            message: result[:message],
+            count: result[:count]
+          }
+        end
+        format.html do
+          if result[:success]
+            redirect_to admin_participations_path, notice: result[:message]
+          else
+            redirect_to admin_participations_path, alert: result[:error]
+          end
+        end
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'No participations selected' } }
+        format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
+      end
+    end
+  end
+
+  # PATCH /admin/participations/bulk_cancel - mirrors ActiveAdmin batch_action
+  def bulk_cancel
+    participation_ids = params[:participation_ids] || params[:ids] || []
+
+    if participation_ids.any?
+      # Use concern method - mirrors ActiveAdmin batch_action logic
+      result = bulk_cancel_participations(participation_ids)
+
+      respond_to do |format|
+        format.json do
+          render json: {
+            status: result[:success] ? 'success' : 'error',
+            message: result[:message],
+            count: result[:count]
+          }
+        end
+        format.html do
+          if result[:success]
+            redirect_to admin_participations_path, notice: result[:message]
+          else
+            redirect_to admin_participations_path, alert: result[:error]
+          end
+        end
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'No participations selected' } }
+        format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
+      end
+    end
+  end

@@ -48,3 +48,62 @@ module ParticipationManagement
       updated_at: participation.updated_at
     }
   end
+
+  # Get collections for form dropdowns - mirrors ActiveAdmin form collections
+  def get_participation_form_collections
+    {
+      users: User.all.map { |u| [ u.full_name, u.id ] },
+      events: Event.all.map { |e| [ "#{e.title} - #{e.event_date}", e.id ] },
+      statuses: Participation.statuses.map { |key, value| [ key.humanize, key ] }
+    }
+  end
+
+  # Bulk confirm participations - mirrors ActiveAdmin batch_action
+  def bulk_confirm_participations(participation_ids)
+    return { success: false, count: 0, error: 'No participations provided' } if participation_ids.blank?
+
+    begin
+      updated_count = Participation.where(id: participation_ids).update_all(status: :confirmed)
+
+      # Update related event statuses after bulk operation
+      update_events_status_after_bulk_operation(participation_ids)
+
+      {
+        success: true,
+        count: updated_count,
+        message: "#{updated_count} participations confirmed successfully!"
+      }
+    rescue StandardError => e
+      Rails.logger.error "Bulk confirm participations error: #{e.message}"
+      {
+        success: false,
+        count: 0,
+        error: e.message
+      }
+    end
+  end
+
+  # Bulk cancel participations - mirrors ActiveAdmin batch_action
+  def bulk_cancel_participations(participation_ids)
+    return { success: false, count: 0, error: 'No participations provided' } if participation_ids.blank?
+
+    begin
+      updated_count = Participation.where(id: participation_ids).update_all(status: :cancelled)
+
+      # Update related event statuses after bulk operation
+      update_events_status_after_bulk_operation(participation_ids)
+
+      {
+        success: true,
+        count: updated_count,
+        message: "#{updated_count} participations cancelled successfully!"
+      }
+    rescue StandardError => e
+      Rails.logger.error "Bulk cancel participations error: #{e.message}"
+      {
+        success: false,
+        count: 0,
+        error: e.message
+      }
+    end
+  end

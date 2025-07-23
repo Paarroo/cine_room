@@ -1,0 +1,330 @@
+<!-- app/views/admin/movies/show.html.erb -->
+<%= render 'admin/dashboard/navbar' %>
+
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section pt-20 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_movies_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Films
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white"><%= @movie.title %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Movie Details Header -->
+  <section class="movie-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Movie Poster & Basic Info -->
+          <div class="lg:col-span-1">
+            <!-- Poster Placeholder -->
+            <div class="w-full h-96 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-white text-4xl font-bold mb-6">
+              <%= @movie.title.first(2).upcase %>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="text-center mb-6">
+              <% case @movie.validation_status %>
+              <% when 'pending' %>
+                <span class="px-6 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-clock mr-2"></i>En attente de validation
+                </span>
+              <% when 'approved' %>
+                <span class="px-6 py-3 bg-green-500/20 text-green-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-check mr-2"></i>Film validé
+                </span>
+              <% when 'rejected' %>
+                <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-times mr-2"></i>Film rejeté
+                </span>
+              <% end %>
+            </div>
+
+            <!-- Action Buttons -->
+            <% if @movie.pending? %>
+              <div class="flex space-x-3 justify-center">
+                <!-- Validate Button -->
+                <%= button_to validate_movie_admin_movie_path(@movie),
+                    method: :patch,
+                    class: "flex-1 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                    data: { confirm: "Valider ce film ?" } do %>
+                  <i class="fas fa-check mr-2"></i>Valider
+                <% end %>
+
+                <!-- Reject Button -->
+                <%= button_to reject_movie_admin_movie_path(@movie),
+                    method: :patch,
+                    class: "flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                    data: { confirm: "Rejeter ce film ?" } do %>
+                  <i class="fas fa-times mr-2"></i>Rejeter
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Movie Information -->
+          <div class="lg:col-span-2">
+            <div class="space-y-6">
+              <!-- Title & Director -->
+              <div>
+                <h1 class="text-4xl font-bold gradient-text mb-3">
+                  <%= @movie.title %>
+                </h1>
+                <p class="text-xl text-gray-300">
+                  Réalisé par <span class="text-primary font-semibold"><%= @movie.director %></span>
+                </p>
+              </div>
+
+              <!-- Movie Details Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Année</div>
+                  <div class="text-lg font-semibold text-white"><%= @movie.year %></div>
+                </div>
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Durée</div>
+                  <div class="text-lg font-semibold text-white"><%= @movie.duration %> min</div>
+                </div>
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Genre</div>
+                  <div class="text-lg font-semibold text-white"><%= @movie.genre %></div>
+                </div>
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Langue</div>
+                  <div class="text-lg font-semibold text-white"><%= @movie.language %></div>
+                </div>
+              </div>
+              <!-- Synopsis -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-file-alt text-primary mr-2"></i>Synopsis
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <p class="text-gray-300 leading-relaxed">
+                    <%= simple_format(@movie.synopsis) %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Creator Info -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-user-plus text-primary mr-2"></i>Créateur
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold">
+                      <%= @movie.user&.full_name&.first(2)&.upcase || 'U' %>
+                    </div>
+                    <div>
+                      <div class="text-lg font-semibold text-white">
+                        <%= @movie.user&.full_name || 'Utilisateur inconnu' %>
+                      </div>
+                      <div class="text-sm text-gray-400">
+                        <%= @movie.user&.email || 'Email non disponible' %>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Soumis le <%= @movie.created_at.strftime("%d %B %Y à %H:%M") %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <!-- Validation Info -->
+              <% if @movie.validated_by.present? %>
+                <div>
+                  <h3 class="text-xl font-semibold text-white mb-3">
+                    <i class="fas fa-user-check text-primary mr-2"></i>Validation
+                  </h3>
+                  <div class="glass-subtle rounded-xl p-6">
+                    <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <%= @movie.validated_by.full_name.first(2).upcase %>
+                      </div>
+                      <div>
+                        <div class="text-lg font-semibold text-white">
+                          <%= @movie.validated_by.full_name %>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                          Validé le <%= @movie.validated_at&.strftime("%d %B %Y à %H:%M") %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Section -->
+  <% if @events.any? %>
+    <section class="events-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-calendar-alt text-primary mr-3"></i>
+              Événements associés
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @events.count %> événement<%= 's' if @events.count > 1 %>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% @events.each do |event| %>
+              <div class="glass-subtle rounded-xl p-6 hover:bg-white/10 transition-colors">
+                <!-- Event Header -->
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-semibold text-white truncate">
+                    <%= event.title %>
+                  </h4>
+                  <span class="px-2 py-1 bg-<%= event.status == 'upcoming' ? 'blue' : event.status == 'completed' ? 'green' : event.status == 'sold_out' ? 'yellow' : 'red' %>-500/20 text-<%= event.status == 'upcoming' ? 'blue' : event.status == 'completed' ? 'green' : event.status == 'sold_out' ? 'yellow' : 'red' %>-400 rounded-lg text-xs font-medium">
+                    <%= event.status.humanize %>
+                  </span>
+                </div>
+
+                <!-- Event Details -->
+                <div class="space-y-2 mb-4">
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-calendar mr-2 w-4"></i>
+                    <%= event.event_date.strftime("%d %B %Y") %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-clock mr-2 w-4"></i>
+                    <%= event.start_time.strftime("%H:%M") %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-map-marker-alt mr-2 w-4"></i>
+                    <%= event.venue_name %>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-users mr-2 w-4"></i>
+                    <%= event.participations.where(status: :confirmed).sum(:seats) %> / <%= event.max_capacity %> places
+                  </div>
+                  <div class="flex items-center text-sm text-gray-400">
+                    <i class="fas fa-euro-sign mr-2 w-4"></i>
+                    <%= number_to_currency(event.price_cents / 100.0) %>
+                  </div>
+                </div>
+
+                <!-- Event Actions -->
+                <div class="pt-4 border-t border-white/10">
+                  <%= link_to "/admin/events/#{event.id}",
+                      class: "inline-flex items-center px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors" do %>
+                    <i class="fas fa-eye mr-2"></i>Voir l'événement
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Reviews Section -->
+  <% if @reviews.any? %>
+    <section class="reviews-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-star text-primary mr-3"></i>
+              Avis récents
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @movie.reviews.count %> avis au total
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <% @reviews.each do |review| %>
+              <div class="glass-subtle rounded-xl p-6">
+                <div class="flex items-start justify-between mb-3">
+                  <!-- User Info -->
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <%= review.user.full_name.first(2).upcase %>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-white">
+                        <%= review.user.full_name %>
+                      </div>
+                      <div class="text-xs text-gray-400">
+                        <%= time_ago_in_words(review.created_at) %> •
+                        <%= review.event.title %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rating -->
+                  <div class="flex items-center space-x-1">
+                    <% review.rating.times do %>
+                      <i class="fas fa-star text-yellow-400"></i>
+                    <% end %>
+                    <% (5 - review.rating).times do %>
+                      <i class="fas fa-star text-gray-600"></i>
+                    <% end %>
+                    <span class="text-sm text-gray-400 ml-2">
+                      <%= review.rating %>/5
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Comment -->
+                <% if review.comment.present? %>
+                  <p class="text-gray-300 text-sm leading-relaxed">
+                    <%= simple_format(review.comment) %>
+                  </p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- View All Reviews Link -->
+          <% if @movie.reviews.count > @reviews.count %>
+            <div class="text-center mt-6">
+              <%= link_to "/admin/reviews?movie_id=#{@movie.id}",
+                  class: "inline-flex items-center px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors" do %>
+                <i class="fas fa-list mr-2"></i>
+                Voir tous les avis (<%= @movie.reviews.count %>)
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+
+    </section>
+  <% end %>
+
+
+
+
+
+</div>
+
+
+                <!-- Back to List Button -->
+                <section class="back-section py-8">
+                  <div class="container-app text-center">
+                    <%= link_to admin_movies_path, class: "btn-secondary" do %>
+                      <i class="fas fa-arrow-left mr-2"></i>
+                      Retour à la liste des films
+                    <% end %>
+                  </div>
+                </section>

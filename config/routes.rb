@@ -1,48 +1,84 @@
 Rails.application.routes.draw do
-  ActiveAdmin.routes(self)
+  # ActiveAdmin.routes(self)
+
 
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
 
+
   authenticated :user, ->(user) { user.admin? } do
-    root to: redirect('/admin'), as: :admin_authenticated_root
+    root to: 'admin/dashboard#index', as: :admin_authenticated_root
   end
+
 
   authenticated :user do
     root to: 'pages#home', as: :authenticated_root
   end
 
+
   unauthenticated do
     root to: 'pages#home', as: :public_home
   end
 
+
+  root 'pages#home'
+
+
   get '/home', to: 'pages#home', as: :public_site
 
+
   namespace :admin do
-      resources :dashboard, only: [ :index ]
-    get 'dashboard/refresh', to: 'dashboard#refresh'
-    get 'dashboard/quick_stats', to: 'dashboard#quick_stats'
-    post 'dashboard/export', to: 'dashboard#export'
+    root 'dashboard#index'
+
+    resources :dashboard, only: [ :index ] do
+      collection do
+        get :refresh
+        get :quick_stats
+        post :export
+      end
+    end
+
+    resources :movies, only: [ :index, :show, :update ] do
+      member do
+        patch :validate_movie
+        patch :reject_movie
+      end
+
+      collection do
+        patch :bulk_validate
+        patch :bulk_reject
+      end
+    end
+
+    resources :events, only: [ :index, :show, :update ] do
+      member do
+        patch :toggle_status
+      end
+    end
+
+    resources :users, only: [ :index, :show, :update ] do
+      member do
+        patch :toggle_role
+      end
+    end
+
+    resources :participations, only: [ :index, :show, :update ] do
+      collection do
+        patch :bulk_confirm
+        patch :bulk_cancel
+      end
+    end
+
+    resources :reviews, only: [ :index, :show, :update ]
 
     get 'notifications/poll', to: 'notifications#poll'
-
-    patch 'movies/bulk_validate', to: 'movies#bulk_validate'
-    patch 'movies/bulk_reject', to: 'movies#bulk_reject'
-
-    patch 'events/:id/toggle_status', to: 'events#toggle_status', as: :toggle_event_status
-
-    patch 'users/:id/toggle_role', to: 'users#toggle_role', as: :toggle_user_role
-
-    patch 'participations/bulk_confirm', to: 'participations#bulk_confirm'
-    patch 'participations/bulk_cancel', to: 'participations#bulk_cancel'
 
     get 'reports', to: 'reports#index'
     get 'reports/revenue', to: 'reports#revenue'
     get 'reports/users', to: 'reports#users'
     get 'reports/events', to: 'reports#events'
-
 
     get 'system/status', to: 'system#status'
     post 'system/backup', to: 'system#backup'
@@ -51,9 +87,9 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :dashboard, only: [ :show ] do
-      get :edit_profile
-      patch :update_profile
       member do
+        get :edit_profile
+        patch :update_profile
         get :upcoming_participations
         get :past_participations
         get :favorite_events
@@ -190,7 +226,6 @@ Rails.application.routes.draw do
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
-
     get "/rails/mailers", to: "rails/mailers#index"
     get "/rails/mailers/*path", to: "rails/mailers#preview"
   end

@@ -5,10 +5,8 @@
         <i class="fas fa-bolt text-yellow-400 mr-3"></i>
         Actions Rapides
       </h3>
-
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <%= link_to "/admin/movies",
-            class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+        <%= link_to admin_movies_path, class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <i class="fas fa-film text-primary"></i>
@@ -22,8 +20,7 @@
           </div>
         <% end %>
 
-        <%= link_to "/admin/events",
-            class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+        <%= link_to "/admin/events", class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <i class="fas fa-calendar-alt text-accent"></i>
@@ -37,8 +34,7 @@
           </div>
         <% end %>
 
-        <%= link_to "/admin/users",
-            class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+        <%= link_to "/admin/users", class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-green-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <i class="fas fa-users text-green-400"></i>
@@ -52,8 +48,7 @@
           </div>
         <% end %>
 
-        <%= link_to "/admin/participations",
-            class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
+        <%= link_to "/admin/participations", class: "group p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105" do %>
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <i class="fas fa-ticket-alt text-yellow-400"></i>
@@ -67,7 +62,6 @@
           </div>
         <% end %>
       </div>
-
       <!-- Additional Actions -->
       <div class="border-t border-white/10 mt-8 pt-6">
         <div class="flex flex-wrap gap-4">
@@ -78,7 +72,6 @@
           >
             <i class="fas fa-download mr-2"></i>Exporter Utilisateurs
           </button>
-
           <button
             class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors"
             data-action="click->admin-dashboard#exportData"
@@ -86,14 +79,12 @@
           >
             <i class="fas fa-download mr-2"></i>Exporter Événements
           </button>
-
           <button
             class="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
             data-action="click->admin-dashboard#backupDatabase"
           >
             <i class="fas fa-database mr-2"></i>Sauvegarde BDD
           </button>
-
           <button
             class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
             data-action="click->admin-dashboard#toggleMaintenanceMode"

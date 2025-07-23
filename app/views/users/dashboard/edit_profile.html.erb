@@ -23,7 +23,7 @@
 
     <!-- Form card -->
     <div class="glass-effect rounded-2xl p-8 shadow-xl">
-      <%= form_with model: @user, url: update_profile_users_dashboard_path, method: :patch, html: { multipart: true } do |f| %>
+      <%= form_with model: @user, url: users_dashboard_update_profile_path, method: :patch, html: { multipart: true } do |f| %>
         <div class="mb-6">
           <%= f.label :first_name, "Prénom", class: "block text-sm font-semibold text-gray-300 mb-1" %>
           <%= f.text_field :first_name, placeholder: "Votre prénom",

@@ -195,3 +195,78 @@
       </div>
     </div>
   </section>
+
+  <!-- Quick Analytics Section -->
+  <section class="analytics-overview py-8">
+    <div class="container-app">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Top Rated Movies -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-trophy text-primary mr-2"></i>
+              Films les mieux notés
+            </h3>
+          </div>
+
+          <div class="space-y-4">
+            <% @top_movies.each_with_index do |movie, index| %>
+              <div class="flex items-center space-x-4 p-4 bg-white/5 rounded-xl">
+                <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <%= index + 1 %>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-white font-semibold"><%= movie.title %></h4>
+                  <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <span class="flex items-center">
+                      <i class="fas fa-star text-yellow-400 mr-1"></i>
+                      <%= movie.avg_rating&.round(1) || 0 %>/5
+                    </span>
+                    <span>•</span>
+                    <span><%= movie.reviews_count %> avis</span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Most Active Reviewers -->
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-white">
+              <i class="fas fa-user-edit text-primary mr-2"></i>
+              Utilisateurs les plus actifs
+            </h3>
+          </div>
+
+          <div class="space-y-4">
+            <% @active_reviewers.each_with_index do |reviewer, index| %>
+              <div class="flex items-center space-x-4 p-4 bg-white/5 rounded-xl">
+                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <%= index + 1 %>
+                </div>
+                <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <%= reviewer.full_name&.first(2)&.upcase || reviewer.email&.first(2)&.upcase %>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-white font-semibold">
+                    <%= reviewer.full_name || 'Utilisateur' %>
+                  </h4>
+                  <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <span><%= reviewer.reviews_count %> avis</span>
+                    <span>•</span>
+                    <span class="flex items-center">
+                      Moyenne: <i class="fas fa-star text-yellow-400 ml-1 mr-1"></i>
+                      <%= reviewer.avg_rating_given&.round(1) || 0 %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

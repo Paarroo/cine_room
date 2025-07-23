@@ -239,3 +239,54 @@ class Admin::UsersController < Admin::ApplicationController
       end
     end
   end
+
+  private
+
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  def user_params
+    params.require(:user).permit(
+      :email, :first_name, :last_name, :role, :bio,
+      :password, :password_confirmation
+    )
+  end
+
+  # Generate CSV from export data
+  def generate_csv(data)
+    return '' if data.empty?
+
+    headers = data.first.keys
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+      data.each { |row| csv << headers.map { |h| row[h] } }
+    end
+  end
+
+  # Override permission check to include context
+  def can_modify_user?(target_user)
+    return true if current_user.admin?
+    return false if target_user.admin?
+    return false if target_user == current_user # Can't modify self through admin
+
+    current_user.creator? && target_user.user?
+  end
+
+  # Enhanced logging with admin context
+  def log_user_action(action, target_user, details = {})
+    Rails.logger.info "Admin User Management: #{current_user.email} #{action} #{target_user&.email || 'multiple users'} - #{details}"
+
+
+    # ok RGPD Obligation
+    In production, you might want to store this in an audit log table
+    AuditLog.create(
+      admin_user: current_user,
+      action: action,
+      target_user: target_user,
+      details: details,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent
+    )
+  end
+end

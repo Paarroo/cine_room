@@ -242,3 +242,122 @@
       </div>
     </div>
   </section>
+
+  <!-- Related Reviews Section -->
+  <% if @related_reviews.any? %>
+    <section class="related-reviews py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-users text-primary mr-3"></i>
+              Autres avis pour ce film
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @review.movie&.reviews&.count || 0 %> avis au total
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% @related_reviews.each do |related_review| %>
+              <div class="glass-subtle rounded-xl p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <%= related_review.user&.full_name&.first(2)&.upcase || 'U' %>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-white">
+                        <%= related_review.user&.full_name || 'Utilisateur' %>
+                      </div>
+                      <div class="text-xs text-gray-400">
+                        <%= related_review.event&.title %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-1">
+                    <% if related_review.rating %>
+                      <% related_review.rating.times do %>
+                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                      <% end %>
+                      <% (5 - related_review.rating).times do %>
+                        <i class="fas fa-star text-gray-600 text-sm"></i>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+
+                <% if related_review.comment.present? %>
+                  <p class="text-gray-300 text-sm leading-relaxed">
+                    <%= truncate(related_review.comment, length: 100) %>
+                  </p>
+                <% else %>
+                  <p class="text-gray-500 text-sm italic">Pas de commentaire</p>
+                <% end %>
+
+                <div class="mt-4 pt-3 border-t border-white/10">
+                  <%= link_to admin_review_path(related_review),
+                      class: "text-primary hover:text-primary/80 text-sm transition-colors" do %>
+                    <i class="fas fa-eye mr-1"></i>Voir cet avis
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Action Buttons -->
+  <section class="actions-section py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-6">
+        <div class="flex flex-wrap gap-4 justify-center">
+          <!-- Approve -->
+          <%= button_to approve_admin_review_path(@review),
+              method: :patch,
+              class: "px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center",
+              data: { confirm: "Approuver cet avis ?" } do %>
+            <i class="fas fa-check mr-2"></i>Approuver l'avis
+          <% end %>
+
+          <!-- Flag -->
+          <%= button_to flag_admin_review_path(@review),
+              method: :patch,
+              class: "px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center",
+              data: { confirm: "Signaler cet avis ?" } do %>
+            <i class="fas fa-flag mr-2"></i>Signaler
+          <% end %>
+
+          <!-- Reject -->
+          <%= button_to reject_admin_review_path(@review),
+              method: :patch,
+              class: "px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center",
+              data: { confirm: "Rejeter cet avis ?" } do %>
+            <i class="fas fa-times mr-2"></i>Rejeter l'avis
+          <% end %>
+
+          <!-- Delete -->
+          <%= button_to admin_review_path(@review),
+              method: :delete,
+              class: "px-6 py-3 bg-gray-700/50 hover:bg-gray-700/70 text-gray-400 rounded-xl transition-colors font-semibold flex items-center",
+              data: { confirm: "Supprimer définitivement cet avis ?" } do %>
+            <i class="fas fa-trash mr-2"></i>Supprimer
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Back to List Button -->
+  <section class="back-section py-8">
+    <div class="container-app text-center">
+      <%= link_to admin_reviews_path, class: "btn-secondary" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Retour à la liste des avis
+      <% end %>
+    </div>
+  </section>
+</div>

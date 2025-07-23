@@ -44,5 +44,4 @@ class PagesController < ApplicationController
       events_count: Event.upcoming.count
     }
   end
-
 end

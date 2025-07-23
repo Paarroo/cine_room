@@ -17,10 +17,10 @@ Rails.application.routes.draw do
   unauthenticated do
     root to: 'pages#home', as: :public_home
   end
+  root 'pages#home'
 
   get '/home', to: 'pages#home', as: :public_site
 
-  # ADMIN NAMESPACE
   namespace :admin do
     resources :dashboard, only: [ :index ]
 
@@ -29,12 +29,10 @@ Rails.application.routes.draw do
     resources :users, only: [ :index, :show, :update ]
     resources :participations, only: [ :index, :show, :update ]
 
-    # Dashboard actions
     get 'dashboard/refresh', to: 'dashboard#refresh'
     get 'dashboard/quick_stats', to: 'dashboard#quick_stats'
     post 'dashboard/export', to: 'dashboard#export'
 
-    # System actions
     get 'notifications/poll', to: 'notifications#poll'
     get 'reports', to: 'reports#index'
     get 'reports/revenue', to: 'reports#revenue'
@@ -45,7 +43,6 @@ Rails.application.routes.draw do
     post 'system/maintenance', to: 'system#toggle_maintenance'
   end
 
-  # USER DASHBOARD
   namespace :users do
     resources :dashboard, only: [ :show ] do
       get :edit_profile
@@ -65,17 +62,14 @@ Rails.application.routes.draw do
   get '/terms', to: 'pages#terms', as: :terms
   get '/about', to: 'pages#about', as: :about
 
-  # AUTH
   delete '/admin/logout', to: 'application#admin_logout'
   devise_scope :user do
     get '/users/sign_out', to: 'devise/sessions#destroy'
   end
 
-  # STRIPE
   get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
   get "stripe_checkout/cancel", to: "stripe_checkout#cancel", as: :stripe_cancel
 
-  # PUBLIC RESOURCES - Fully RESTful
   resources :movies do
     resources :reviews, except: [ :index ]
 
@@ -143,7 +137,6 @@ Rails.application.routes.draw do
 
   get "/reservation/success", to: "reservations#success", as: :reservation_success
 
-  # API
   namespace :api do
     namespace :v1 do
       resources :events, only: [ :index, :show ] do
@@ -165,7 +158,6 @@ Rails.application.routes.draw do
     post 'stripe', to: 'stripe#handle'
   end
 
-  # DEVELOPMENT
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
     get "/rails/mailers", to: "rails/mailers#index"

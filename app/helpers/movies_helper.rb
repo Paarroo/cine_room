@@ -57,13 +57,11 @@ module Admin::MoviesHelper
       safe_attr(movie, :validation_status, 'pending')
     end
 
-    # Safe user association
     def safe_movie_creator(movie)
       return 'Utilisateur inconnu' if movie.nil? || movie.user.nil?
       safe_attr(movie.user, :full_name, 'Utilisateur sans nom')
     end
 
-    # Safe counts
     def safe_movie_events_count(movie)
       return 0 if movie.nil? || !movie.respond_to?(:events)
       movie.events&.count || 0
@@ -74,7 +72,6 @@ module Admin::MoviesHelper
       movie.reviews&.count || 0
     end
 
-    # Status badge helper
     def movie_status_badge(movie)
       status = safe_movie_validation_status(movie)
 

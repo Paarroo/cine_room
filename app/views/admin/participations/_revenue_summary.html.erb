@@ -1,0 +1,120 @@
+<section class="revenue-summary py-8">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-euro-sign text-primary mr-2"></i>
+          Résumé des Revenus
+        </h3>
+        <span class="text-sm text-gray-400">Réservations confirmées uniquement</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Total Revenue -->
+        <div class="revenue-card p-6 bg-white/5 rounded-xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-coins text-primary text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-arrow-up mr-1"></i>Revenus Total
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold gradient-text mb-2">
+            <%= number_to_currency(@revenue_data[:total_revenue], precision: 0) %>
+          </div>
+
+          <div class="text-sm text-gray-400">Toutes périodes confondues</div>
+          <div class="text-xs text-gray-500 mt-1">
+            Moyenne par réservation: <%= number_to_currency(@revenue_data[:average_participation_value]) %>
+          </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="revenue-card p-6 bg-white/5 rounded-xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-calendar-alt text-blue-400 text-xl"></i>
+            </div>
+            <div class="text-blue-400 text-sm font-medium">
+              <i class="fas fa-chart-line mr-1"></i>Ce Mois
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-blue-400 mb-2">
+            <%= number_to_currency(@revenue_data[:monthly_revenue], precision: 0) %>
+          </div>
+
+          <div class="text-sm text-gray-400">Revenus de <%= Date.current.strftime('%B %Y') %></div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= @stats[:this_month] || 0 %> réservations ce mois
+          </div>
+        </div>
+
+        <!-- Weekly Revenue -->
+        <div class="revenue-card p-6 bg-white/5 rounded-xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-chart-bar text-green-400 text-xl"></i>
+            </div>
+            <div class="text-green-400 text-sm font-medium">
+              <i class="fas fa-calendar-week mr-1"></i>Cette Semaine
+            </div>
+          </div>
+
+          <div class="text-3xl font-bold text-green-400 mb-2">
+            <%= number_to_currency(@revenue_data[:weekly_revenue], precision: 0) %>
+          </div>
+
+          <div class="text-sm text-gray-400">7 derniers jours</div>
+          <div class="text-xs text-gray-500 mt-1">
+            <%= @stats[:this_week] || 0 %> réservations cette semaine
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Progress Bar -->
+      <div class="mt-6 pt-6 border-t border-white/10">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm text-gray-400">Progression mensuelle</span>
+          <span class="text-sm text-primary font-medium">
+            <%= number_to_percentage((@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), precision: 1) %>
+          </span>
+        </div>
+
+        <div class="w-full bg-white/10 rounded-full h-3">
+          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-500"
+               style="width: <%= [(@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), 100].min %>%">
+          </div>
+        </div>
+
+        <div class="flex justify-between text-xs text-gray-500 mt-2">
+          <span>0€</span>
+          <span><%= number_to_currency(@revenue_data[:total_revenue], precision: 0) %></span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mt-6 pt-6 border-t border-white/10">
+        <div class="flex flex-wrap gap-3">
+          <%= link_to admin_participations_path(format: :csv),
+              class: "px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors inline-flex items-center" do %>
+            <i class="fas fa-download mr-2"></i>Exporter en CSV
+          <% end %>
+
+          <%= link_to admin_participations_path(scope: 'confirmed'),
+              class: "px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors inline-flex items-center" do %>
+            <i class="fas fa-check mr-2"></i>Voir confirmées uniquement
+          <% end %>
+
+          <%= link_to admin_participations_path(payment_filter: 'with_payment'),
+              class: "px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm transition-colors inline-flex items-center" do %>
+            <i class="fas fa-credit-card mr-2"></i>Avec paiement
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

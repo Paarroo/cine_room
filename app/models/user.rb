@@ -13,6 +13,8 @@ class User < ApplicationRecord
   has_many :created_events, through: :movies, source: :events
   has_one_attached :avatar
 
+  validate :name_cannot_be_changed_after_publishing, on: :update
+
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
   scope :admin_users, -> { where(role: :admin) }
   scope :regular_users, -> { where(role: :user) }
@@ -36,6 +38,14 @@ class User < ApplicationRecord
   end
 
   private
+
+  def name_cannot_be_changed_after_publishing
+    return unless movies.exists?
+
+    if first_name_changed? || last_name_changed?*
+      errors.add(:base, "Impossible de modifier votre nom après publication d’un film approuvé.")
+    end
+  end
 
   def send_welcome_email
     UserMailer.welcome_email(self).deliver_later

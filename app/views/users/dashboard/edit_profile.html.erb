@@ -27,12 +27,14 @@
         <div class="mb-6">
           <%= f.label :first_name, "Prénom", class: "block text-sm font-semibold text-gray-300 mb-1" %>
           <%= f.text_field :first_name, placeholder: "Votre prénom",
+                disabled: @user.movies.exists?,
                 class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 transition" %>
         </div>
 
         <div class="mb-6">
           <%= f.label :last_name, "Nom", class: "block text-sm font-semibold text-gray-300 mb-1" %>
           <%= f.text_field :last_name, placeholder: "Votre nom de famille",
+                disabled: @user.movies.exists?,
                 class: "w-full px-4 py-3 bg-dark-500/70 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500 transition" %>
         </div>
 

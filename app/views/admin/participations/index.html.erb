@@ -1,0 +1,94 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div
+  class="admin-dashboard min-h-screen bg-dark-400"
+  data-controller="admin-dashboard admin-flash admin-participations"
+>
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="welcome-section glass-effect rounded-3xl p-8 mt-20">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <!-- Title Section -->
+        <div class="flex-1 min-width-0">
+          <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+            <i class="fas fa-ticket-alt mr-4"></i>
+            Gestion des Réservations
+          </h1>
+          <p class="text-xl text-gray-300 mb-2">
+            Administration des participations utilisateurs
+          </p>
+          <p class="text-gray-400 text-base">
+            <%= @stats[:total] %> réservations au total • <%= @stats[:pending] %> en attente
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 lg:mt-0 flex flex-wrap gap-4">
+          <button
+            class="btn-primary"
+            data-action="click->admin-dashboard#exportData"
+            data-type="participations"
+          >
+            <i class="fas fa-download mr-2"></i>
+            Exporter CSV
+          </button>
+
+          <!-- Bulk Actions -->
+          <div class="bulk-actions hidden" id="bulk-actions">
+            <button
+              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
+              data-action="click->admin-participations#bulkConfirm"
+            >
+              <i class="fas fa-check mr-2"></i>
+              Confirmer sélection
+            </button>
+            <button
+              class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
+              data-action="click->admin-participations#bulkCancel"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Annuler sélection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <%= render 'stats_cards' %>
+
+  <!-- Filters Section -->
+  <%= render 'filters' %>
+
+  <!-- Participations List -->
+  <section class="participations-list py-8">
+    <div class="container-app">
+      <div
+        class="glass-effect rounded-3xl p-6"
+        data-controller="admin-participations"
+      >
+        <!-- List Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-list text-primary mr-2"></i>
+            Liste des Réservations
+          </h3>
+
+          <!-- Select All Checkbox -->
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+                data-admin-participations-target="selectAll"
+                data-action="change->admin-participations#toggleSelectAll"
+              >
+              <span class="text-sm text-gray-400">Tout sélectionner</span>
+            </label>
+
+            <span class="text-sm text-gray-400">
+              <%= @formatted_participations.count %> résultats
+            </span>
+          </div>
+        </div>

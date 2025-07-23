@@ -1,225 +1,205 @@
-ActiveAdmin.register User do
-  menu priority: 1, label: "Users"
+module UserManagement
+  extend ActiveSupport::Concern
 
-  permit_params :email, :first_name, :last_name, :role, :bio, :password, :password_confirmation
-
-  scope :all, default: true
-  scope :admin_users, -> { where(role: :admin) }
-  scope :regular_users, -> { where(role: :user) }
-  scope :creators, -> { where(role: :creator) }
-  scope :movie_creators, -> { joins(:movies).distinct }
-
-  index do
-    selectable_column
-    id_column
-
-    column :email do |user|
-      link_to user.email, admin_user_path(user)
-    end
-
-    column :full_name do |user|
-      user.full_name
-    end
-
-    column :role do |user|
-      status_tag user.role.humanize, class: user.role
-    end
-
-    # Show creator status based on movies created
-    column :creator_status do |user|
-      if user.creator?
-        status_tag "Creator", class: "yes"
-      else
-        status_tag "Not a creator", class: "no"
-      end
-    end
-
-    column :movies_count do |user|
-      user.movies.count
-    end
-
-    column :participations_count do |user|
-      user.participations.count
-    end
-
-    column :created_at do |user|
-      user.created_at.strftime("%d/%m/%Y")
-    end
-
-    actions
+  # User role management actions
+  def promote_to_admin_action(user)
+    user.update!(role: :admin)
   end
 
-  # Show page configuration
-  show do
-    attributes_table do
-      row :id
-      row :email
-      row :first_name
-      row :last_name
-      row :role do |user|
-        status_tag user.role.humanize, class: user.role
-      end
-      row :bio
-      row :created_at
-      row :updated_at
-      row :last_sign_in_at if user.respond_to?(:last_sign_in_at)
-    end
+  def demote_to_user_action(user)
+    user.update!(role: :user)
+  end
 
-    # Show movies created by this user (if any)
-    if user.creator?
-      panel "Created Movies" do
-        table_for user.movies.limit(10) do
-          column :title do |movie|
-            link_to movie.title, admin_movie_path(movie)
-          end
-          column :validation_status do |movie|
-            status_tag movie.validation_status.humanize, class: movie.validation_status
-          end
-          column :year
-          column :genre
-          column :created_at do |movie|
-            movie.created_at.strftime("%d/%m/%Y")
-          end
-        end
-        div do
-          # FIXED: Remove Ransack syntax, use simple URL
-          link_to "View all movies by this user", admin_movies_path
-        end
-      end
-    end
-
-    # Show user participations
-    panel "Participations" do
-      table_for user.participations.includes(:event).limit(10) do
-        column :event do |participation|
-          link_to participation.event.title, admin_event_path(participation.event)
-        end
-        column :status do |participation|
-          status_tag participation.status.humanize, class: participation.status
-        end
-        column :seats
-        column :created_at do |participation|
-          participation.created_at.strftime("%d/%m/%Y")
-        end
-      end
-      div do
-        # FIXED: Remove Ransack syntax, use simple URL
-        link_to "View all participations", admin_participations_path
-      end
-    end
-
-    # Show user reviews
-    panel "Reviews" do
-      table_for user.reviews.includes(:movie, :event).limit(10) do
-        column :movie do |review|
-          link_to review.movie.title, admin_movie_path(review.movie)
-        end
-        column :event do |review|
-          link_to review.event.title, admin_event_path(review.event)
-        end
-        column :rating do |review|
-          "⭐" * review.rating if review.rating
-        end
-        column :created_at do |review|
-          review.created_at.strftime("%d/%m/%Y")
-        end
-      end
-      div do
-        # FIXED: Remove Ransack syntax, use simple URL
-        link_to "View all reviews", admin_reviews_path
-      end
+  def toggle_role_action(user)
+    case user.role
+    when 'user'
+      user.update!(role: :creator)
+    when 'creator'
+      user.update!(role: :admin)
+    when 'admin'
+      user.update!(role: :user)
     end
   end
 
-  # Form configuration for creating/editing users
-  form do |f|
-    f.semantic_errors
-
-    f.inputs "User Information" do
-      f.input :email, required: true
-      f.input :first_name
-      f.input :last_name
-      f.input :role, as: :select, collection: User.roles.map { |key, value| [ key.humanize, key ] }, include_blank: false
-      f.input :bio, as: :text, input_html: { rows: 4 }
-    end
-
-    f.inputs "Password" do
-      f.input :password, hint: "Leave blank to keep current password"
-      f.input :password_confirmation
-    end
-
-    f.actions
+  # Bulk operations for multiple users
+  def bulk_promote_users(user_ids)
+    User.where(id: user_ids).update_all(
+      role: :admin,
+      updated_at: Time.current
+    )
   end
 
-  # Batch actions for bulk operations
-  batch_action :promote_to_admin, confirm: "Are you sure you want to promote selected users to admin?" do |ids|
-    User.where(id: ids).update_all(role: :admin)
-    redirect_to collection_path, notice: "Users promoted to admin successfully!"
+  def bulk_demote_users(user_ids)
+    User.where(id: user_ids).update_all(
+      role: :user,
+      updated_at: Time.current
+    )
   end
 
-  batch_action :demote_to_user, confirm: "Are you sure you want to demote selected users?" do |ids|
-    User.where(id: ids).update_all(role: :user)
-    redirect_to collection_path, notice: "Users demoted successfully!"
+  def bulk_promote_to_creator(user_ids)
+    User.where(id: user_ids).update_all(
+      role: :creator,
+      updated_at: Time.current
+    )
   end
 
-  # Custom member action for password reset
-  member_action :reset_password, method: :put do
-    user = User.find(params[:id])
+  # Password management
+  def reset_password_action(user)
     new_password = SecureRandom.hex(8)
-    user.update!(password: new_password, password_confirmation: new_password)
+    user.update!(
+      password: new_password,
+      password_confirmation: new_password
+    )
 
-    # Here send an email with the new password
+    # Send email with new password (uncomment when ready)
     # UserMailer.password_reset(user, new_password).deliver_now
 
-    redirect_to resource_path, notice: "Password reset successfully! New password: #{new_password}"
+    new_password
   end
 
-  action_item :reset_password, only: :show do
-    link_to "Reset Password", reset_password_admin_user_path(user), method: :put,
-            confirm: "Are you sure? This will generate a new password.",
-            class: "button"
+  # User statistics and metrics
+  def calculate_user_stats
+    {
+      total: User.count,
+      admins: User.where(role: :admin).count,
+      creators: User.where(role: :creator).count,
+      regular_users: User.where(role: :user).count,
+      movie_creators: User.joins(:movies).distinct.count,
+      active_users: User.joins(:participations)
+                       .where(participations: { status: :confirmed })
+                       .distinct.count
+    }
   end
 
-  # CSV export configuration
-  csv do
-    column :id
-    column :email
-    column :first_name
-    column :last_name
-    column :role
-    column("Full Name") { |user| user.full_name }
-    column("Movies Count") { |user| user.movies.count }
-    column("Participations Count") { |user| user.participations.count }
-    column("Is Creator") { |user| user.creator? ? "Yes" : "No" }
-    column :created_at
-  end
+  # User filtering and search
+  def filter_users(params)
+    users = User.includes(:movies, :participations, :reviews)
 
-  # Controller customization
-  controller do
-    def create
-      @user = User.new(permitted_params[:user])
+    # Filter by role
+    users = users.where(role: params[:role]) if params[:role].present?
 
-      if @user.save
-        redirect_to admin_user_path(@user), notice: "User created successfully!"
-      else
-        render :new
+    # Filter by creator status
+    if params[:creator_status].present?
+      case params[:creator_status]
+      when 'with_movies'
+        users = users.joins(:movies).distinct
+      when 'without_movies'
+        users = users.left_joins(:movies).where(movies: { id: nil })
       end
     end
 
-    def update
-      # Don't require current password for admin updates
-      user_params = permitted_params[:user]
-
-      if user_params[:password].blank?
-        user_params.delete(:password)
-        user_params.delete(:password_confirmation)
-      end
-
-      if resource.update(user_params)
-        redirect_to admin_user_path(resource), notice: "User updated successfully!"
-      else
-        render :edit
+    # Filter by activity level
+    if params[:activity].present?
+      case params[:activity]
+      when 'active'
+        users = users.joins(:participations)
+                    .where(participations: { status: :confirmed })
+                    .distinct
+      when 'inactive'
+        users = users.left_joins(:participations)
+                    .where(participations: { id: nil })
       end
     end
+
+    # Search by name or email
+    if params[:q].present?
+      users = users.where(
+        "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
+        "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
+      )
+    end
+
+    # Date range filter
+    if params[:created_since].present?
+      users = users.where(created_at: Date.parse(params[:created_since])..Time.current)
+    end
+
+    users.order(created_at: :desc)
+  end
+
+  # User profile completion check
+  def profile_completion_status(user)
+    fields = %w[first_name last_name bio]
+    completed = fields.count { |field| user.send(field).present? }
+
+    {
+      percentage: (completed.to_f / fields.size * 100).round(1),
+      completed_fields: completed,
+      total_fields: fields.size,
+      missing_fields: fields.reject { |field| user.send(field).present? }
+    }
+  end
+
+  # User activity summary
+  def user_activity_summary(user)
+    {
+      movies_created: user.movies.count,
+      events_attended: user.participations.where(status: :confirmed).count,
+      reviews_written: user.reviews.count,
+      total_spent: user.participations
+                      .joins(:event)
+                      .where(status: :confirmed)
+                      .sum("events.price_cents * participations.seats") / 100.0,
+      last_activity: [
+        user.movies.maximum(:created_at),
+        user.participations.maximum(:created_at),
+        user.reviews.maximum(:created_at)
+      ].compact.max
+    }
+  end
+
+  # Export user data for CSV/Excel
+  def export_users_data(user_scope = User.all)
+    user_scope.includes(:movies, :participations, :reviews)
+              .limit(1000)
+              .map do |user|
+      activity = user_activity_summary(user)
+      {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        full_name: user.full_name,
+        role: user.role,
+        movies_count: activity[:movies_created],
+        participations_count: activity[:events_attended],
+        reviews_count: activity[:reviews_written],
+        total_spent: activity[:total_spent],
+        created_at: user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        last_activity: activity[:last_activity]&.strftime("%Y-%m-%d %H:%M:%S")
+      }
+    end
+  end
+
+  # Get filter options for form selects
+  def get_user_filter_options
+    {
+      roles: User.roles.keys.map { |role| [ role.humanize, role ] },
+      creator_statuses: [
+        [ 'All Users', '' ],
+        [ 'With Movies', 'with_movies' ],
+        [ 'Without Movies', 'without_movies' ]
+      ],
+      activity_levels: [
+        [ 'All Users', '' ],
+        [ 'Active (with bookings)', 'active' ],
+        [ 'Inactive (no bookings)', 'inactive' ]
+      ]
+    }
+  end
+
+  private
+
+  # Validate user permissions for sensitive operations
+  def can_modify_user?(target_user)
+    return true if current_user.admin?
+    return false if target_user.admin?
+
+    current_user.creator? && !target_user.creator?
+  end
+
+  # Log user management actions for audit trail
+  def log_user_action(action, target_user, details = {})
+    Rails.logger.info "User Management: #{current_user.email} #{action} user #{target_user.email} - #{details}"
   end
 end

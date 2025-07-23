@@ -1,6 +1,6 @@
 class Admin::ParticipationsController < Admin::ApplicationController
   include ParticipationManagement
-  before_action :set_participation, only: [:show, :update]
+  before_action :set_participation, only: [ :show, :update ]
 
   # GET /admin/participations
   def index
@@ -198,3 +198,36 @@ class Admin::ParticipationsController < Admin::ApplicationController
       format.html { redirect_to admin_participations_path, alert: 'Error updating participation' }
     end
   end
+
+  # Update participation with custom attributes
+  def update_participation_attributes
+    if @participation.update(participation_params)
+      redirect_to admin_participation_path(@participation), notice: 'Participation updated successfully'
+    else
+      render :show, alert: 'Error updating participation'
+    end
+  end
+
+  # Calculate participation statistics
+  def calculate_participation_stats
+    {
+      total: Participation.count,
+      pending: Participation.where(status: :pending).count,
+      confirmed: Participation.where(status: :confirmed).count,
+      cancelled: Participation.where(status: :cancelled).count,
+      today: Participation.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day).count
+    }
+  end
+
+  # Calculate total price for a participation
+  def calculate_participation_total(participation)
+    return 0 unless participation.event&.price_cents && participation.seats
+
+    (participation.event.price_cents * participation.seats) / 100.0
+  end
+
+  # Strong parameters for participation updates
+  def participation_params
+    params.require(:participation).permit(:seats, :status, :stripe_payment_id)
+  end
+end

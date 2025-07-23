@@ -23,7 +23,7 @@
   <section class="movie-header py-8">
     <div class="container-app">
       <div class="glass-effect rounded-3xl p-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Movie Poster & Basic Info -->
           <div class="lg:col-span-1">
             <!-- Poster Placeholder -->
@@ -51,19 +51,21 @@
 
             <!-- Action Buttons -->
             <% if @movie.pending? %>
-              <div class="space-y-3">
+              <div class="flex space-x-3 justify-center">
+                <!-- Validate Button -->
                 <%= button_to validate_movie_admin_movie_path(@movie),
                     method: :patch,
-                    class: "w-full btn-primary",
+                    class: "flex-1 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
                     data: { confirm: "Valider ce film ?" } do %>
-                  <i class="fas fa-check mr-2"></i>Valider le Film
+                  <i class="fas fa-check mr-2"></i>Valider
                 <% end %>
 
+                <!-- Reject Button -->
                 <%= button_to reject_movie_admin_movie_path(@movie),
                     method: :patch,
-                    class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold",
+                    class: "flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
                     data: { confirm: "Rejeter ce film ?" } do %>
-                  <i class="fas fa-times mr-2"></i>Rejeter le Film
+                  <i class="fas fa-times mr-2"></i>Rejeter
                 <% end %>
               </div>
             <% end %>
@@ -101,6 +103,41 @@
                   <div class="text-lg font-semibold text-white"><%= @movie.language %></div>
                 </div>
               </div>
+              <!-- Synopsis -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-file-alt text-primary mr-2"></i>Synopsis
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <p class="text-gray-300 leading-relaxed">
+                    <%= simple_format(@movie.synopsis) %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Creator Info -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-user-plus text-primary mr-2"></i>Créateur
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold">
+                      <%= @movie.user&.full_name&.first(2)&.upcase || 'U' %>
+                    </div>
+                    <div>
+                      <div class="text-lg font-semibold text-white">
+                        <%= @movie.user&.full_name || 'Utilisateur inconnu' %>
+                      </div>
+                      <div class="text-sm text-gray-400">
+                        <%= @movie.user&.email || 'Email non disponible' %>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Soumis le <%= @movie.created_at.strftime("%d %B %Y à %H:%M") %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               <!-- Validation Info -->
               <% if @movie.validated_by.present? %>
@@ -270,52 +307,24 @@
           <% end %>
         </div>
       </div>
+
+
     </section>
   <% end %>
 
-  <!-- Back to List Button -->
-  <section class="back-section py-8">
-    <div class="container-app text-center">
-      <%= link_to admin_movies_path, class: "btn-secondary" do %>
-        <i class="fas fa-arrow-left mr-2"></i>
-        Retour à la liste des films
-      <% end %>
-    </div>
-  </section>
+
+
+
+
 </div>
 
-              <!-- Synopsis -->
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-3">
-                  <i class="fas fa-file-alt text-primary mr-2"></i>Synopsis
-                </h3>
-                <div class="glass-subtle rounded-xl p-6">
-                  <p class="text-gray-300 leading-relaxed">
-                    <%= simple_format(@movie.synopsis) %>
-                  </p>
-                </div>
-              </div>
 
-              <!-- Creator Info -->
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-3">
-                  <i class="fas fa-user-plus text-primary mr-2"></i>Créateur
-                </h3>
-                <div class="glass-subtle rounded-xl p-6">
-                  <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold">
-                      <%= @movie.user&.full_name&.first(2)&.upcase || 'U' %>
-                    </div>
-                    <div>
-                      <div class="text-lg font-semibold text-white">
-                        <%= @movie.user&.full_name || 'Utilisateur inconnu' %>
-                      </div>
-                      <div class="text-sm text-gray-400">
-                        <%= @movie.user&.email || 'Email non disponible' %>
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        Soumis le <%= @movie.created_at.strftime("%d %B %Y à %H:%M") %>
-                      </div>
-                    </div>
+                <!-- Back to List Button -->
+                <section class="back-section py-8">
+                  <div class="container-app text-center">
+                    <%= link_to admin_movies_path, class: "btn-secondary" do %>
+                      <i class="fas fa-arrow-left mr-2"></i>
+                      Retour à la liste des films
+                    <% end %>
                   </div>
-                </div>
+                </section>

@@ -1,6 +1,7 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_owner_or_admin!, only: [ :update,:destroy ]
+  before_action :ensure_owner_or_admin!, only: [ :edit, :update,:destroy ]
+  before_action :authorize_editing, only: [:edit, :update, :destroy]
 
   def index
     @movies = Movie.filter_by(params).order(year: :asc).page(params[:page])
@@ -44,6 +45,12 @@ class MoviesController < ApplicationController
   end
 
   private
+
+  def authorize_editing
+    if @movie.approved? && !current_user.admin?
+      redirect_to @movie, alert: "Ce film est approuvé et ne peut plus être modifié."
+    end
+  end
 
   def set_movie
     @movie = Movie.find(params[:id])

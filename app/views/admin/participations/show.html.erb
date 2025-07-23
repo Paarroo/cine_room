@@ -1,0 +1,61 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section pt-20 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_participations_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Réservations
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white">Réservation #<%= @participation.id %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Participation Details Header -->
+  <section class="participation-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          <!-- Status & Actions -->
+          <div class="lg:col-span-1">
+            <!-- Status Badge -->
+            <div class="text-center mb-6">
+              <% case @participation_data[:status] %>
+              <% when 'pending' %>
+                <span class="px-6 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-clock mr-2"></i>En attente
+                </span>
+              <% when 'confirmed' %>
+                <span class="px-6 py-3 bg-green-500/20 text-green-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-check mr-2"></i>Confirmée
+                </span>
+              <% when 'cancelled' %>
+                <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-times mr-2"></i>Annulée
+                </span>
+              <% end %>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="text-center mb-6">
+              <% if @participation_data[:has_payment] %>
+                <div class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg">
+                  <i class="fas fa-credit-card mr-2"></i>Paiement effectué
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                  ID: <%= @participation_data[:stripe_payment_id] %>
+                </p>
+              <% else %>
+                <div class="px-4 py-2 bg-gray-500/20 text-gray-400 rounded-lg">
+                  <i class="fas fa-credit-card mr-2"></i>Aucun paiement
+                </div>
+              <% end %>
+            </div>

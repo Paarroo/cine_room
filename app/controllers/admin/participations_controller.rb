@@ -1,53 +1,61 @@
 class Admin::ParticipationsController < Admin::ApplicationController
-  include ParticipationManagement
+  include ParticipationsManagement
   before_action :set_participation, only: [ :show, :update ]
 
-  # GET /admin/participations
+  # GET /admin/participations - mirrors ActiveAdmin index with scopes and filters
   def index
-    @participations_query = Participation.includes(:user, :event, event: :movie)
+    # Apply scope filter (all/pending/confirmed/cancelled) - mirrors ActiveAdmin scopes
+    scope = params[:scope] || 'all'
+    @participations = participation_scopes[scope.to_sym] || participation_scopes[:all]
 
-    # Status filter
-    @participations_query = @participations_query.where(status: params[:status]) if params[:status].present?
+    # Apply additional filters using concern method
+    @participations = filter_participations(params)
 
-    # Event filter
-    @participations_query = @participations_query.joins(:event).where(events: { id: params[:event_id] }) if params[:event_id].present?
+    # Limit results for performance
+    @participations = @participations.limit(100)
 
-    # User search
-    if params[:user_search].present?
-      @participations_query = @participations_query.joins(:user)
-                                                  .where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ?",
-                                                         "%#{params[:user_search]}%", "%#{params[:user_search]}%", "%#{params[:user_search]}%")
+    # Format data for display - mirrors ActiveAdmin columns
+    @formatted_participations = @participations.map { |p| format_participation_data(p) }
+
+    # Get statistics for dashboard - mirrors ActiveAdmin counters
+    @stats = calculate_participation_statistics
+
+    # Get revenue data for admin overview
+    @revenue_data = calculate_participation_revenue
+
+    # Get collections for filter dropdowns - mirrors ActiveAdmin form collections
+    @filter_collections = get_participation_form_collections
+    @filter_collections[:scopes] = participation_scopes.keys.map(&:to_s)
+
+    # Export data if requested
+    if params[:format] == 'csv'
+      @export_data = export_participation_data(@participations)
+      respond_to do |format|
+        format.csv { send_csv_data(@export_data) }
+      end
+      return
     end
-
-    # Date range filter
-    case params[:date_filter]
-    when "today"
-      @participations_query = @participations_query.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day)
-    when "week"
-      @participations_query = @participations_query.where(created_at: 1.week.ago..Time.current)
-    when "month"
-      @participations_query = @participations_query.where(created_at: 1.month.ago..Time.current)
-    end
-
-    @participations = @participations_query.order(created_at: :desc).limit(100).to_a
-
-    # Calculate statistics
-    @stats = calculate_participation_stats
-
-    # Get filter options for dropdowns
-    @events_options = Event.joins(:participations).distinct.pluck(:title, :id)
-    @status_options = Participation.statuses.keys
   end
 
-  # GET /admin/participations/:id
+  # GET /admin/participations/:id - mirrors ActiveAdmin show page
   def show
-    @event = @participation.event
+    # Format participation data using concern method - mirrors ActiveAdmin attributes_table
+    @participation_data = format_participation_data(@participation)
+
+    # Get related objects for display
     @user = @participation.user
-    @movie = @event.movie
-    @total_price = calculate_participation_total(@participation)
+    @event = @participation.event
+    @movie = @event&.movie
+
+    # Calculate additional metrics for this participation
+    @total_price = @participation_data[:total_price]
+    @formatted_total_price = @participation_data[:formatted_total_price]
+
+    # Check if participation can be modified
+    @can_modify = can_modify_participation?(@participation)
   end
 
-  # PATCH /admin/participations/:id
+  # PATCH /admin/participations/:id - handles status updates
   def update
     case params[:status]
     when 'confirmed'
@@ -57,29 +65,33 @@ class Admin::ParticipationsController < Admin::ApplicationController
     when 'pending'
       set_pending_participation_action
     else
-      # Regular participation update
+      # Regular participation update with validation
       update_participation_attributes
     end
   end
 
-  # PATCH /admin/participations/bulk_confirm
+  # PATCH /admin/participations/bulk_confirm - mirrors ActiveAdmin batch_action
   def bulk_confirm
-    participation_ids = params[:participation_ids] || []
+    participation_ids = params[:participation_ids] || params[:ids] || []
 
     if participation_ids.any?
+      # Use concern method - mirrors ActiveAdmin batch_action logic
       result = bulk_confirm_participations(participation_ids)
 
       respond_to do |format|
         format.json do
           render json: {
-            status: 'success',
-            message: "#{result[:count]} participations confirmed successfully",
-            confirmed_count: result[:count]
+            status: result[:success] ? 'success' : 'error',
+            message: result[:message],
+            count: result[:count]
           }
         end
         format.html do
-          redirect_to admin_participations_path,
-                     notice: "#{result[:count]} participations confirmed successfully"
+          if result[:success]
+            redirect_to admin_participations_path, notice: result[:message]
+          else
+            redirect_to admin_participations_path, alert: result[:error]
+          end
         end
       end
     else
@@ -88,32 +100,30 @@ class Admin::ParticipationsController < Admin::ApplicationController
         format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
       end
     end
-  rescue StandardError => e
-    Rails.logger.error "Bulk confirm error: #{e.message}"
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_participations_path, alert: 'Error confirming participations' }
-    end
   end
 
-  # PATCH /admin/participations/bulk_cancel
+  # PATCH /admin/participations/bulk_cancel - mirrors ActiveAdmin batch_action
   def bulk_cancel
-    participation_ids = params[:participation_ids] || []
+    participation_ids = params[:participation_ids] || params[:ids] || []
 
     if participation_ids.any?
+      # Use concern method - mirrors ActiveAdmin batch_action logic
       result = bulk_cancel_participations(participation_ids)
 
       respond_to do |format|
         format.json do
           render json: {
-            status: 'success',
-            message: "#{result[:count]} participations cancelled successfully",
-            cancelled_count: result[:count]
+            status: result[:success] ? 'success' : 'error',
+            message: result[:message],
+            count: result[:count]
           }
         end
         format.html do
-          redirect_to admin_participations_path,
-                     notice: "#{result[:count]} participations cancelled successfully"
+          if result[:success]
+            redirect_to admin_participations_path, notice: result[:message]
+          else
+            redirect_to admin_participations_path, alert: result[:error]
+          end
         end
       end
     else
@@ -122,17 +132,22 @@ class Admin::ParticipationsController < Admin::ApplicationController
         format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
       end
     end
-  rescue StandardError => e
-    Rails.logger.error "Bulk cancel error: #{e.message}"
+  end
+
+  # GET /admin/participations/export - export functionality
+  def export
+    @participations = filter_participations(params)
+    @export_data = export_participation_data(@participations)
+
     respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_participations_path, alert: 'Error cancelling participations' }
+      format.csv { send_csv_data(@export_data) }
+      format.json { render json: { data: @export_data, count: @export_data.length } }
     end
   end
 
   private
 
-  # Find participation by ID
+  # Find participation by ID with error handling
   def set_participation
     @participation = Participation.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -142,92 +157,116 @@ class Admin::ParticipationsController < Admin::ApplicationController
     end
   end
 
-  # Confirm single participation
+  # Confirm single participation - uses concern method
   def confirm_participation_action
-    @participation.update!(
-      status: :confirmed,
-      updated_at: Time.current
-    )
+    result = update_participation_status(@participation, 'confirmed')
 
     respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Participation confirmed successfully' } }
-      format.html { redirect_to admin_participations_path, notice: 'Participation confirmed successfully' }
-    end
-  rescue StandardError => e
-    Rails.logger.error "Confirm participation error: #{e.message}"
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_participations_path, alert: 'Error confirming participation' }
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
     end
   end
 
-  # Cancel single participation
+  # Cancel single participation - uses concern method
   def cancel_participation_action
-    @participation.update!(
-      status: :cancelled,
-      updated_at: Time.current
-    )
+    result = update_participation_status(@participation, 'cancelled')
 
     respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Participation cancelled successfully' } }
-      format.html { redirect_to admin_participations_path, notice: 'Participation cancelled successfully' }
-    end
-  rescue StandardError => e
-    Rails.logger.error "Cancel participation error: #{e.message}"
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_participations_path, alert: 'Error cancelling participation' }
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
     end
   end
 
-  # Set participation to pending
+  # Set participation to pending - uses concern method
   def set_pending_participation_action
-    @participation.update!(
-      status: :pending,
-      updated_at: Time.current
-    )
+    result = update_participation_status(@participation, 'pending')
 
     respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Participation set to pending' } }
-      format.html { redirect_to admin_participations_path, notice: 'Participation set to pending' }
-    end
-  rescue StandardError => e
-    Rails.logger.error "Set pending participation error: #{e.message}"
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_participations_path, alert: 'Error updating participation' }
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_participations_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_participations_path, alert: result[:error] }
+      end
     end
   end
 
-  # Update participation with custom attributes
+  # Update participation with custom attributes - includes validation
   def update_participation_attributes
+    # Validate data before update
+    validation_result = validate_participation_data(participation_params)
+
+    unless validation_result[:valid]
+      respond_to do |format|
+        format.json { render json: { status: 'error', errors: validation_result[:errors] } }
+        format.html { redirect_to admin_participation_path(@participation), alert: validation_result[:errors].join(', ') }
+      end
+      return
+    end
+
     if @participation.update(participation_params)
-      redirect_to admin_participation_path(@participation), notice: 'Participation updated successfully'
+      respond_to do |format|
+        format.json { render json: { status: 'success', message: 'Participation updated successfully' } }
+        format.html { redirect_to admin_participation_path(@participation), notice: 'Participation updated successfully' }
+      end
     else
-      render :show, alert: 'Error updating participation'
+      respond_to do |format|
+        format.json { render json: { status: 'error', errors: @participation.errors.full_messages } }
+        format.html { render :show, alert: @participation.errors.full_messages.join(', ') }
+      end
     end
   end
 
-  # Calculate participation statistics
-  def calculate_participation_stats
-    {
-      total: Participation.count,
-      pending: Participation.where(status: :pending).count,
-      confirmed: Participation.where(status: :confirmed).count,
-      cancelled: Participation.where(status: :cancelled).count,
-      today: Participation.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day).count
-    }
+  # Check if participation can be modified based on event status and date
+  def can_modify_participation?(participation)
+    return false unless participation
+    return false if participation.event&.completed? || participation.event&.cancelled?
+    return false if participation.event&.event_date && participation.event.event_date < Date.current
+
+    true
   end
 
-  # Calculate total price for a participation
-  def calculate_participation_total(participation)
-    return 0 unless participation.event&.price_cents && participation.seats
+  # Send CSV data as download
+  def send_csv_data(export_data)
+    csv_content = generate_csv_content(export_data)
+    filename = "participations_export_#{Date.current.strftime('%Y%m%d')}.csv"
 
-    (participation.event.price_cents * participation.seats) / 100.0
+    send_data csv_content,
+              filename: filename,
+              type: 'text/csv',
+              disposition: 'attachment'
   end
 
-  # Strong parameters for participation updates
+  # Generate CSV content from export data
+  def generate_csv_content(export_data)
+    return '' if export_data.empty?
+
+    require 'csv'
+
+    CSV.generate(headers: true) do |csv|
+      # Add headers
+      csv << export_data.first.keys.map(&:to_s).map(&:humanize)
+
+      # Add data rows
+      export_data.each do |row|
+        csv << row.values
+      end
+    end
+  end
+
+  # Strong parameters for participation updates - mirrors ActiveAdmin permit_params
   def participation_params
-    params.require(:participation).permit(:seats, :status, :stripe_payment_id)
+    params.require(:participation).permit(:user_id, :event_id, :status, :seats, :stripe_payment_id)
   end
 end

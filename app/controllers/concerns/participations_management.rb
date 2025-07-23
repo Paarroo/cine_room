@@ -1,4 +1,4 @@
-module ParticipationManagement
+module ParticipationsManagement
   extend ActiveSupport::Concern
 
   # Get all scopes for participation filtering - mirrors ActiveAdmin scopes

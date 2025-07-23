@@ -24,6 +24,22 @@ module ParticipationsManagement
     (participation.event.price_cents * participation.seats) / 100.0
   end
 
+  # MAIN STATS METHOD - Fixed name to match controller usage
+  def calculate_participation_statistics
+    {
+      total: Participation.count,
+      pending: Participation.where(status: :pending).count,
+      confirmed: Participation.where(status: :confirmed).count,
+      cancelled: Participation.where(status: :cancelled).count,
+      attended: Participation.where(status: :attended).count,
+      today: Participation.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day).count,
+      this_week: Participation.where(created_at: 1.week.ago..Time.current).count,
+      this_month: Participation.where(created_at: 1.month.ago..Time.current).count,
+      total_revenue: calculate_total_participation_revenue,
+      average_participation_value: calculate_average_participation_value
+    }
+  end
+
   # Format participation display data - mirrors ActiveAdmin columns
   def format_participation_data(participation)
     {
@@ -133,19 +149,6 @@ module ParticipationsManagement
     end
   end
 
-  # Get participation statistics for dashboard
-  def calculate_participation_statistics
-    {
-      total: Participation.count,
-      pending: Participation.where(status: :pending).count,
-      confirmed: Participation.where(status: :confirmed).count,
-      cancelled: Participation.where(status: :cancelled).count,
-      today: Participation.where(created_at: Date.current.beginning_of_day..Date.current.end_of_day).count,
-      this_week: Participation.where(created_at: 1.week.ago..Time.current).count,
-      this_month: Participation.where(created_at: 1.month.ago..Time.current).count
-    }
-  end
-
   # Filter participations based on parameters
   def filter_participations(params)
     participations = build_participation_query
@@ -194,7 +197,7 @@ module ParticipationsManagement
 
   # Get revenue data for participations
   def calculate_participation_revenue
-    confirmed_participations = Participation.where(status: :confirmed).joins(:event)
+    confirmed_participations = Participation.where(status: [ :confirmed, :attended ]).joins(:event)
 
     {
       total_revenue: confirmed_participations.sum("events.price_cents * participations.seats") / 100.0,
@@ -231,11 +234,18 @@ module ParticipationsManagement
 
   private
 
+  # Calculate total revenue from all confirmed participations
+  def calculate_total_participation_revenue
+    Participation.where(status: [ :confirmed, :attended ])
+                 .joins(:event)
+                 .sum("events.price_cents * participations.seats") / 100.0
+  end
+
   # Update event status based on current participations
   def update_event_status_if_needed(event)
     return unless event
 
-    confirmed_seats = event.participations.where(status: :confirmed).sum(:seats)
+    confirmed_seats = event.participations.where(status: [ :confirmed, :attended ]).sum(:seats)
 
     if confirmed_seats >= event.max_capacity && !event.sold_out?
       event.update!(status: :sold_out)
@@ -257,7 +267,7 @@ module ParticipationsManagement
 
   # Calculate average value per participation
   def calculate_average_participation_value
-    confirmed_participations = Participation.where(status: :confirmed).joins(:event)
+    confirmed_participations = Participation.where(status: [ :confirmed, :attended ]).joins(:event)
     total_count = confirmed_participations.count
 
     return 0 if total_count.zero?
@@ -285,7 +295,7 @@ module ParticipationsManagement
     if participation_params[:event_id].present?
       event = Event.find_by(id: participation_params[:event_id])
       if event
-        current_confirmed_seats = event.participations.where(status: :confirmed).sum(:seats)
+        current_confirmed_seats = event.participations.where(status: [ :confirmed, :attended ]).sum(:seats)
         requested_seats = participation_params[:seats].to_i
 
         if (current_confirmed_seats + requested_seats) > event.max_capacity

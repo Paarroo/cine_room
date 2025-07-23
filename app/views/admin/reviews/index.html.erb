@@ -1,0 +1,63 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div
+  class="admin-dashboard min-h-screen bg-dark-400"
+  data-controller="admin-dashboard admin-flash"
+>
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="welcome-section glass-effect rounded-3xl p-8 mt-20">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <!-- Title Section -->
+        <div class="flex-1 min-width-0">
+          <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+            <i class="fas fa-star mr-4"></i>
+            Gestion des Avis
+          </h1>
+          <p class="text-xl text-gray-300 mb-2">
+            Modération et analyse des commentaires
+          </p>
+          <p class="text-gray-400 text-base">
+            <%= @stats[:total] %> avis au total • Note moyenne: <%= @stats[:average_rating] %>/5
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 lg:mt-0 flex flex-wrap gap-4">
+          <button
+            class="btn-primary"
+            data-action="click->admin-dashboard#exportData"
+            data-type="reviews"
+          >
+            <i class="fas fa-download mr-2"></i>
+            Exporter
+          </button>
+
+          <!-- Bulk Actions -->
+          <div class="bulk-actions hidden" id="bulk-actions">
+            <button
+              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
+              data-action="click->admin-reviews#bulkApprove"
+            >
+              <i class="fas fa-check mr-2"></i>
+              Approuver sélection
+            </button>
+            <button
+              class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
+              data-action="click->admin-reviews#bulkReject"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Rejeter sélection
+            </button>
+            <button
+              class="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors"
+              data-action="click->admin-reviews#bulkFlag"
+            >
+              <i class="fas fa-flag mr-2"></i>
+              Signaler sélection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,4 +1,5 @@
 class Admin::EventsController < Admin::ApplicationController
+  include EventManagement
   before_action :set_event, only: [ :show, :update ]
 
   def index
@@ -14,17 +15,9 @@ class Admin::EventsController < Admin::ApplicationController
       @events_query = @events_query.where("title ILIKE ? OR venue_name ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%")
     end
 
-    # Date filters
-    case params[:date_filter]
-    when "week"
-      @events_query = @events_query.where(event_date: Date.today..Date.today.end_of_week)
-    when "month"
-      @events_query = @events_query.where(event_date: Date.today..Date.today.end_of_month)
-    end
-
     @events = @events_query.order(event_date: :desc).limit(50).to_a
 
-    # Stats
+    # Calculate stats
     @stats = {
       total: Event.count,
       upcoming: Event.where(status: :upcoming).count,
@@ -33,23 +26,25 @@ class Admin::EventsController < Admin::ApplicationController
       cancelled: Event.where(status: :cancelled).count
     }
 
-    # Filter options
+    # Get filter options
     @venues = Event.distinct.pluck(:venue_name).compact.sort
-    @genres = Movie.distinct.pluck(:genre).compact.sort
+    @genres = Movie.joins(:events).distinct.pluck(:genre).compact.sort
   end
 
   def show
-    @participations = @event.participations.includes(:user).order(created_at: :desc).limit(20)
-    @revenue = @event.participations.where(status: :confirmed).sum("price_cents * seats") / 100.0
+    @participations = @event.participations.includes(:user).order(created_at: :desc)
+    @revenue = @event.participations.where(status: :confirmed).sum("@event.price_cents * participations.seats") / 100.0
   end
 
+  # Update action
   def update
     case params[:status]
     when 'completed'
-      mark_completed_action
+      complete_event_action
     when 'cancelled'
       cancel_event_action
     else
+      # Regular event update
       update_event_attributes
     end
   end
@@ -60,25 +55,41 @@ class Admin::EventsController < Admin::ApplicationController
     @event = Event.find(params[:id])
   end
 
-  def mark_completed_action
-    @event.update!(status: :completed)
+  def complete_event_action
+    @event.update!(
+      status: :completed,
+      updated_at: Time.current
+    )
     respond_to do |format|
       format.json { render json: { status: 'success', message: 'Événement marqué comme terminé' } }
-      format.html { redirect_to admin_events_path, notice: 'Événement terminé' }
+      format.html { redirect_to admin_events_path, notice: 'Événement terminé avec succès' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_events_path, alert: 'Erreur lors de la mise à jour' }
     end
   end
 
   def cancel_event_action
-    @event.update!(status: :cancelled)
+    @event.update!(
+      status: :cancelled,
+      updated_at: Time.current
+    )
     respond_to do |format|
       format.json { render json: { status: 'success', message: 'Événement annulé' } }
       format.html { redirect_to admin_events_path, notice: 'Événement annulé' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_events_path, alert: 'Erreur lors de l\'annulation' }
     end
   end
 
   def update_event_attributes
     if @event.update(event_params)
-      redirect_to admin_event_path(@event), notice: 'Événement mis à jour'
+      redirect_to admin_event_path(@event), notice: 'Événement mis à jour avec succès'
     else
       render :show, alert: 'Erreur lors de la mise à jour'
     end

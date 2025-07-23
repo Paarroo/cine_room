@@ -1,5 +1,4 @@
 ActiveAdmin.setup do |config|
-  # Basic site configuration
   config.site_title = "CinéRoom Admin"
   # config.site_title_link = "/"
 
@@ -16,7 +15,7 @@ ActiveAdmin.setup do |config|
   config.default_per_page = 30
   config.max_per_page = 100
 
-  config.default_namespace = :admin
+  config.default_namespace = :active_admin
   config.filters = false
 
   config.download_links = [ :csv, :xml, :json ]

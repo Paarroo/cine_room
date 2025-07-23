@@ -80,3 +80,101 @@
       <span class="text-gray-500 text-sm">-</span>
     <% end %>
   </td>
+
+  <!-- Seats -->
+  <td class="py-4 px-4">
+    <div class="flex items-center space-x-2">
+      <i class="fas fa-users text-gray-400 text-xs"></i>
+      <span class="text-white font-medium"><%= data[:seats] %></span>
+    </div>
+  </td>
+
+  <!-- Total Price -->
+  <td class="py-4 px-4">
+    <div class="text-primary font-semibold">
+      <%= data[:formatted_total_price] %>
+    </div>
+  </td>
+
+  <!-- Status -->
+  <td class="py-4 px-4">
+    <% case data[:status] %>
+    <% when 'pending' %>
+      <span class="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-lg text-xs font-medium">
+        <i class="fas fa-clock mr-1"></i><%= data[:status_humanized] %>
+      </span>
+    <% when 'confirmed' %>
+      <span class="px-2 py-1 bg-green-500/20 text-green-300 rounded-lg text-xs font-medium">
+        <i class="fas fa-check mr-1"></i><%= data[:status_humanized] %>
+      </span>
+    <% when 'cancelled' %>
+      <span class="px-2 py-1 bg-red-500/20 text-red-300 rounded-lg text-xs font-medium">
+        <i class="fas fa-times mr-1"></i><%= data[:status_humanized] %>
+      </span>
+    <% end %>
+  </td>
+
+  <!-- Payment -->
+  <td class="py-4 px-4 text-center">
+    <% if data[:has_payment] %>
+      <div class="text-green-400" title="Paiement effectué: <%= data[:stripe_payment_id] %>">
+        <i class="fas fa-credit-card"></i>
+      </div>
+    <% else %>
+      <div class="text-gray-500" title="Aucun paiement enregistré">
+        <i class="fas fa-credit-card"></i>
+      </div>
+    <% end %>
+  </td>
+
+  <!-- Actions -->
+  <td class="py-4 px-4">
+    <div class="flex items-center space-x-2">
+      <!-- View Button -->
+      <%= link_to admin_participation_path(data[:id]),
+          class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors" do %>
+        <i class="fas fa-eye"></i>
+      <% end %>
+
+      <!-- Quick Action Buttons -->
+      <% case data[:status] %>
+      <% when 'pending' %>
+        <!-- Confirm Button -->
+        <%= button_to admin_participation_path(data[:id]),
+            method: :patch,
+            params: { status: 'confirmed' },
+            class: "px-2 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors",
+            data: { confirm: "Confirmer cette réservation ?" } do %>
+          <i class="fas fa-check"></i>
+        <% end %>
+
+        <!-- Cancel Button -->
+        <%= button_to admin_participation_path(data[:id]),
+            method: :patch,
+            params: { status: 'cancelled' },
+            class: "px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
+            data: { confirm: "Annuler cette réservation ?" } do %>
+          <i class="fas fa-times"></i>
+        <% end %>
+      <% when 'confirmed' %>
+        <!-- Cancel Button -->
+        <%= button_to admin_participation_path(data[:id]),
+            method: :patch,
+            params: { status: 'cancelled' },
+            class: "px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
+            data: { confirm: "Annuler cette réservation confirmée ?" } do %>
+          <i class="fas fa-times"></i>
+        <% end %>
+      <% when 'cancelled' %>
+        <!-- Restore Button -->
+        <%= button_to admin_participation_path(data[:id]),
+            method: :patch,
+            params: { status: 'pending' },
+            class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
+            data: { confirm: "Remettre en attente cette réservation ?" } do %>
+          <i class="fas fa-undo"></i>
+        <% end %>
+      <% end %>
+    </div>
+  </td>
+</tr>

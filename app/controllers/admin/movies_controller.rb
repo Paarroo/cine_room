@@ -1,16 +1,20 @@
 class Admin::MoviesController < Admin::ApplicationController
-  before_action :set_movie, only: [ :show, :validate_movie, :reject_movie ]
+  before_action :set_movie, only: [ :show, :update ]
 
   def index
-    @movies = Movie.includes(:user, :events)
-                   .filter_by_status(params[:status])
-                   .filter_by_genre(params[:genre])
-                   .filter_by_year(params[:year])
-                   .search(params[:q])
-                   .order(created_at: :desc)
-                   .page(params[:page])
-                   .per(20)
+    @movies_query = Movie.includes(:user, :events, :reviews)
 
+    @movies_query = @movies_query.where(validation_status: params[:status]) if params[:status].present?
+    @movies_query = @movies_query.where(genre: params[:genre]) if params[:genre].present?
+    @movies_query = @movies_query.where(year: params[:year]) if params[:year].present?
+
+    if params[:q].present?
+      @movies_query = @movies_query.where("title ILIKE ? OR director ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%")
+    end
+
+    @movies = @movies_query.order(created_at: :desc).limit(50).to_a
+
+    # Calculate stats
     @stats = {
       total: Movie.count,
       pending: Movie.where(validation_status: :pending).count,
@@ -18,6 +22,7 @@ class Admin::MoviesController < Admin::ApplicationController
       rejected: Movie.where(validation_status: :rejected).count
     }
 
+    # Get filter options
     @genres = Movie.distinct.pluck(:genre).compact.sort
     @years = Movie.distinct.pluck(:year).compact.sort.reverse
   end
@@ -27,71 +32,16 @@ class Admin::MoviesController < Admin::ApplicationController
     @reviews = @movie.reviews.includes(:user, :event).order(created_at: :desc).limit(10)
   end
 
-  # AJAX endpoint for validation
-  def validate_movie
-    if @movie.update(
-      validation_status: :approved,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-      respond_to do |format|
-        format.json { render json: { status: 'success', message: 'Film validé avec succès' } }
-        format.html { redirect_to admin_movies_path, notice: 'Film validé avec succès' }
-      end
+  #  Update action
+  def update
+    case params[:status]
+    when 'approved'
+      validate_movie_action
+    when 'rejected'
+      reject_movie_action
     else
-      respond_to do |format|
-        format.json { render json: { status: 'error', message: 'Erreur lors de la validation' } }
-        format.html { redirect_to admin_movies_path, alert: 'Erreur lors de la validation' }
-      end
-    end
-  end
-
-  def reject_movie
-    if @movie.update(
-      validation_status: :rejected,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-      respond_to do |format|
-        format.json { render json: { status: 'success', message: 'Film rejeté' } }
-        format.html { redirect_to admin_movies_path, notice: 'Film rejeté' }
-      end
-    else
-      respond_to do |format|
-        format.json { render json: { status: 'error', message: 'Erreur lors du rejet' } }
-        format.html { redirect_to admin_movies_path, alert: 'Erreur lors du rejet' }
-      end
-    end
-  end
-
-  # Bulk actions for multiple movies
-  def bulk_validate
-    movie_ids = params[:movie_ids] || []
-
-    Movie.where(id: movie_ids).update_all(
-      validation_status: :approved,
-      validated_by_id: current_user.id,
-      validated_at: Time.current
-    )
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: "#{movie_ids.count} films validés" } }
-      format.html { redirect_to admin_movies_path, notice: "#{movie_ids.count} films validés" }
-    end
-  end
-
-  def bulk_reject
-    movie_ids = params[:movie_ids] || []
-
-    Movie.where(id: movie_ids).update_all(
-      validation_status: :rejected,
-      validated_by_id: current_user.id,
-      validated_at: Time.current
-    )
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: "#{movie_ids.count} films rejetés" } }
-      format.html { redirect_to admin_movies_path, notice: "#{movie_ids.count} films rejetés" }
+      # Regular movie update
+      update_movie_attributes
     end
   end
 
@@ -100,29 +50,52 @@ class Admin::MoviesController < Admin::ApplicationController
   def set_movie
     @movie = Movie.find(params[:id])
   end
-end
 
-# Add these scopes to the Movie model (app/models/movie.rb)
-class Movie < ApplicationRecord
-  # ... existing code ...
+  def validate_movie_action
+    @movie.update!(
+      validation_status: :approved,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
 
-  scope :filter_by_status, ->(status) {
-    return all unless status.present?
-    where(validation_status: status)
-  }
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Film validé avec succès' } }
+      format.html { redirect_to admin_movies_path, notice: 'Film validé avec succès' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_movies_path, alert: 'Erreur lors de la validation' }
+    end
+  end
 
-  scope :filter_by_genre, ->(genre) {
-    return all unless genre.present?
-    where(genre: genre)
-  }
+  def reject_movie_action
+    @movie.update!(
+      validation_status: :rejected,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
 
-  scope :filter_by_year, ->(year) {
-    return all unless year.present?
-    where(year: year)
-  }
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Film rejeté' } }
+      format.html { redirect_to admin_movies_path, notice: 'Film rejeté' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_movies_path, alert: 'Erreur lors du rejet' }
+    end
+  end
 
-  scope :search, ->(query) {
-    return all unless query.present?
-    where("title ILIKE ? OR director ILIKE ?", "%#{query}%", "%#{query}%")
-  }
+  def update_movie_attributes
+    if @movie.update(movie_params)
+      redirect_to admin_movie_path(@movie), notice: 'Film mis à jour avec succès'
+    else
+      render :show, alert: 'Erreur lors de la mise à jour'
+    end
+  end
+
+  def movie_params
+    params.require(:movie).permit(:title, :synopsis, :director, :duration, :genre, :year, :validation_status)
+  end
 end

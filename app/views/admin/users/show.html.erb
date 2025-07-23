@@ -1,0 +1,87 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section pt-20 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_users_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Utilisateurs
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white"><%= @user.full_name.present? ? @user.full_name : @user.email %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- User Profile Header -->
+  <section class="user-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- User Avatar & Basic Info -->
+          <div class="lg:col-span-1">
+            <!-- Avatar -->
+            <div class="w-full max-w-xs mx-auto">
+              <div class="w-48 h-48 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-6xl font-bold mb-6 mx-auto">
+                <%= @user.full_name.present? ? @user.full_name.first(2).upcase : @user.email.first(2).upcase %>
+              </div>
+            </div>
+
+            <!-- Role Badge -->
+            <div class="text-center mb-6">
+              <% case @user.role %>
+              <% when 'admin' %>
+                <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-crown mr-2"></i>Administrateur
+                </span>
+              <% when 'creator' %>
+                <span class="px-6 py-3 bg-purple-500/20 text-purple-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-palette mr-2"></i>Créateur
+                </span>
+              <% else %>
+                <span class="px-6 py-3 bg-blue-500/20 text-blue-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-user mr-2"></i>Utilisateur
+                </span>
+              <% end %>
+            </div>
+
+            <!-- Action Buttons -->
+            <% if @user != current_user %>
+              <div class="space-y-3">
+                <% if @user.user? %>
+                  <%= button_to admin_user_path(@user, role: 'creator'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Promouvoir en créateur ?" } do %>
+                    <i class="fas fa-palette mr-2"></i>Promouvoir Créateur
+                  <% end %>
+                <% elsif @user.creator? %>
+                  <%= button_to admin_user_path(@user, role: 'admin'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Promouvoir en administrateur ?" } do %>
+                    <i class="fas fa-crown mr-2"></i>Promouvoir Admin
+                  <% end %>
+                <% elsif @user.admin? %>
+                  <%= button_to admin_user_path(@user, role: 'user'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Rétrograder cet administrateur ?" } do %>
+                    <i class="fas fa-arrow-down mr-2"></i>Rétrograder
+                  <% end %>
+                <% end %>
+
+                <%= button_to reset_password_admin_user_path(@user),
+                    method: :put,
+                    class: "w-full px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                    data: { confirm: "Réinitialiser le mot de passe ?" } do %>
+                  <i class="fas fa-key mr-2"></i>Réinitialiser MDP
+                <% end %>
+              </div>
+            <% end %>
+          </div>

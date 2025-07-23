@@ -61,3 +61,71 @@ class Admin::ParticipationsController < Admin::ApplicationController
       update_participation_attributes
     end
   end
+
+  # PATCH /admin/participations/bulk_confirm
+  def bulk_confirm
+    participation_ids = params[:participation_ids] || []
+
+    if participation_ids.any?
+      result = bulk_confirm_participations(participation_ids)
+
+      respond_to do |format|
+        format.json do
+          render json: {
+            status: 'success',
+            message: "#{result[:count]} participations confirmed successfully",
+            confirmed_count: result[:count]
+          }
+        end
+        format.html do
+          redirect_to admin_participations_path,
+                     notice: "#{result[:count]} participations confirmed successfully"
+        end
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'No participations selected' } }
+        format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
+      end
+    end
+  rescue StandardError => e
+    Rails.logger.error "Bulk confirm error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_participations_path, alert: 'Error confirming participations' }
+    end
+  end
+
+  # PATCH /admin/participations/bulk_cancel
+  def bulk_cancel
+    participation_ids = params[:participation_ids] || []
+
+    if participation_ids.any?
+      result = bulk_cancel_participations(participation_ids)
+
+      respond_to do |format|
+        format.json do
+          render json: {
+            status: 'success',
+            message: "#{result[:count]} participations cancelled successfully",
+            cancelled_count: result[:count]
+          }
+        end
+        format.html do
+          redirect_to admin_participations_path,
+                     notice: "#{result[:count]} participations cancelled successfully"
+        end
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'No participations selected' } }
+        format.html { redirect_to admin_participations_path, alert: 'No participations selected' }
+      end
+    end
+  rescue StandardError => e
+    Rails.logger.error "Bulk cancel error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_participations_path, alert: 'Error cancelling participations' }
+    end
+  end

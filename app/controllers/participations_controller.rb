@@ -1,50 +1,38 @@
-module ParticipationManagement
-  extend ActiveSupport::Concern
+class Admin::ParticipationsController < Admin::ApplicationController
+  include ParticipationManagement
+  before_action :set_participation, only: [ :show, :update ]
 
-  # Get all scopes for participation filtering - mirrors ActiveAdmin scopes
-  def participation_scopes
-    {
-      all: Participation.all,
-      pending: Participation.where(status: :pending),
-      confirmed: Participation.where(status: :confirmed),
-      cancelled: Participation.where(status: :cancelled)
-    }
-  end
+  # GET /admin/participations - mirrors ActiveAdmin index with scopes and filters
+  def index
+    # Apply scope filter (all/pending/confirmed/cancelled) - mirrors ActiveAdmin scopes
+    scope = params[:scope] || 'all'
+    @participations = participation_scopes[scope.to_sym] || participation_scopes[:all]
 
-  # Build participation query with includes for performance - mirrors ActiveAdmin index
-  def build_participation_query
-    Participation.includes(:user, :event, event: :movie)
-                 .order(created_at: :desc)
-  end
+    # Apply additional filters using concern method
+    @participations = filter_participations(params)
 
-  # Calculate total price for a participation - mirrors ActiveAdmin total_price column
-  def calculate_participation_total_price(participation)
-    return 0 unless participation.event&.price_cents && participation.seats
+    # Limit results for performance
+    @participations = @participations.limit(100)
 
-    (participation.event.price_cents * participation.seats) / 100.0
-  end
+    # Format data for display - mirrors ActiveAdmin columns
+    @formatted_participations = @participations.map { |p| format_participation_data(p) }
 
-  # Format participation display data - mirrors ActiveAdmin columns
-  def format_participation_data(participation)
-    {
-      id: participation.id,
-      user_name: participation.user&.full_name || 'Unknown User',
-      user_link: participation.user,
-      event_title: participation.event&.title || 'Unknown Event',
-      event_link: participation.event,
-      movie_title: participation.event&.movie&.title,
-      movie_link: participation.event&.movie,
-      event_date: participation.event&.event_date,
-      seats: participation.seats,
-      total_price: calculate_participation_total_price(participation),
-      formatted_total_price: format_currency(calculate_participation_total_price(participation)),
-      status: participation.status,
-      status_humanized: participation.status.humanize,
-      has_payment: participation.stripe_payment_id.present?,
-      payment_indicator: participation.stripe_payment_id.present? ? "✓" : "✗",
-      stripe_payment_id: participation.stripe_payment_id,
-      formatted_created_at: participation.created_at.strftime("%d/%m/%Y"),
-      created_at: participation.created_at,
-      updated_at: participation.updated_at
-    }
+    # Get statistics for dashboard - mirrors ActiveAdmin counters
+    @stats = calculate_participation_statistics
+
+    # Get revenue data for admin overview
+    @revenue_data = calculate_participation_revenue
+
+    # Get collections for filter dropdowns - mirrors ActiveAdmin form collections
+    @filter_collections = get_participation_form_collections
+    @filter_collections[:scopes] = participation_scopes.keys.map(&:to_s)
+
+    # Export data if requested
+    if params[:format] == 'csv'
+      @export_data = export_participation_data(@participations)
+      respond_to do |format|
+        format.csv { send_csv_data(@export_data) }
+      end
+      return
+    end
   end

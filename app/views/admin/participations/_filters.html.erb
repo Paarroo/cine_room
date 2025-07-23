@@ -1,0 +1,143 @@
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+
+      <!-- Scope Tabs (like ActiveAdmin) -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex space-x-1">
+          <%= link_to admin_participations_path(scope: 'all'),
+              class: "px-4 py-2 rounded-lg transition-colors #{'bg-primary text-white' if params[:scope].blank? || params[:scope] == 'all'} #{'hover:bg-white/10 text-gray-300' unless params[:scope].blank? || params[:scope] == 'all'}" do %>
+            Toutes (<%= @stats[:total] %>)
+          <% end %>
+
+          <%= link_to admin_participations_path(scope: 'pending'),
+              class: "px-4 py-2 rounded-lg transition-colors #{'bg-yellow-500 text-white' if params[:scope] == 'pending'} #{'hover:bg-white/10 text-gray-300' unless params[:scope] == 'pending'}" do %>
+            En attente (<%= @stats[:pending] %>)
+          <% end %>
+
+          <%= link_to admin_participations_path(scope: 'confirmed'),
+              class: "px-4 py-2 rounded-lg transition-colors #{'bg-green-500 text-white' if params[:scope] == 'confirmed'} #{'hover:bg-white/10 text-gray-300' unless params[:scope] == 'confirmed'}" do %>
+            Confirmées (<%= @stats[:confirmed] %>)
+          <% end %>
+
+          <%= link_to admin_participations_path(scope: 'cancelled'),
+              class: "px-4 py-2 rounded-lg transition-colors #{'bg-red-500 text-white' if params[:scope] == 'cancelled'} #{'hover:bg-white/10 text-gray-300' unless params[:scope] == 'cancelled'}" do %>
+            Annulées (<%= @stats[:cancelled] %>)
+          <% end %>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <%= link_to admin_participations_path,
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
+          <i class="fas fa-times mr-2"></i>Effacer les filtres
+        <% end %>
+      </div>
+
+      <!-- Advanced Filters Form -->
+      <%= form_with url: admin_participations_path, method: :get,
+          class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+          data: { turbo_frame: "_top" } do |form| %>
+
+        <!-- Preserve scope -->
+        <%= form.hidden_field :scope, value: params[:scope] %>
+
+        <!-- User Search -->
+        <div class="form-group">
+          <%= form.label :user_search, "Recherche Utilisateur", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.text_field :user_search,
+              value: params[:user_search],
+              placeholder: "Nom, email...",
+              class: "form-input" %>
+        </div>
+
+        <!-- Event Filter -->
+        <div class="form-group">
+          <%= form.label :event_id, "Événement", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :event_id,
+              options_for_select([
+                ['Tous les événements', '']
+              ] + @filter_collections[:events], params[:event_id]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="form-group">
+          <%= form.label :date_filter, "Période", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :date_filter,
+              options_for_select([
+                ['Toutes les dates', ''],
+                ['Aujourd\'hui', 'today'],
+                ['Cette semaine', 'week'],
+                ['Ce mois', 'month']
+              ], params[:date_filter]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Payment Filter -->
+        <div class="form-group">
+          <%= form.label :payment_filter, "Paiement", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :payment_filter,
+              options_for_select([
+                ['Tous les paiements', ''],
+                ['Avec paiement', 'with_payment'],
+                ['Sans paiement', 'without_payment']
+              ], params[:payment_filter]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group flex items-end">
+          <%= form.submit "Appliquer les filtres",
+              class: "w-full btn-primary" %>
+        </div>
+      <% end %>
+
+      <!-- Active Filters Display -->
+      <% active_filters = params.slice(:user_search, :event_id, :date_filter, :payment_filter).compact_blank %>
+      <% if active_filters.any? %>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="text-sm text-gray-400 mr-2">Filtres actifs :</span>
+
+            <% if params[:user_search].present? %>
+              <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs">
+                Utilisateur: "<%= params[:user_search] %>"
+              </span>
+            <% end %>
+
+            <% if params[:event_id].present? %>
+              <% event_title = @filter_collections[:events].find { |e| e[1].to_s == params[:event_id] }&.first %>
+              <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+                Événement: <%= truncate(event_title, length: 30) %>
+              </span>
+            <% end %>
+
+            <% if params[:date_filter].present? %>
+              <% date_label = {
+                'today' => 'Aujourd\'hui',
+                'week' => 'Cette semaine',
+                'month' => 'Ce mois'
+              }[params[:date_filter]] %>
+              <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+                Période: <%= date_label %>
+              </span>
+            <% end %>
+
+            <% if params[:payment_filter].present? %>
+              <% payment_label = {
+                'with_payment' => 'Avec paiement',
+                'without_payment' => 'Sans paiement'
+              }[params[:payment_filter]] %>
+              <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs">
+                Paiement: <%= payment_label %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

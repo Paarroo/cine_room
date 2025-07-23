@@ -92,3 +92,63 @@
             </span>
           </div>
         </div>
+
+        <!-- Participations Table -->
+        <% if @formatted_participations.any? %>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-white/10">
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">
+                    <input type="checkbox" class="w-4 h-4" data-admin-participations-target="selectAll">
+                  </th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Utilisateur</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Événement</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Film</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Date</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Places</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Prix Total</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Statut</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Paiement</th>
+                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @formatted_participations.each do |data| %>
+                  <%= render 'participation_row', data: data %>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <!-- Empty State -->
+          <div class="text-center py-12">
+            <i class="fas fa-ticket-alt text-6xl text-gray-600 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucune réservation trouvée</h3>
+            <p class="text-gray-500">
+              <% if params[:scope].present? && params[:scope] != 'all' %>
+                Aucune réservation avec le statut "<%= params[:scope] %>"
+              <% elsif params[:user_search].present? || params[:status].present? %>
+                Essayez de modifier vos critères de recherche
+              <% else %>
+                Aucune réservation n'a encore été effectuée
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+
+        <!-- Pagination -->
+        <% if @formatted_participations.count >= 100 %>
+          <div class="mt-8 text-center">
+            <p class="text-sm text-gray-400">
+              Affichage des 100 premiers résultats. Utilisez les filtres pour affiner votre recherche.
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Revenue Summary -->
+  <%= render 'revenue_summary' %>
+</div>

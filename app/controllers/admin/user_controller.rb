@@ -153,3 +153,89 @@ class Admin::UsersController < Admin::ApplicationController
       format.html { redirect_to admin_users_path, alert: 'Erreur lors de la promotion en masse' }
     end
   end
+
+  def bulk_demote
+    user_ids = params[:user_ids]
+    return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
+
+    users_to_demote = User.where(id: user_ids)
+    return redirect_to admin_users_path, alert: 'Utilisateurs non trouvés' if users_to_demote.empty?
+
+    # Check permissions
+    unauthorized_users = users_to_demote.reject { |user| can_modify_user?(user) }
+    if unauthorized_users.any?
+      return redirect_to admin_users_path,
+                        alert: "Vous n'avez pas les permissions pour modifier certains utilisateurs"
+    end
+
+    bulk_demote_users(user_ids)
+    log_user_action('bulk_demoted', nil, { count: user_ids.count, ids: user_ids })
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs rétrogradés" } }
+      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs rétrogradés" }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la rétrogradation en masse' }
+    end
+  end
+
+  def bulk_promote_to_creator
+    user_ids = params[:user_ids]
+    return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
+
+    bulk_promote_to_creator(user_ids)
+    log_user_action('bulk_promoted_to_creator', nil, { count: user_ids.count, ids: user_ids })
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs promus créateurs" } }
+      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs promus créateurs" }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la promotion en masse' }
+    end
+  end
+
+  # Export functionality
+  def export
+    users_scope = filter_users(params)
+    @export_data = export_users_data(users_scope)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          success: true,
+          data: @export_data,
+          filename: "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
+        }
+      end
+      format.csv do
+        send_data generate_csv(@export_data),
+                  filename: "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
+      end
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_users_path, alert: 'Erreur lors de l\'export' }
+    end
+  end
+
+  # Statistics endpoint
+  def stats
+    respond_to do |format|
+      format.json do
+        render json: {
+          stats: calculate_user_stats,
+          recent_signups: User.where(created_at: 1.week.ago..Time.current).count,
+          active_this_month: User.joins(:participations)
+                                 .where(participations: { created_at: 1.month.ago..Time.current })
+                                 .distinct.count
+        }
+      end
+    end
+  end

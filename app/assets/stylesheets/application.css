@@ -118,6 +118,25 @@ h6 {
   line-height: 1.2;
 }
 
+/* RATING STARS STYLE */
+.rating {
+  display: flex;
+  gap: 5px;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.star {
+  color: lightgray;
+  transition: color 0.2s;
+}
+
+.star.hovered,
+.star.selected {
+  color: gold;
+}
+
+
 /* GLASS EFFECTS */
 .glass-effect {
   background: rgba(255, 255, 255, 0.05);

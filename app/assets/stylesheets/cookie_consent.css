@@ -3,7 +3,7 @@
 /* Ensure cookie banner is always visible with high contrast */
 #cookie-consent-banner {
   background-color: #000000 !important;
-  border-top: 2px solid #ffffff !important;
+  border-top: 1px solid #3b82f6 !important;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
   z-index: 9999 !important;
 }
@@ -25,7 +25,7 @@
 
 .cookie-modal-content {
   background-color: #000000 !important;
-  border: 2px solid #ffffff !important;
+  border: 1px solid #10b981 !important;
 }
 
 /* Ensure modal scrolling works properly */
@@ -110,7 +110,7 @@ input:focus + .cookie-slider {
 
 input:checked + .cookie-slider:before {
   transform: translateX(24px);
-  border-color: white;
+  border-color: #10b981;
 }
 
 /* Ensure buttons are clickable and visible */
@@ -227,11 +227,11 @@ input:checked + .cookie-slider:before {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   #cookie-consent-banner {
-    border-top: 3px solid #ffffff !important;
+    border-top: 2px solid #3b82f6 !important;
   }
   
   .cookie-slider {
-    border: 2px solid #ffffff !important;
+    border: 1px solid #f59e0b !important;
   }
 }
 

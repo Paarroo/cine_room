@@ -9,6 +9,10 @@ puts " Seeding the database..."
 if Rails.env.production?
   puts "Production seeding - creating complete dataset without FactoryBot..."
   
+  # Disable welcome email during seeding only
+  puts "Disabling welcome emails for seeding process..."
+  User.skip_callback(:create, :after, :send_welcome_email)
+  
   puts "Cleaning database..."
   Review.destroy_all
   Participation.destroy_all
@@ -152,6 +156,10 @@ if Rails.env.production?
     end
   end
 
+  # Re-enable welcome email callback for normal user registration
+  puts "Re-enabling welcome emails for normal operation..."
+  User.set_callback(:create, :after, :send_welcome_email)
+  
   puts " Production seeding complete!"
   puts "Created:"
   puts "  Users: #{User.count} (#{User.where(role: 'admin').count} admin, #{User.where(role: 'creator').count} creators, #{User.where(role: 'user').count} users)"

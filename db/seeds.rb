@@ -155,8 +155,7 @@ if Rails.env.production?
         user: user,
         event: event,
         status: event.finished? ? 'confirmed' : ['pending', 'confirmed'].sample,
-        seats: rand(1..3),
-        total_price_cents: event.price_cents * rand(1..3)
+        seats: rand(1..3)
       )
     end
   end

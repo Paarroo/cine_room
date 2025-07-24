@@ -107,7 +107,7 @@ if Rails.env.production?
   events = []
   movies.each do |movie|
     rand(1..3).times do
-      event_date = Date.current + rand(7..30).days # Ensure it's at least 1 week from now
+      event_date = Date.current + rand(8..30).days # Ensure it's at least 8 days from now (more than 1 week)
       events << Event.create!(
         title: "Projection de #{movie.title}",
         description: "Venez découvrir ce magnifique film dans une ambiance conviviale.",

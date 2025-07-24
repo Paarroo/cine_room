@@ -50,7 +50,7 @@
             <% if @movie.pending? %>
               <div class="flex space-x-3 justify-center">
                 <!-- Validate Button -->
-                <%= button_to validate_movie_admin_movie_path(@movie),
+                <%= button_to validate_admin_movie_path(@movie),
                     method: :patch,
                     class: "flex-1 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
                     data: { confirm: "Valider ce film ?" } do %>
@@ -58,7 +58,7 @@
                 <% end %>
 
                 <!-- Reject Button -->
-                <%= button_to reject_movie_admin_movie_path(@movie),
+                <%= button_to reject_admin_movie_path(@movie),
                     method: :patch,
                     class: "flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
                     data: { confirm: "Rejeter ce film ?" } do %>

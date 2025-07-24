@@ -20,24 +20,6 @@
             <%= @stats[:total] %> films au total • <%= @stats[:pending] %> en attente
           </p>
         </div>
-
-        <!-- Bulk Actions -->
-        <div class="bulk-actions hidden" id="bulk-actions">
-          <button
-            class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
-            data-action="click->admin-movies#bulkValidate"
-          >
-            <i class="fas fa-check mr-2"></i>
-            Valider sélection
-          </button>
-          <button
-            class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
-            data-action="click->admin-movies#bulkReject"
-          >
-            <i class="fas fa-times mr-2"></i>
-            Rejeter sélection
-          </button>
-        </div>
       </div>
       </div>
     </div>
@@ -98,6 +80,8 @@
     </div>
   </section>
 
+  <!-- Filters Section -->
+  <%= render 'filters' %>
 
   <!-- Movies List -->
   <section class="movies-list py-8">
@@ -128,6 +112,24 @@
             <span class="text-sm text-gray-400">
               <%= @movies.count %> résultats
             </span>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions hidden" id="bulk-actions">
+              <button
+                class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
+                data-action="click->admin-movies#bulkValidate"
+              >
+                <i class="fas fa-check mr-2"></i>
+                Valider sélection
+              </button>
+              <button
+                class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
+                data-action="click->admin-movies#bulkReject"
+              >
+                <i class="fas fa-times mr-2"></i>
+                Rejeter sélection
+              </button>
+            </div>
           </div>
         </div>
 
@@ -163,6 +165,5 @@
     </div>
   </section>
 
-  <!-- Filters Section -->
-  <%= render 'filters' %>
+
 </div>

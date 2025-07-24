@@ -1,5 +1,5 @@
 <!-- Admin Navbar - Combined with positioning fix -->
-<nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50">
+<nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50 nav-blur border-b border-white/10">
   <div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-full">
 
@@ -64,11 +64,9 @@
             <div class="text-xs text-primary">Administrateur</div>
           </div>
         </div>
-
         <!-- Back to Site -->
-        <%= link_to "Retour au site", public_site_path,
-            class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
-
+        <%= button_to "Retour au site", public_site_path, method: :get,
+            class: "px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-xl transition-colors duration-200 font-medium" %>
         <!-- Logout -->
         <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
             class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-xl transition-colors duration-200 font-medium" %>
@@ -79,11 +77,11 @@
               data-action="click->navigation#toggleMenu">
         <i class="fas fa-bars text-white"></i>
       </button>
-    </div>
+    </div> <!-- ← Cette fermeture était manquante pour la div principale -->
   </div>
 
   <!-- Mobile Admin Menu -->
-  <div data-navigation-target="mobileMenu" class="lg:hidden hidden admin-mobile-menu">
+  <div data-navigation-target="mobileMenu" class="lg:hidden hidden nav-blur border-t border-white/10">
     <div class="px-4 py-6 space-y-2">
 
       <%= link_to admin_dashboard_index_path,
@@ -119,7 +117,7 @@
       <!-- Mobile Admin Actions -->
       <div class="border-t border-white/20 mt-4 pt-4">
         <%= link_to "Retour au site", public_site_path,
-            class: "admin-mobile-nav-link text-accent" %>
+            class: "admin-mobile-nav-link text-content" %>
 
         <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
             class: "w-full text-left admin-mobile-nav-link text-red-300 bg-red-500/10" %>

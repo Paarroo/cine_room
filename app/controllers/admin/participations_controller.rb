@@ -20,8 +20,6 @@ class Admin::ParticipationsController < Admin::ApplicationController
     @filter_options = get_participation_filter_options
     @revenue_data = calculate_participation_revenue
 
-    @revenue_data = calculate_participation_revenue
-
     # Additional data for dashboard
     @top_events = top_events_by_participation(5)
     @active_participants = most_active_participants(5)
@@ -29,7 +27,7 @@ class Admin::ParticipationsController < Admin::ApplicationController
   end
 
   def show
-    @participation_revenue = calculate_participation_revenue(@participation)
+    @participation_revenue = calculate_single_participation_revenue(@participation)
     @related_participations = Participation.joins(:event)
                                           .where(events: { id: @participation.event_id })
                                           .where.not(id: @participation.id)

@@ -1,27 +1,26 @@
 <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
   <!-- Checkbox -->
-  <td class="py-4 px-4">
+  <td class="py-4 px-2">
     <input
       type="checkbox"
-      class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-      data-admin-participations-target="participationCheckbox"
+      class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary participation-checkbox"
       data-participation-id="<%= data[:id] %>"
-      data-action="change->admin-participations#updateBulkActions"
+      onchange="updateBulkActions()"
     >
   </td>
 
   <!-- User -->
-  <td class="py-4 px-4">
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xs">
+  <td class="py-4 px-2">
+    <div class="flex items-center space-x-2 min-w-0">
+      <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
         <%= data[:user_name].present? ? data[:user_name].first(2).upcase : 'U' %>
       </div>
-      <div>
-        <div class="text-white font-medium text-sm">
+      <div class="min-w-0">
+        <div class="text-white font-medium text-sm truncate">
           <%= data[:user_name] %>
         </div>
         <% if data[:user_link]&.email %>
-          <div class="text-gray-400 text-xs">
+          <div class="text-gray-400 text-xs truncate">
             <%= data[:user_link].email %>
           </div>
         <% end %>
@@ -30,14 +29,14 @@
   </td>
 
   <!-- Event -->
-  <td class="py-4 px-4">
-    <div>
-      <div class="text-white font-medium text-sm">
+  <td class="py-4 px-2">
+    <div class="min-w-0">
+      <div class="text-white font-medium text-sm truncate">
         <%= link_to data[:event_title], admin_participation_path(data[:id]),
             class: "hover:text-primary transition-colors" %>
       </div>
       <% if data[:event_link]&.venue_name %>
-        <div class="text-gray-400 text-xs">
+        <div class="text-gray-400 text-xs truncate">
           <%= data[:event_link].venue_name %>
         </div>
       <% end %>
@@ -45,15 +44,15 @@
   </td>
 
   <!-- Movie -->
-  <td class="py-4 px-4">
+  <td class="py-4 px-2">
     <% if data[:movie_title].present? %>
-      <div class="flex items-center space-x-2">
-        <div class="w-6 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs">
-          <%= data[:movie_title].first %>
+      <div class="flex items-center space-x-2 min-w-0">
+        <div class="w-6 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+          <%= data[:movie_title].first(1) %>
         </div>
-        <div>
-          <div class="text-white text-sm">
-            <%= truncate(data[:movie_title], length: 20) %>
+        <div class="min-w-0">
+          <div class="text-white text-sm truncate">
+            <%= truncate(data[:movie_title], length: 15) %>
           </div>
           <% if data[:movie_link]&.year %>
             <div class="text-gray-400 text-xs">
@@ -68,10 +67,10 @@
   </td>
 
   <!-- Event Date -->
-  <td class="py-4 px-4">
+  <td class="py-4 px-2">
     <% if data[:event_date] %>
       <div class="text-white text-sm">
-        <%= data[:event_date].strftime("%d/%m/%Y") %>
+        <%= data[:event_date].strftime("%d/%m") %>
       </div>
       <div class="text-gray-400 text-xs">
         <%= data[:event_link]&.start_time&.strftime("%H:%M") %>
@@ -82,22 +81,22 @@
   </td>
 
   <!-- Seats -->
-  <td class="py-4 px-4">
-    <div class="flex items-center space-x-2">
+  <td class="py-4 px-2">
+    <div class="flex items-center space-x-1">
       <i class="fas fa-users text-gray-400 text-xs"></i>
       <span class="text-white font-medium"><%= data[:seats] %></span>
     </div>
   </td>
 
   <!-- Total Price -->
-  <td class="py-4 px-4">
-    <div class="text-primary font-semibold">
+  <td class="py-4 px-2">
+    <div class="text-primary font-semibold text-sm">
       <%= data[:formatted_total_price] %>
     </div>
   </td>
 
   <!-- Status -->
-  <td class="py-4 px-4">
+  <td class="py-4 px-2">
     <% case data[:status] %>
     <% when 'pending' %>
       <span class="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-lg text-xs font-medium">
@@ -115,63 +114,55 @@
   </td>
 
   <!-- Payment -->
-  <td class="py-4 px-4 text-center">
+  <td class="py-4 px-2 text-center">
     <% if data[:has_payment] %>
-      <div class="text-green-400" title="Paiement effectué: <%= data[:stripe_payment_id] %>">
+      <div class="text-green-400" title="Paiement effectué">
         <i class="fas fa-credit-card"></i>
       </div>
     <% else %>
-      <div class="text-gray-500" title="Aucun paiement enregistré">
+      <div class="text-gray-500" title="Aucun paiement">
         <i class="fas fa-credit-card"></i>
       </div>
     <% end %>
   </td>
 
   <!-- Actions -->
-  <td class="py-4 px-4">
-    <div class="flex items-center space-x-2">
+  <td class="py-4 px-2">
+    <div class="flex items-center space-x-1">
       <!-- View Button -->
       <%= link_to admin_participation_path(data[:id]),
-          class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors" do %>
+          class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
+          title: "Voir" do %>
         <i class="fas fa-eye"></i>
       <% end %>
 
-      <!-- Quick Action Buttons -->
+      <!-- Status-based single action -->
       <% case data[:status] %>
       <% when 'pending' %>
-        <!-- Confirm Button -->
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'confirmed' },
             class: "px-2 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors",
-            data: { confirm: "Confirmer cette réservation ?" } do %>
+            data: { confirm: "Confirmer ?" },
+            title: "Confirmer" do %>
           <i class="fas fa-check"></i>
         <% end %>
-
-        <!-- Cancel Button -->
-        <%= button_to admin_participation_path(data[:id]),
-            method: :patch,
-            params: { status: 'cancelled' },
-            class: "px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
-            data: { confirm: "Annuler cette réservation ?" } do %>
-          <i class="fas fa-times"></i>
-        <% end %>
       <% when 'confirmed' %>
-        <!-- Cancel Button -->
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'cancelled' },
             class: "px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
-            data: { confirm: "Annuler cette réservation confirmée ?" } do %>
+            data: { confirm: "Annuler ?" },
+            title: "Annuler" do %>
           <i class="fas fa-times"></i>
         <% end %>
       <% when 'cancelled' %>
-        <!-- Restore Button -->
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'pending' },
             class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
-            data: { confirm: "Remettre en attente cette réservation ?" } do %>
+            data: { confirm: "Remettre en attente ?" },
+            title: "Restaurer" do %>
           <i class="fas fa-undo"></i>
         <% end %>
       <% end %>

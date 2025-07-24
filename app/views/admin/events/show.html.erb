@@ -1,0 +1,44 @@
+<%= render 'admin/dashboard/navbar' %>
+
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb-section pt-20 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_events_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Événements
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white"><%= @event.title %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Event Header Section -->
+  <%= render 'event_header' %>
+
+  <!-- Event Details Section -->
+  <%= render 'event_details' %>
+
+  <!-- Participations Section -->
+  <% if @participations.any? %>
+    <%= render 'participations_section' %>
+  <% end %>
+
+  <!-- Event Actions Section -->
+  <%= render 'event_actions' %>
+
+  <!-- Back Navigation -->
+  <section class="back-section py-8">
+    <div class="container-app text-center">
+      <%= link_to admin_events_path, class: "btn-secondary" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Retour à la liste des événements
+      <% end %>
+    </div>
+  </section>
+</div>

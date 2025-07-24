@@ -9,6 +9,10 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    
+    <%# Conditional analytics and marketing scripts based on cookie consent %>
+    <%= render_analytics_scripts %>
+    <%= render_marketing_scripts %>
 
     <%# Icons %>
     <link rel="icon" href="/icon.png" type="image/png">
@@ -28,6 +32,7 @@
 
     <%# CSS - Single application.css file %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "cookie_consent", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -46,5 +51,11 @@
     </main>
 
     <%= render 'shared/footer' %>
+    
+    <!-- Cookie Consent Banner -->
+    <%= render 'shared/cookie_consent' if show_consent_banner? %>
+    
+    <!-- Cookie consent controller -->
+    <div data-controller="cookie-consent"></div>
   </body>
 </html>

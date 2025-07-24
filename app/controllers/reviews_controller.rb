@@ -18,8 +18,13 @@ class ReviewsController < ApplicationController
   def create
     @review = current_user.reviews.build(review_params.merge(event: @event, movie: @event.movie))
 
+    # Only allow review creation if event is finished
+    unless @event.finished?
+      redirect_to event_path(@event), alert: "Vous ne pouvez laisser un avis qu'après la fin de l'événement." and return
+    end
+
     if @review.save
-      redirect_to @event, notice: 'Thank you for your review!'
+      redirect_to @event, notice: 'Merci pour votre avis!'
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,7 +35,7 @@ class ReviewsController < ApplicationController
 
   def update
     if @review.update(review_params)
-      redirect_to @review.event, notice: 'Review updated successfully.'
+      redirect_to @review.event, notice: 'Avis modifié avec succés'
     else
       render :edit, status: :unprocessable_entity
     end

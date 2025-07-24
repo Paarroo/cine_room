@@ -95,7 +95,8 @@ if Rails.env.production?
         user: creator,
         validation_status: 'approved',
         validated_by: admin,
-        validated_at: Time.current
+        validated_at: Time.current,
+        authorship_confirmed: "1"
       )
       
       # Attach the default poster
@@ -114,11 +115,13 @@ if Rails.env.production?
   events = []
   movies.each do |movie|
     rand(1..3).times do
+      event_date = Date.current + rand(7..30).days # Ensure it's at least 1 week from now
       events << Event.create!(
         title: "Projection de #{movie.title}",
+        description: "Venez découvrir ce magnifique film dans une ambiance conviviale.",
         venue_name: ["Cinéma Le Grand Rex", "MK2 Bibliothèque", "Pathé Châtelet", "UGC Ciné Cité"].sample,
         venue_address: ["1 bd Poissonnière, Paris", "128-162 Av. de France, Paris", "Place du Châtelet, Paris", "19 Rue Berger, Paris"].sample,
-        event_date: Date.current + rand(1..30).days,
+        event_date: event_date,
         start_time: Time.current.change(hour: [18, 19, 20, 21].sample, min: [0, 30].sample),
         max_capacity: [20, 30, 40, 50].sample,
         price_cents: [800, 1000, 1200, 1500].sample,
@@ -130,18 +133,24 @@ if Rails.env.production?
 
   puts "Creating some completed events..."
   past_events = []
+  
   movies.sample(3).each do |movie|
-    past_events << Event.create!(
+    past_event_date = Date.current - rand(30..90).days
+    event = Event.new(
       title: "Projection de #{movie.title} (passée)",
+      description: "Projection terminée avec succès.",
       venue_name: "Cinéma Vintage",
       venue_address: "15 Rue de la Paix, Paris",
-      event_date: Date.current - rand(30..90).days,
+      event_date: past_event_date,
       start_time: Time.current.change(hour: 20, min: 0),
       max_capacity: 25,
       price_cents: 1000,
       status: 'finished',
       movie: movie
     )
+    # Save without validations to bypass date validation
+    event.save!(validate: false)
+    past_events << event
   end
 
   puts "Creating participations..."
@@ -191,7 +200,7 @@ if Rails.env.production?
   puts " Production seeding complete!"
   puts "Created:"
   puts "  Users: #{User.count} (#{User.where(role: 'admin').count} admin, #{User.where(role: 'creator').count} creators, #{User.where(role: 'user').count} users)"
-  puts "  Movies: #{Movie.count}"
+  puts "  Movies: #{Movie.count} (#{Movie.where(validation_status: 'approved').count} approved)"
   puts "  Events: #{Event.count} (#{Event.where(status: 'upcoming').count} upcoming, #{Event.where(status: 'finished').count} finished)"
   puts "  Participations: #{Participation.count}"
   puts "  Reviews: #{Review.count}"

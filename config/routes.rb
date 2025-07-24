@@ -37,6 +37,9 @@ Rails.application.routes.draw do
         get :refresh
         get :quick_stats
         post :export
+        post :export_data
+        post :backup_database
+        post :toggle_maintenance_mode
       end
     end
 

@@ -208,3 +208,188 @@
               </div>
             </div>
           </div>
+
+          <!-- Status Management Section -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-cog text-primary mr-3"></i>
+              Gestion du statut
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Current Status Display -->
+              <div class="form-group">
+                <label class="form-label">Statut actuel</label>
+                <div class="p-4 bg-white/5 rounded-xl">
+                  <div class="flex items-center space-x-3">
+                    <% case @event.status %>
+                    <% when 'upcoming' %>
+                      <i class="fas fa-calendar-plus text-blue-400 text-xl"></i>
+                      <span class="text-blue-400 font-semibold">À venir</span>
+                    <% when 'completed' %>
+                      <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                      <span class="text-green-400 font-semibold">Terminé</span>
+                    <% when 'sold_out' %>
+                      <i class="fas fa-star text-yellow-400 text-xl"></i>
+                      <span class="text-yellow-400 font-semibold">Complet</span>
+                    <% when 'cancelled' %>
+                      <i class="fas fa-times-circle text-red-400 text-xl"></i>
+                      <span class="text-red-400 font-semibold">Annulé</span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Change -->
+              <div class="form-group">
+                <%= form.label :status, "Modifier le statut", class: "form-label" %>
+                <%= form.select :status,
+                    [
+                      ['À venir', 'upcoming'],
+                      ['Terminé', 'completed'],
+                      ['Complet', 'sold_out'],
+                      ['Annulé', 'cancelled']
+                    ],
+                    { selected: @event.status },
+                    {
+                      class: "form-input",
+                      data: { action: "change->admin-form#confirmStatusChange" }
+                    } %>
+                <div class="text-sm text-gray-400 mt-1">
+                  ⚠️ Attention : Changer le statut peut affecter les participants
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Statistics -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-chart-bar text-primary mr-3"></i>
+              Statistiques actuelles
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-blue-400 mb-1">
+                  <%= @event.participations.count %>
+                </div>
+                <div class="text-sm text-gray-400">Réservations</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-green-400 mb-1">
+                  <%= @event.participations.where(status: :confirmed).sum(:seats) %>
+                </div>
+                <div class="text-sm text-gray-400">Places vendues</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-yellow-400 mb-1">
+                  <%= @event.max_capacity - @event.participations.where(status: :confirmed).sum(:seats) %>
+                </div>
+                <div class="text-sm text-gray-400">Places restantes</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-accent mb-1">
+                  <%= number_to_currency(@event.participations.where(status: :confirmed).sum("#{@event.price_cents} * participations.seats") / 100.0) %>
+                </div>
+                <div class="text-sm text-gray-400">Revenus</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions pt-8 border-t border-white/10">
+            <div class="flex flex-col sm:flex-row gap-4 justify-between">
+              <!-- Cancel & Back -->
+              <div class="flex gap-4">
+                <%= link_to admin_event_path(@event),
+                    class: "btn-secondary" do %>
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Annuler
+                <% end %>
+
+                <%= link_to admin_events_path,
+                    class: "px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-xl transition-colors font-semibold flex items-center" do %>
+                  <i class="fas fa-list mr-2"></i>
+                  Liste des événements
+                <% end %>
+              </div>
+
+              <!-- Save Actions -->
+              <div class="flex gap-4">
+                <%= form.submit "Sauvegarder les modifications",
+                    class: "btn-primary",
+                    data: {
+                      admin_form_target: "submitButton",
+                      confirm: "Êtes-vous sûr de vouloir sauvegarder ces modifications ?"
+                    } %>
+
+                <button type="button"
+                        class="px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center"
+                        data-action="click->admin-form#saveDraft">
+                  <i class="fas fa-save mr-2"></i>
+                  Sauvegarder brouillon
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-6">
+        <h3 class="text-xl font-bold text-white mb-4">Actions rapides</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- View Event -->
+          <%= link_to admin_event_path(@event),
+              class: "flex items-center justify-center px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors" do %>
+            <i class="fas fa-eye mr-2"></i>
+            Voir l'événement
+          <% end %>
+
+          <!-- Manage Participants -->
+          <%= link_to admin_participations_path(event_id: @event.id),
+              class: "flex items-center justify-center px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors" do %>
+            <i class="fas fa-users mr-2"></i>
+            Gérer les participants
+          <% end %>
+
+          <!-- Delete Event -->
+          <%= button_to admin_event_path(@event),
+              method: :delete,
+              class: "flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full",
+              data: { confirm: "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible." } do %>
+            <i class="fas fa-trash mr-2"></i>
+            Supprimer l'événement
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+.form-label {
+  @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors;
+}
+
+.form-section {
+  @apply bg-white/5 rounded-2xl p-8;
+}
+
+.form-group {
+  @apply space-y-2;
+}
+</style>

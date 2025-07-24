@@ -36,6 +36,6 @@ module CineRoom
 
     config.i18n.available_locales = [ :fr, :en ]
     config.i18n.default_locale = :fr
-    config.middleware.use MaintenanceMode
+    # config.middleware.use MaintenanceMode
   end
 end

@@ -39,7 +39,7 @@ Rails.application.routes.draw do
         post :export
         post :export_data
         post :backup_database
-        post :toggle_maintenance_mode
+        # post :toggle_maintenance_mode
       end
     end
 

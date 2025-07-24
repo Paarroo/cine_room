@@ -41,7 +41,8 @@ class Event < ApplicationRecord
   }
 
   def self.filter_by(params)
-    by_title(params[:q])
+    upcoming
+      .by_title(params[:q])
       .by_genre(params[:genre])
       .by_venue(params[:venue])
       .by_date_filter(params[:date_filter])

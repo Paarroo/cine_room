@@ -1,5 +1,7 @@
-module Admin
-  class DashboardController < Admin::ApplicationController
+module DashboardManagement
+    extend ActiveSupport::Concern
+
+    included do
     include ActionView::Helpers::NumberHelper
     include ActionView::Helpers::DateHelper
 

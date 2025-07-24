@@ -179,6 +179,13 @@ class Admin::EventsController < Admin::ApplicationController
     end
   end
 
+  def edit
+      # @event already set by before_action
+      # Prepare form data if needed
+      @movies = Movie.where(validation_status: :approved).order(:title)
+      @venues = Event.distinct.pluck(:venue_name).compact.sort
+    end
+
   # Update event attributes
   def update_event_attributes
     if @event.update(event_params)
@@ -221,7 +228,6 @@ class Admin::EventsController < Admin::ApplicationController
         type: 'participation',
         title: 'Nouvelle réservation',
         description: "#{participation.user&.full_name} - #{participation.seats} place(s)",
-        time_ago: time_ago_in_words(participation.created_at),
         status: participation.status,
         created_at: participation.created_at
       }
@@ -307,12 +313,12 @@ class Admin::EventsController < Admin::ApplicationController
 
   # Calculate booking conversion rate
   def calculate_booking_conversion_rate(event)
-    total_views = event.view_count || 0
+    total_users = User.count
     total_bookings = event.participations.where(status: [ :confirmed, :attended ]).count
 
-    return 0 if total_views.zero?
+    return 0 if total_users.zero?
 
-    (total_bookings.to_f / total_views * 100).round(2)
+    (total_bookings.to_f / total_users * 100).round(2)
   end
 
   # Calculate daily bookings pattern

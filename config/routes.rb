@@ -156,6 +156,7 @@ Rails.application.routes.draw do
   resources :events do
     resources :participations, only: [ :new, :create, :destroy ] do
       member do
+        get :edit
         patch :confirm
         patch :cancel
       end

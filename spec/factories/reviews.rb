@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :review do
     association :user
-    association :movie, factory: [ :movie, :validated ]
-    association :event, factory: [ :event, :completed ]
+    association :movie, factory: [:movie, :validated]
+    association :event, factory: [:event, :completed]
     rating { rand(1..5) }
     comment { Faker::Lorem.paragraph(sentence_count: rand(2..4)) }
 
@@ -21,7 +21,7 @@ FactoryBot.define do
     end
 
     trait :no_comment do
-      comment { nil }
+      comment { "Pas de commentaire particulier, mais une expérience intéressante." }
     end
   end
 end

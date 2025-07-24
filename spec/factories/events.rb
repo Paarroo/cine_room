@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :event do
-    association :movie, factory: [ :movie, :validated ]
+    association :movie, factory: [:movie, :validated]
     title { "Projection de #{movie.title}" }
     description { Faker::Lorem.paragraph(sentence_count: 3) }
     venue_name { Faker::Company.name + " Cinema" }

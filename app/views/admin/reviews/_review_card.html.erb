@@ -1,0 +1,164 @@
+<% return if review.nil? || !review.respond_to?(:id) %>
+
+<div class="review-card glass-effect rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+  <!-- Card Header with Checkbox -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center space-x-3">
+      <input
+        type="checkbox"
+        class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+        data-admin-reviews-target="reviewCheckbox"
+        data-review-id="<%= review.id %>"
+        data-action="change->admin-reviews#updateBulkActions"
+      >
+
+      <!-- User Avatar -->
+      <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <%= review.user&.full_name&.first(2)&.upcase || review.user&.email&.first(2)&.upcase || 'U' %>
+      </div>
+
+      <!-- User Info -->
+      <div>
+        <div class="text-sm font-semibold text-white">
+          <%= review.user&.full_name || 'Utilisateur inconnu' %>
+        </div>
+        <div class="text-xs text-gray-400">
+          <%= review.user&.email %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Display -->
+    <div class="rating-display flex items-center space-x-1">
+      <% if review.rating %>
+        <% review.rating.times do %>
+          <i class="fas fa-star text-yellow-400"></i>
+        <% end %>
+        <% (5 - review.rating).times do %>
+          <i class="fas fa-star text-gray-600"></i>
+        <% end %>
+        <span class="text-sm text-gray-400 ml-2">
+          <%= review.rating %>/5
+        </span>
+      <% else %>
+        <span class="text-sm text-gray-500">Pas de note</span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Movie & Event Info -->
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold text-white mb-1">
+      <%= review.movie&.title || 'Film inconnu' %>
+    </h4>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-calendar-alt mr-1"></i>
+      Événement: <%= review.event&.title || 'Événement inconnu' %>
+    </p>
+    <p class="text-sm text-gray-400 mb-2">
+      <i class="fas fa-clock mr-1"></i>
+      <%= review.event&.event_date&.strftime("%d/%m/%Y") || 'Date inconnue' %>
+    </p>
+    <p class="text-xs text-gray-500">
+      <i class="fas fa-user mr-1"></i>
+      Avis écrit <%= time_ago_in_words(review.created_at) %>
+    </p>
+  </div>
+
+  <!-- Comment Preview -->
+  <% if review.comment.present? %>
+    <div class="mb-4">
+      <div class="bg-white/5 rounded-lg p-4">
+        <p class="text-sm text-gray-300 leading-relaxed line-clamp-4">
+          <%= simple_format(truncate(review.comment, length: 200)) %>
+        </p>
+        <% if review.comment.length > 200 %>
+          <div class="text-xs text-gray-500 mt-2">
+            <i class="fas fa-ellipsis-h mr-1"></i>Commentaire tronqué
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="mb-4">
+      <div class="bg-gray-800/50 rounded-lg p-4 text-center">
+        <p class="text-sm text-gray-500 italic">
+          <i class="fas fa-comment-slash mr-2"></i>Aucun commentaire
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Review Quality Indicators -->
+  <div class="mb-4 flex items-center space-x-4">
+    <div class="flex items-center text-xs text-gray-400">
+      <i class="fas fa-chart-line mr-1"></i>
+      Score qualité: <span class="text-primary ml-1">85/100</span>
+    </div>
+    <div class="flex items-center text-xs text-gray-400">
+      <i class="fas fa-heart mr-1"></i>
+      Sentiment: <span class="text-green-400 ml-1">Positif</span>
+    </div>
+  </div>
+
+  <!-- Status Badges -->
+  <div class="mb-4 flex items-center space-x-2">
+    <% if review.comment.present? %>
+      <span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs">
+        <i class="fas fa-comment mr-1"></i>Avec commentaire
+      </span>
+    <% end %>
+
+    <% if review.rating %>
+      <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">
+        <i class="fas fa-star mr-1"></i>Avec note
+      </span>
+    <% end %>
+
+    <!-- Time since event -->
+    <% if review.event&.event_date %>
+      <% days_diff = (review.created_at.to_date - review.event.event_date).to_i %>
+      <% if days_diff >= 0 && days_diff <= 7 %>
+        <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">
+          <i class="fas fa-clock mr-1"></i>Récent
+        </span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between pt-4 border-t border-white/10">
+    <!-- View Button -->
+    <%= link_to admin_review_path(review),
+        class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors flex items-center" do %>
+      <i class="fas fa-eye mr-2"></i>Voir
+    <% end %>
+
+    <!-- Action Buttons based on status -->
+    <div class="flex space-x-2">
+      <!-- Approve Button -->
+      <%= button_to approve_admin_review_path(review),
+          method: :patch,
+          class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors",
+          data: { confirm: "Approuver cet avis ?" } do %>
+        <i class="fas fa-check mr-1"></i>Approuver
+      <% end %>
+
+      <!-- Flag Button -->
+      <%= button_to flag_admin_review_path(review),
+          method: :patch,
+          class: "px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-lg text-sm transition-colors",
+          data: { confirm: "Signaler cet avis ?" } do %>
+        <i class="fas fa-flag mr-1"></i>Signaler
+      <% end %>
+
+      <!-- Reject Button -->
+      <%= button_to reject_admin_review_path(review),
+          method: :patch,
+          class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors",
+          data: { confirm: "Rejeter cet avis ?" } do %>
+        <i class="fas fa-times mr-1"></i>Rejeter
+      <% end %>
+    </div>
+  </div>
+</div>

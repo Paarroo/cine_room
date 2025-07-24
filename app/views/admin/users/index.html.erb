@@ -11,32 +11,32 @@
         <!-- Title Section -->
         <div class="flex-1 min-width-0">
           <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
-            <i class="fas fa-film mr-4"></i>
-            Gestion des Films
+            <i class="fas fa-users mr-4"></i>
+            Gestion des Utilisateurs
           </h1>
           <p class="text-xl text-gray-300 mb-2">
-            Administration et validation des contenus
+            Administration et gestion des rôles
           </p>
           <p class="text-gray-400 text-base">
-            <%= @stats[:total] %> films au total • <%= @stats[:pending] %> en attente
+            <%= @stats[:total] %> utilisateurs au total • <%= @stats[:admins] %> administrateurs
           </p>
         </div>
 
           <!-- Bulk Actions -->
           <div class="bulk-actions hidden" id="bulk-actions">
             <button
-              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
-              data-action="click->admin-movies#bulkValidate"
+              class="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors"
+              data-action="click->admin-users#bulkPromoteCreator"
             >
-              <i class="fas fa-check mr-2"></i>
-              Valider sélection
+              <i class="fas fa-palette mr-2"></i>
+              Promouvoir créateur
             </button>
             <button
               class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
-              data-action="click->admin-movies#bulkReject"
+              data-action="click->admin-users#bulkPromoteAdmin"
             >
-              <i class="fas fa-times mr-2"></i>
-              Rejeter sélection
+              <i class="fas fa-crown mr-2"></i>
+              Promouvoir admin
             </button>
           </div>
         </div>
@@ -51,67 +51,69 @@
         <div class="metric-card glass-effect rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-              <i class="fas fa-film text-blue-400 text-xl"></i>
+              <i class="fas fa-users text-blue-400 text-xl"></i>
             </div>
           </div>
           <div class="text-3xl font-bold text-blue-400 mb-2">
             <%= @stats[:total] %>
           </div>
-          <div class="text-sm text-gray-400">Total Films</div>
+          <div class="text-sm text-gray-400">Total Utilisateurs</div>
         </div>
 
         <div class="metric-card glass-effect rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center">
-              <i class="fas fa-clock text-yellow-400 text-xl"></i>
+            <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-crown text-red-400 text-xl"></i>
             </div>
           </div>
-          <div class="text-3xl font-bold text-yellow-400 mb-2">
-            <%= @stats[:pending] %>
+          <div class="text-3xl font-bold text-red-400 mb-2">
+            <%= @stats[:admins] %>
           </div>
-          <div class="text-sm text-gray-400">En Attente</div>
+          <div class="text-sm text-gray-400">Administrateurs</div>
+        </div>
+
+        <div class="metric-card glass-effect rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+              <i class="fas fa-palette text-purple-400 text-xl"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-purple-400 mb-2">
+            <%= @stats[:creators] %>
+          </div>
+          <div class="text-sm text-gray-400">Créateurs</div>
         </div>
 
         <div class="metric-card glass-effect rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
             <div class="w-12 h-12 bg-green-400/10 rounded-xl flex items-center justify-center">
-              <i class="fas fa-check text-green-400 text-xl"></i>
+              <i class="fas fa-user-check text-green-400 text-xl"></i>
             </div>
           </div>
           <div class="text-3xl font-bold text-green-400 mb-2">
-            <%= @stats[:approved] %>
+            <%= @stats[:active_users] %>
           </div>
-          <div class="text-sm text-gray-400">Validés</div>
-        </div>
-
-        <div class="metric-card glass-effect rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-red-400/10 rounded-xl flex items-center justify-center">
-              <i class="fas fa-times text-red-400 text-xl"></i>
-            </div>
-          </div>
-          <div class="text-3xl font-bold text-red-400 mb-2">
-            <%= @stats[:rejected] %>
-          </div>
-          <div class="text-sm text-gray-400">Rejetés</div>
+          <div class="text-sm text-gray-400">Utilisateurs Actifs</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Filters Section -->
+  <%= render 'filters' %>
 
-  <!-- Movies List -->
-  <section class="movies-list py-8">
+  <!-- Users List -->
+  <section class="users-list py-8">
     <div class="container-app">
       <div
         class="glass-effect rounded-3xl p-6"
-        data-controller="admin-movies"
+        data-controller="admin-users"
       >
         <!-- List Header -->
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold text-white">
             <i class="fas fa-list text-primary mr-2"></i>
-            Liste des Films
+            Liste des Utilisateurs
           </h3>
 
           <!-- Select All Checkbox -->
@@ -120,34 +122,34 @@
               <input
                 type="checkbox"
                 class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-                data-admin-movies-target="selectAll"
-                data-action="change->admin-movies#toggleSelectAll"
+                data-admin-users-target="selectAll"
+                data-action="change->admin-users#toggleSelectAll"
               >
               <span class="text-sm text-gray-400">Tout sélectionner</span>
             </label>
 
             <span class="text-sm text-gray-400">
-              <%= @movies.count %> résultats
+              <%= @users.count %> résultats
             </span>
           </div>
         </div>
 
-        <!-- Movies Grid -->
+        <!-- Users Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          <% if @movies.any? %>
-            <% @movies.each do |movie| %>
-              <%= render 'movie_card', movie: movie %>
+          <% if @users.any? %>
+            <% @users.each do |user| %>
+              <%= render 'user_card', user: user %>
             <% end %>
           <% else %>
             <!-- Empty State -->
             <div class="col-span-full text-center py-12">
-              <i class="fas fa-film text-6xl text-gray-600 mb-4"></i>
-              <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucun film trouvé</h3>
+              <i class="fas fa-users text-6xl text-gray-600 mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucun utilisateur trouvé</h3>
               <p class="text-gray-500">
-                <% if params[:q].present? || params[:status].present? %>
+                <% if params[:q].present? || params[:role].present? %>
                   Essayez de modifier vos critères de recherche
                 <% else %>
-                  Aucun film n'a encore été soumis
+                  Aucun utilisateur n'est encore inscrit
                 <% end %>
               </p>
             </div>
@@ -155,15 +157,12 @@
         </div>
 
         <!-- Pagination -->
-        <% if @movies.respond_to?(:total_pages) && @movies.total_pages > 1 %>
+        <% if @users.respond_to?(:total_pages) && @users.total_pages > 1 %>
           <div class="mt-8 flex justify-center">
-            <%= paginate @movies, theme: 'twitter_bootstrap_4' %>
+            <%= paginate @users, theme: 'twitter_bootstrap_4' %>
           </div>
         <% end %>
       </div>
     </div>
   </section>
-
-  <!-- Filters Section -->
-  <%= render 'filters' %>
 </div>

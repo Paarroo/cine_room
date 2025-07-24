@@ -37,6 +37,9 @@ Rails.application.routes.draw do
         get :refresh
         get :quick_stats
         post :export
+        post :export_data
+        post :backup_database
+        # post :toggle_maintenance_mode
       end
     end
 
@@ -71,7 +74,24 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :reviews, only: [ :index, :show, :update ]
+    resources :reviews do
+          member do
+            patch :approve
+            patch :reject
+            patch :flag
+          end
+
+          collection do
+            patch :bulk_approve
+            patch :bulk_reject
+            patch :bulk_delete
+            get :analytics
+            get :export
+            get :stats
+            get :quality_report
+            get :sentiment_analysis
+          end
+        end
 
     get 'notifications/poll', to: 'notifications#poll'
 
@@ -137,6 +157,7 @@ Rails.application.routes.draw do
   resources :events do
     resources :participations, only: [ :new, :create, :destroy ] do
       member do
+        get :edit
         patch :confirm
         patch :cancel
       end

@@ -1,0 +1,173 @@
+<% return if participation.nil? || !participation.respond_to?(:id) %>
+
+<div class="participation-card glass-effect rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+  <!-- Card Header with Checkbox -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center space-x-3">
+      <input
+        type="checkbox"
+        class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+        data-admin-participations-target="participationCheckbox"
+        data-participation-id="<%= participation.id %>"
+        data-action="change->admin-participations#updateBulkActions"
+      >
+
+      <!-- User Avatar -->
+      <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <%= participation.user&.full_name&.first(2)&.upcase || participation.user&.email&.first(2)&.upcase || 'U' %>
+      </div>
+
+      <!-- User Info -->
+      <div>
+        <div class="text-sm font-semibold text-white">
+          <%= participation.user&.full_name || 'Utilisateur inconnu' %>
+        </div>
+        <div class="text-xs text-gray-400">
+          <%= participation.user&.email %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge">
+      <% case participation.status %>
+      <% when 'confirmed' %>
+        <span class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
+          <i class="fas fa-check mr-1"></i>Confirmé
+        </span>
+      <% when 'pending' %>
+        <span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-medium">
+          <i class="fas fa-clock mr-1"></i>En attente
+        </span>
+      <% when 'cancelled' %>
+        <span class="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-medium">
+          <i class="fas fa-times mr-1"></i>Annulé
+        </span>
+      <% when 'attended' %>
+        <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
+          <i class="fas fa-user-check mr-1"></i>Présent
+        </span>
+      <% else %>
+        <span class="px-3 py-1 bg-gray-500/20 text-gray-300 rounded-full text-xs font-medium">
+          <i class="fas fa-question mr-1"></i>Inconnu
+        </span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Event Info -->
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold text-white mb-2">
+      <%= participation.event&.title || 'Événement inconnu' %>
+    </h4>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-film mr-1"></i>
+      Film: <%= participation.event&.movie&.title || 'Film inconnu' %>
+    </p>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-calendar mr-1"></i>
+      <%= participation.event&.event_date&.strftime("%d/%m/%Y à %H:%M") || 'Date inconnue' %>
+    </p>
+    <p class="text-sm text-gray-400 mb-2">
+      <i class="fas fa-map-marker-alt mr-1"></i>
+      <%= participation.event&.venue_name || 'Lieu inconnu' %>
+    </p>
+
+    <!-- Booking Info -->
+    <p class="text-xs text-gray-500">
+      <i class="fas fa-clock mr-1"></i>
+      Réservé <%= time_ago_in_words(participation.created_at) %>
+    </p>
+  </div>
+
+  <!-- Participation Details -->
+  <div class="mb-4 grid grid-cols-2 gap-4">
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-lg font-bold text-primary"><%= participation.seats %></div>
+      <div class="text-xs text-gray-400">Place<%= 's' if participation.seats > 1 %></div>
+    </div>
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-lg font-bold text-green-400">
+        <%= number_to_currency((participation.event&.price_cents || 0) * participation.seats / 100.0) %>
+      </div>
+      <div class="text-xs text-gray-400">Total</div>
+    </div>
+  </div>
+
+  <!-- Payment Status -->
+  <div class="mb-4 p-3 bg-white/5 rounded-lg">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-gray-400">Paiement</span>
+      <% if participation.stripe_payment_id.present? %>
+        <span class="flex items-center text-green-400 text-sm">
+          <i class="fas fa-credit-card mr-2"></i>Payé
+        </span>
+      <% else %>
+        <span class="flex items-center text-red-400 text-sm">
+          <i class="fas fa-credit-card mr-2"></i>Non payé
+        </span>
+      <% end %>
+    </div>
+    <% if participation.stripe_payment_id.present? %>
+      <div class="text-xs text-gray-500 mt-1">
+        ID: <%= participation.stripe_payment_id %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Lead Time Info -->
+  <% if participation.event&.event_date %>
+    <% days_diff = (participation.event.event_date - participation.created_at.to_date).to_i %>
+    <div class="mb-4 p-3 bg-white/5 rounded-lg">
+      <div class="text-sm text-gray-400">Délai de réservation</div>
+      <div class="text-sm text-white">
+        <%= days_diff %> jour<%= 's' if days_diff.abs > 1 %>
+        <%= days_diff >= 0 ? 'avant l\'événement' : 'après l\'événement' %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between pt-4 border-t border-white/10">
+    <!-- View Button -->
+    <%= link_to admin_participation_path(participation),
+        class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors flex items-center" do %>
+      <i class="fas fa-eye mr-2"></i>Voir
+    <% end %>
+
+    <!-- Action Buttons based on status -->
+    <div class="flex space-x-2">
+      <% if participation.pending? %>
+        <!-- Confirm Button -->
+        <%= button_to confirm_admin_participation_path(participation),
+            method: :patch,
+            class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Confirmer cette participation ?" } do %>
+          <i class="fas fa-check mr-1"></i>Confirmer
+        <% end %>
+
+        <!-- Cancel Button -->
+        <%= button_to cancel_admin_participation_path(participation),
+            method: :patch,
+            class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Annuler cette participation ?" } do %>
+          <i class="fas fa-times mr-1"></i>Annuler
+        <% end %>
+      <% elsif participation.confirmed? %>
+        <!-- Mark as Attended -->
+        <%= button_to mark_attended_admin_participation_path(participation),
+            method: :patch,
+            class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors",
+            data: { confirm: "Marquer comme présent ?" } do %>
+          <i class="fas fa-user-check mr-1"></i>Présent
+        <% end %>
+      <% else %>
+        <!-- Already processed indicator -->
+        <span class="text-xs text-gray-500 flex items-center">
+          <i class="fas fa-info-circle mr-1"></i>
+          Traité
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

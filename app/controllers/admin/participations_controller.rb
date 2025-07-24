@@ -212,7 +212,7 @@ class Admin::ParticipationsController < Admin::ApplicationController
     participation.update!(status: :cancelled)
   end
 
-  def calculate_participation_revenue(participation)
+  def calculate_single_participation_revenue(participation)
     return 0 unless participation.event&.price_cents && participation.seats
     (participation.event.price_cents * participation.seats) / 100.0
   end

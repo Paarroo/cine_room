@@ -71,7 +71,24 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :reviews, only: [ :index, :show, :update ]
+    resources :reviews do
+          member do
+            patch :approve
+            patch :reject
+            patch :flag
+          end
+
+          collection do
+            patch :bulk_approve
+            patch :bulk_reject
+            patch :bulk_delete
+            get :analytics
+            get :export
+            get :stats
+            get :quality_report
+            get :sentiment_analysis
+          end
+        end
 
     get 'notifications/poll', to: 'notifications#poll'
 

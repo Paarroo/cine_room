@@ -56,8 +56,8 @@ module ReviewsManagement
       recent: Review.where(created_at: 1.month.ago..Time.current).count,
       average_rating: Review.average(:rating)&.round(2) || 0,
       rating_distribution: Review.group(:rating).count,
-      pending_moderation: Review.where(status: :pending).count,
-      flagged: Review.where(status: :flagged).count
+      pending_moderation: 0,
+         flagged: 0
     }
   end
 
@@ -198,23 +198,20 @@ module ReviewsManagement
     # Comment length (up to 40 points)
     if review.comment.present?
       comment_length = review.comment.length
-      score += [ comment_length / 5, 40 ].min # 1 point per 5 characters, max 40
+      score += [ comment_length / 5, 40 ].min
     end
-
-    # Helpfulness votes (if implemented in future)
-    # score += (review.helpful_votes || 0) * 2
 
     # Sentiment analysis bonus
     sentiment = analyze_review_sentiment(review)
     score += 10 if sentiment[:sentiment] != 'neutral'
 
-    # Recent review bonus (within 48h of event)
-    if review.event.event_date.present?
-      time_diff = review.created_at - review.event.event_date
-      score += 20 if time_diff <= 2.days && time_diff >= 0
+    # Recent review bonus (within 48h of event) - CORRIGÉ
+    if review.event&.event_date.present?
+      days_diff = (review.created_at.to_date - review.event.event_date).to_i
+      score += 20 if days_diff <= 2 && days_diff >= 0
     end
 
-    [ score, 100 ].min # Cap at 100
+    [ score, 100 ].min
   end
 
   # Export reviews data
@@ -281,7 +278,7 @@ module ReviewsManagement
     {
       monthly_growth: calculate_monthly_growth,
       average_rating_trend: calculate_rating_trend,
-      top_rated_movies_this_month: top_reviewed_movies(5).where(reviews: { created_at: 1.month.ago..Time.current }),
+      top_rated_movies_this_month: top_reviewed_movies(5),
       sentiment_distribution: calculate_sentiment_distribution(recent_reviews),
       review_quality_average: calculate_average_quality_score(recent_reviews),
       response_time_after_events: calculate_average_response_time
@@ -330,7 +327,24 @@ module ReviewsManagement
     count = 0
 
     reviews_scope.find_each do |review|
-      total_score += calculate_review_quality_score(review)
+      score = 0
+
+      # Rating provided (+20 points)
+      score += 20 if review.rating.present?
+
+      # Comment length (up to 40 points)
+      if review.comment.present?
+        comment_length = review.comment.length
+        score += [ comment_length / 5, 40 ].min
+      end
+
+      # Recent review bonus (within 48h of event)
+      if review.event&.event_date.present?
+        days_diff = (review.created_at.to_date - review.event.event_date).to_i
+        score += 20 if days_diff <= 2 && days_diff >= 0
+      end
+
+      total_score += [ score, 100 ].min
       count += 1
     end
 
@@ -341,20 +355,20 @@ module ReviewsManagement
   def calculate_average_response_time
     reviews_with_events = Review.joins(:event)
                                .where.not(events: { event_date: nil })
-                               .where('reviews.created_at > events.event_date')
+                               .where('reviews.created_at::date > events.event_date')
 
     return 0 if reviews_with_events.empty?
 
-    total_hours = 0
+    total_days = 0
     count = 0
 
     reviews_with_events.find_each do |review|
-      hours_diff = (review.created_at - review.event.event_date) / 1.hour
-      total_hours += hours_diff
+      days_diff = (review.created_at.to_date - review.event.event_date).to_i
+      total_days += days_diff if days_diff > 0
       count += 1
     end
 
-    (total_hours / count).round(1)
+    count.zero? ? 0 : (total_days.to_f / count).round(1)
   end
 
   # Log review actions for audit

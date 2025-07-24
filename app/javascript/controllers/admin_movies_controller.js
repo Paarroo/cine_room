@@ -83,7 +83,8 @@ export default class extends Controller {
       return
     }
 
-    await this.performBulkAction('/admin/movies/bulk_validate', selectedIds, 'validation')
+    // Pour les actions bulk, on traite les films un par un
+    await this.performBulkValidation(selectedIds)
   }
 
   // Bulk reject selected movies
@@ -99,7 +100,8 @@ export default class extends Controller {
       return
     }
 
-    await this.performBulkAction('/admin/movies/bulk_reject', selectedIds, 'rejet')
+    // Pour les actions bulk, on traite les films un par un
+    await this.performBulkRejection(selectedIds)
   }
 
   // Individual movie validation
@@ -113,7 +115,7 @@ export default class extends Controller {
     button.disabled = true
 
     try {
-      const response = await fetch(`/admin/movies/${movieId}/validate_movie`, {
+      const response = await fetch(`/admin/movies/${movieId}/validate`, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
@@ -149,7 +151,7 @@ export default class extends Controller {
     button.disabled = true
 
     try {
-      const response = await fetch(`/admin/movies/${movieId}/reject_movie`, {
+      const response = await fetch(`/admin/movies/${movieId}/reject`, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
@@ -181,34 +183,73 @@ export default class extends Controller {
       .map(checkbox => checkbox.dataset.movieId)
   }
 
-  async performBulkAction(url, movieIds, actionType) {
-    try {
-      const response = await fetch(url, {
-        method: 'PATCH',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-Token': this.getCSRFToken()
-        },
-        body: JSON.stringify({ movie_ids: movieIds })
-      })
+  async performBulkValidation(movieIds) {
+    let successCount = 0
+    let errorCount = 0
 
-      const result = await response.json()
+    for (const movieId of movieIds) {
+      try {
+        const response = await fetch(`/admin/movies/${movieId}/validate`, {
+          method: 'PATCH',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': this.getCSRFToken()
+          }
+        })
 
-      if (response.ok) {
-        this.showToast(result.message, 'success')
-
-        // Refresh the page to show updated status
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
-      } else {
-        throw new Error(result.message || `Erreur lors du ${actionType}`)
+        if (response.ok) {
+          successCount++
+          this.refreshMovieCard(movieId, 'approved')
+        } else {
+          errorCount++
+        }
+      } catch (error) {
+        console.error('Validation error:', error)
+        errorCount++
       }
-    } catch (error) {
-      console.error(`Bulk ${actionType} error:`, error)
-      this.showToast(error.message, 'error')
+    }
+
+    if (successCount > 0) {
+      this.showToast(`${successCount} film(s) validé(s) avec succès`, 'success')
+    }
+    if (errorCount > 0) {
+      this.showToast(`${errorCount} erreur(s) lors de la validation`, 'error')
+    }
+  }
+
+  async performBulkRejection(movieIds) {
+    let successCount = 0
+    let errorCount = 0
+
+    for (const movieId of movieIds) {
+      try {
+        const response = await fetch(`/admin/movies/${movieId}/reject`, {
+          method: 'PATCH',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': this.getCSRFToken()
+          }
+        })
+
+        if (response.ok) {
+          successCount++
+          this.refreshMovieCard(movieId, 'rejected')
+        } else {
+          errorCount++
+        }
+      } catch (error) {
+        console.error('Rejection error:', error)
+        errorCount++
+      }
+    }
+
+    if (successCount > 0) {
+      this.showToast(`${successCount} film(s) rejeté(s) avec succès`, 'success')
+    }
+    if (errorCount > 0) {
+      this.showToast(`${errorCount} erreur(s) lors du rejet`, 'error')
     }
   }
 

@@ -72,6 +72,9 @@ class Movie < ApplicationRecord
   end
 
   def prevent_update_if_approved
+    # Allow admin validation status changes
+    return if validation_status_changed?
+    
     if self.approved?
       errors.add(:base, "Un film approuvé ne peut plus être modifié.")
       throw(:abort)

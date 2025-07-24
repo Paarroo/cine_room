@@ -1,0 +1,141 @@
+<%#
+  Metric Card Content Partial - Internal content structure for metric cards
+  Used by metric_card partial to maintain DRY principles
+%>
+
+<div class="metric-card-header flex items-center justify-between mb-4">
+  <!-- Icon -->
+  <div class="metric-icon w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+    <i class="<%= icon %> text-xl"></i>
+  </div>
+
+  <!-- Trend Indicator -->
+  <% if trend %>
+    <div class="metric-trend <%= trend_class %> px-2 py-1 rounded-full text-xs font-medium flex items-center">
+      <% if trend_type == 'positive' %>
+        <i class="fas fa-arrow-up mr-1"></i>
+      <% elsif trend_type == 'negative' %>
+        <i class="fas fa-arrow-down mr-1"></i>
+      <% else %>
+        <i class="fas fa-minus mr-1"></i>
+      <% end %>
+      <%= trend %>
+    </div>
+  <% end %>
+</div>
+
+<div class="metric-card-body">
+  <!-- Main Value -->
+  <div class="metric-value text-3xl font-bold font-display mb-2 transition-all duration-300">
+    <%= value %>
+  </div>
+
+  <!-- Title -->
+  <div class="metric-title text-sm font-medium text-content mb-1">
+    <%= title %>
+  </div>
+
+  <!-- Subtitle (optional) -->
+  <% if subtitle %>
+    <div class="metric-subtitle text-xs text-muted">
+      <%= subtitle %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Hover Effect Indicator -->
+<div class="metric-card-footer mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+  <div class="flex items-center text-xs text-muted">
+    <i class="fas fa-external-link-alt mr-2"></i>
+    <span>Voir détails</span>
+  </div>
+</div>
+
+<!-- Loading Overlay (hidden by default) -->
+<div class="metric-loading absolute inset-0 bg-surface/80 backdrop-blur-sm rounded-2xl flex items-center justify-center opacity-0 transition-opacity duration-300 pointer-events-none">
+  <div class="loading-spinner w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+</div>
+
+<%# Inline styles for metric-specific animations %>
+<style>
+  .metric-card.refreshing .metric-loading {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .metric-card .value-updated {
+    animation: valueUpdate 1.5s ease-out;
+  }
+
+  .metric-card .trend-updated {
+    animation: trendPulse 2s ease-out;
+  }
+
+  @keyframes valueUpdate {
+    0% {
+      background-color: rgba(245, 158, 11, 0.2);
+      transform: scale(1);
+    }
+    50% {
+      background-color: rgba(245, 158, 11, 0.3);
+      transform: scale(1.05);
+    }
+    100% {
+      background-color: transparent;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes trendPulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .metric-value {
+      font-size: 1.875rem; /* text-3xl -> text-2xl on mobile */
+    }
+
+    .metric-icon {
+      width: 2.5rem; /* w-12 -> w-10 on mobile */
+      height: 2.5rem;
+    }
+
+    .metric-icon i {
+      font-size: 1rem; /* text-xl -> text-lg on mobile */
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .metric-card {
+      border-width: 2px;
+    }
+
+    .metric-trend {
+      border: 1px solid currentColor;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .metric-card,
+    .metric-icon,
+    .metric-value,
+    .metric-loading {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .metric-card:hover {
+      transform: none !important;
+    }
+  }
+</style>

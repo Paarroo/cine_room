@@ -1,5 +1,5 @@
 class Admin::MoviesController < Admin::ApplicationController
-  before_action :set_movie, only: [ :show, :update ]
+  before_action :set_movie, only: [ :show, :update, :validate, :reject ]
 
   def index
     @movies_query = Movie.includes(:user, :events, :reviews)
@@ -42,6 +42,44 @@ class Admin::MoviesController < Admin::ApplicationController
     else
       # Regular movie update
       update_movie_attributes
+    end
+  end
+
+  # Validate action for RESTful route
+  def validate
+    @movie.update!(
+      validation_status: :approved,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Film validé avec succès' } }
+      format.html { redirect_to admin_movies_path, notice: 'Film validé avec succès' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_movies_path, alert: 'Erreur lors de la validation' }
+    end
+  end
+
+  # Reject action for RESTful route
+  def reject
+    @movie.update!(
+      validation_status: :rejected,
+      validated_by: current_user,
+      validated_at: Time.current
+    )
+
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'Film rejeté' } }
+      format.html { redirect_to admin_movies_path, notice: 'Film rejeté' }
+    end
+  rescue StandardError => e
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message } }
+      format.html { redirect_to admin_movies_path, alert: 'Erreur lors du rejet' }
     end
   end
 

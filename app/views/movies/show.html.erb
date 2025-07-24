@@ -83,22 +83,19 @@
       <% end %>
 
       <!-- Avis -->
-      <% if @movie.reviews.any? %>
-        <div>
-          <h2 class="text-2xl font-bold mb-4">Avis</h2>
+      <div class="mt-16">
+        <h2 class="text-2xl font-bold mb-4">Avis</h2>
+
+        <% if @movie.reviews.any? %>
           <div class="space-y-6">
-            <% @movie.reviews.order(created_at: :desc).each do |review| %>
-              <div class="p-4 bg-white/5 border border-white/10 rounded-xl text-gray-300">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-semibold"><%= review.user.first_name %></span>
-                  <span class="text-yellow-400"><i class="fas fa-star mr-1"></i><%= review.rating %>/5</span>
-                </div>
-                <p class="text-sm"><%= review.comment %></p>
-              </div>
-            <% end %>
+            <!-- Render all reviews using the shared partial -->
+            <%= render partial: "reviews/review_card", collection: @movie.reviews.order(created_at: :desc), as: :review, locals: { show_event_context: true } %>
           </div>
-        </div>
-      <% end %>
+        <% else %>
+          <p class="text-gray-400">Aucun avis pour le moment. Soyez le premier à donner votre opinion !</p>
+        <% end %>
+      </div>
+
 
     </div>
   </section>

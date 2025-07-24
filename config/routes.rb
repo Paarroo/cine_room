@@ -149,6 +149,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :events do
+    resources :reviews, only: [:new, :create, :edit, :update, :destroy]
+  end
+
+
   get '/contact', to: 'pages#contact', as: :contact
   get '/legal', to: 'pages#legal', as: :legal
   get '/privacy', to: 'pages#privacy', as: :privacy

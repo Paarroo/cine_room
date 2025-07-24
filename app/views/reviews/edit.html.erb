@@ -1,10 +1,35 @@
-<% content_for :title, "Editing review" %>
+<div class="max-w-3xl mx-auto my-44 px-4">
+  <!-- Movie presentation -->
+  <div class="flex flex-col md:flex-row items-start gap-6 mb-8 bg-white/5 rounded-2xl p-6 border border-white/10">
+    <% movie = @review.movie || @review.event&.movie %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing review</h1>
+    <% if movie.present? %>
+      <!-- Movie poster -->
+      <div class="w-32 h-48 rounded-xl overflow-hidden flex-shrink-0">
+        <% if movie.poster.attached? %>
+          <%= image_tag movie.poster.variant(resize_to_fill: [192, 288]).processed,
+              alt: "#{movie.title} poster",
+              class: "w-full h-full object-cover" %>
+        <% else %>
+          <%= image_tag "default-poster.jpg",
+              alt: "Default poster",
+              class: "w-full h-full object-cover" %>
+        <% end %>
+      </div>
 
-  <%= render "form", review: @review %>
+      <!-- Movie details -->
+      <div class="flex-1 text-gray-300">
+        <h1 class="text-2xl font-bold text-white mb-2"><%= movie.title %></h1>
+        <p class="text-sm mb-2 text-gray-400">
+          Réalisé par <%= movie.director.presence || "#{movie.user.first_name} #{movie.user.last_name}" %>
+        </p>
+        <% if movie.synopsis.present? %>
+          <p class="text-sm leading-relaxed"><%= truncate(movie.synopsis, length: 300) %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 
-  <%= link_to "Show this review", @review, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to reviews", reviews_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+  <!-- Review form (edit mode) -->
+  <%= render 'form', review: @review %>
 </div>

@@ -8,7 +8,7 @@ class Event < ApplicationRecord
   validates :max_capacity, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :price_cents, numericality: { greater_than: 0 }
 
-  enum :status, { upcoming: 0, sold_out: 1, completed: 2, cancelled: 3 }, default: :upcoming
+  enum :status, { upcoming: 0, sold_out: 1, ongoing: 2, finished: 3, cancelled: 4 }, default: :upcoming
 
   before_save :update_status_if_sold_out
 

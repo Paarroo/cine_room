@@ -32,45 +32,70 @@ Rails.application.routes.draw do
   namespace :admin do
     root 'dashboard#index'
 
-    resources :dashboard, only: [ :index ] do
+    # Main Dashboard
+    resources :dashboard, only: [ :index ]
+
+    # Separated stats
+    resources :stats, only: [ :index ] do
       collection do
+        get :quick
         get :refresh
-        get :quick_stats
-        post :export
-        post :export_data
-        post :backup_database
-        # post :toggle_maintenance_mode
       end
     end
 
-    resources :movies, only: [ :index, :show, :update ] do
-      member do
-        patch :validate_movie
-        patch :reject_movie
-      end
-
+    # Exports
+    resources :exports, only: [ :create ] do
       collection do
-        patch :bulk_validate
-        patch :bulk_reject
+        post :data
       end
     end
 
-    resources :events, only: [ :index, :show, :update ] do
+    # Backups
+    resources :backups, only: [ :create ]
+
+    # Movies RESTful
+    resources :movies do
       member do
-        patch :toggle_status
+        patch :validate
+        patch :reject
+      end
+
+      # Validations bulk nested
+      resources :validations, only: [ :create ] do
+        collection do
+          patch :bulk
+        end
+      end
+
+      resources :rejections, only: [ :create ] do
+        collection do
+          patch :bulk
+        end
       end
     end
 
-    resources :users, only: [ :index, :show, :update ] do
-      member do
-        patch :toggle_role
-      end
+    # Events with status
+    resources :events do
+      resource :status, only: [ :show, :update ]
     end
 
-    resources :participations, only: [ :index, :show, :update ] do
-      collection do
-        patch :bulk_confirm
-        patch :bulk_cancel
+    # Users role
+    resources :users do
+      resource :role, only: [ :show, :update ]
+    end
+
+    # Participations with confirmation
+    resources :participations do
+      resources :confirmations, only: [ :create ] do
+        collection do
+          patch :bulk
+        end
+      end
+
+      resources :cancellations, only: [ :create ] do
+        collection do
+          patch :bulk
+        end
       end
     end
 
@@ -95,14 +120,19 @@ Rails.application.routes.draw do
 
     get 'notifications/poll', to: 'notifications#poll'
 
-    get 'reports', to: 'reports#index'
-    get 'reports/revenue', to: 'reports#revenue'
-    get 'reports/users', to: 'reports#users'
-    get 'reports/events', to: 'reports#events'
+    # Reports
+    resources :reports, only: [ :index ] do
+      collection do
+        get :revenue
+        get :users
+        get :events
+      end
+    end
 
-    get 'system/status', to: 'system#status'
-    post 'system/backup', to: 'system#backup'
-    post 'system/maintenance', to: 'system#toggle_maintenance'
+    # System
+    resources :system_status, only: [ :show ], path: 'system/status'
+    resources :system_backups, only: [ :create ], path: 'system/backup'
+    resources :maintenance_modes, only: [ :create, :destroy ], path: 'system/maintenance'
   end
 
   namespace :users do
@@ -143,15 +173,14 @@ Rails.application.routes.draw do
     end
 
     member do
-      patch :validate_movie
-      patch :reject_movie
+      patch :validate
+      patch :reject
     end
 
-    collection do
-      get :search
-      get :by_genre
-      get :featured
-    end
+    # Recherches/filters
+    resources :searches, only: [ :index ], path: 'search'
+    resources :genre_filters, only: [ :index ], path: 'by_genre'
+    resources :featured_selections, only: [ :index ], path: 'featured'
   end
 
   resources :events do
@@ -163,38 +192,32 @@ Rails.application.routes.draw do
       end
     end
 
-    member do
-      get :availability
-      patch :toggle_status
-    end
+    # State action
+    resource :status, only: [ :show, :update ]
+    resources :availabilities, only: [ :show ]
+
+    resources :searches, only: [ :index ]
+    resources :filters, only: [ :index ]
+    resources :calendars, only: [ :index ]
 
     collection do
-      get :search
-      get :filter
-      get :calendar
       get :upcoming
       get :past
     end
   end
 
   resources :creators do
-    member do
-      get :portfolio
-      get :events
-    end
+    resources :portfolios, only: [ :show ]
+    resources :creator_events, only: [ :index ], path: 'events'
 
-    collection do
-      get :featured
-      get :search
-    end
+    resources :featured_selections, only: [ :index ], path: 'featured'
+    resources :searches, only: [ :index ]
   end
 
   resources :participations, only: [ :index, :show ] do
-    member do
-      get :qr_code
-      get :ticket
-      patch :check_in
-    end
+    resources :qr_codes, only: [ :show ]
+    resources :tickets, only: [ :show ]
+    resources :check_ins, only: [ :create ]
 
     collection do
       get :upcoming
@@ -204,11 +227,9 @@ Rails.application.routes.draw do
   end
 
   resources :reviews, only: [ :index, :show ] do
-    member do
-      patch :like
-      patch :unlike
-      patch :report
-    end
+    # Actions d'interaction comme ressources nested
+    resources :likes, only: [ :create, :destroy ]
+    resources :reports, only: [ :create ]
 
     collection do
       get :recent
@@ -217,11 +238,9 @@ Rails.application.routes.draw do
   end
 
   resources :reservations, only: [ :show, :create ] do
-    member do
-      get :confirmation
-      get :qr_code
-      patch :cancel
-    end
+    resources :confirmations, only: [ :show ]
+    resources :qr_codes, only: [ :show ]
+    resources :cancellations, only: [ :create ]
   end
 
   get "/reservation/success", to: "reservations#success", as: :reservation_success
@@ -229,15 +248,15 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :events, only: [ :index, :show ] do
-        get :availability, on: :member
+        resources :availabilities, only: [ :show ]
       end
 
       resources :movies, only: [ :index, :show ] do
-        get :search, on: :collection
+        resources :searches, only: [ :index ]
       end
 
       resources :users, only: [ :show ] do
-        get :dashboard_stats, on: :member
+        resources :dashboard_stats, only: [ :show ]
       end
     end
   end

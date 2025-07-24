@@ -1,0 +1,20 @@
+<div class="fixed top-20 right-6 flex justify-center">
+  <% flash.each do |type, message| %>
+    <% next if message.blank? %>
+    <% color = {
+      notice: "bg-green-500/10 text-green-300 border-green-500/30",
+      alert: "bg-red-500/10 text-red-300 border-red-500/30",
+      info: "bg-blue-500/10 text-blue-300 border-blue-500/30",
+      warning: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+    }[type.to_sym] || "bg-gray-700 text-white border-gray-600" %>
+
+    <div
+      data-controller="flash"
+      data-flash-timeout-value="8000"
+      class="max-w-xl px-4 py-3 rounded-xl border text-sm font-medium flex items-center gap-2 shadow-md <%= color %>"
+    >
+      <i class="fas fa-info-circle"></i>
+      <%= message %>
+    </div>
+  <% end %>
+</div>

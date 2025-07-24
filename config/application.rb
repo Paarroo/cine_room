@@ -19,7 +19,7 @@ module CineRoom
     config.autoload_lib(ignore: %w[assets tasks])
 
     config.assets.precompile += %w( active_admin.css active_admin.js )
-
+    config.action_controller.raise_on_missing_callback_actions = false
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -29,8 +29,13 @@ module CineRoom
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.assets.paths << Rails.root.join("app", "assets", "stylesheets")
-       config.assets.paths << Rails.root.join("app", "assets", "javascripts")
+    config.assets.paths << Rails.root.join("app", "assets", "javascripts")
+    config.assets.paths << Rails.root.join("app/assets/images")
 
-       config.assets.css_compressor = nil
+    config.assets.css_compressor = nil
+
+    config.i18n.available_locales = [ :fr, :en ]
+    config.i18n.default_locale = :fr
+    # config.middleware.use MaintenanceMode
   end
 end

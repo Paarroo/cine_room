@@ -1,0 +1,74 @@
+<section class="recent-activity py-8">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-8">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="text-xl font-bold text-white">
+      <i class="fas fa-clock text-accent mr-2"></i>
+      Activité Récente
+    </h3>
+    <span class="text-sm text-gray-400">Aujourd'hui</span>
+  </div>
+
+  <div class="space-y-4 recent-activity">
+    <% if @recent_activities.any? %>
+      <% @recent_activities.each do |activity| %>
+        <div class="activity-item flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
+          <div class="w-10 h-10 bg-<%= activity[:color] %>/20 rounded-xl flex items-center justify-center">
+            <i class="fas fa-<%= activity[:icon] %> text-<%= activity[:color] %>"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-white">
+              <%= activity[:title] %>
+            </p>
+            <p class="text-xs text-gray-400">
+              <%= activity[:description] %>
+            </p>
+          </div>
+          <div class="text-xs text-gray-500">
+            <%= activity[:time_ago] %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <!-- Fallback content with real data -->
+      <% Participation.includes(:user, :event).order(created_at: :desc).limit(3).each do |participation| %>
+        <div class="activity-item flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
+          <div class="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
+            <i class="fas fa-ticket-alt text-primary"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-white">
+              Nouvelle réservation
+            </p>
+            <p class="text-xs text-gray-400">
+              <%= participation.user&.full_name || 'Utilisateur' %> •
+              <%= participation.event&.title || 'Événement' %>
+            </p>
+          </div>
+          <div class="text-xs text-gray-500">
+            <%= time_ago_in_words(participation.created_at) %>
+          </div>
+        </div>
+      <% end %>
+
+      <% Movie.includes(:user).order(created_at: :desc).limit(2).each do |movie| %>
+        <div class="activity-item flex items-center space-x-4 p-3 bg-white/5 rounded-xl">
+          <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+            <i class="fas fa-film text-blue-400"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-white">
+              Nouveau film ajouté
+            </p>
+            <p class="text-xs text-gray-400">
+              "<%= movie.title %>" par <%= movie.user&.full_name || 'Créateur' %>
+            </p>
+          </div>
+          <div class="text-xs text-gray-500">
+            <%= time_ago_in_words(movie.created_at) %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</section>

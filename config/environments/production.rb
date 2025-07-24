@@ -8,7 +8,7 @@ Rails.application.configure do
    config.assets.compile = true
    config.assets.digest = true
    config.serve_static_assets = true
-
+   config.action_controller.raise_on_missing_callback_actions = false
    # Desable redentials
    config.require_master_key = false
   # Settings specified here will take precedence over those in config/application.rb.
@@ -39,7 +39,7 @@ Rails.application.configure do
   config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudinary
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
@@ -87,20 +87,28 @@ Rails.application.configure do
   # config/environments/production.rb
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'cineroom-4a08b0587adb.herokuapp.com', protocol: 'https' }
+  config.action_mailer.default_url_options = { host: 'cineroom-95309b4cb0ca.herokuapp.com/', protocol: 'https' }
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address:              "in-v3.mailjet.com",
-    port:                 587,
-    domain:               "cineroom.com", 
-    user_name:            ENV["SMTP_USERNAME"],
-    password:             ENV["SMTP_PASSWORD"],
-    authentication:       "plain",
-    enable_starttls_auto: true
-  }
-
-
+    # config.action_mailer.delivery_method = :smtp
+    # config.action_mailer.smtp_settings = {
+    #   address:              "in-v3.mailjet.com",
+    #   port:                 587,
+    #   domain:               "cineroom.com",
+    #   user_name:            ENV["SMTP_USERNAME"],
+    #   password:             ENV["SMTP_PASSWORD"],
+    #   authentication:       "plain",
+    #   enable_starttls_auto: true
+    # }
 
 
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: "smtp.gmail.com",
+      port: 587,
+      domain: "https://cineroom-95309b4cb0ca.herokuapp.com/",
+      authentication: "plain",
+      enable_starttls_auto: true,
+      user_name: ENV["GMAIL_USERNAME"],
+      password: ENV["GMAIL_PASSWORD"]
+    }
 end

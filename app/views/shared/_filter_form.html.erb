@@ -1,0 +1,57 @@
+<%= form_with url: url, method: :get,
+              data: { controller: "filters", action: "change->filters#submit" } do |f| %>
+
+  <div class="glass-effect rounded-2xl p-6 mb-16">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <% if options[:search] %>
+        <div class="relative">
+          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <%= f.text_field :q, placeholder: "Rechercher...",
+              value: params[:q],
+              class: "w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400" %>
+        </div>
+      <% end %>
+
+      <% if options[:genres] %>
+        <%= f.select :genre,
+            [["🎭 Tous les genres", ""]] + options[:genres].map { |g| [g, g] },
+            { selected: params[:genre] },
+            class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+      <% end %>
+
+      <% if options[:years] %>
+        <%= f.select :year,
+            [["📅 Toutes les années", ""]] + options[:years].map { |y| [y, y] },
+            { selected: params[:year] },
+            class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+      <% end %>
+
+      <% if options[:directors] %>
+        <%= f.select :director,
+            [["🎬 Tous les réalisateurs", ""]] + options[:directors].map { |d| [d, d] },
+            { selected: params[:director] },
+            class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+      <% end %>
+
+      <% if options[:venues] %>
+        <%= f.select :venue,
+            [["📍 Tous les lieux", ""]] + options[:venues].map { |v| [v, v] },
+            { selected: params[:venue] },
+            class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+      <% end %>
+
+      <% if options[:date_filter] %>
+        <%= f.select :date_filter,
+            [["🗓️ Toutes les dates", ""], ["Cette semaine", "week"], ["Ce mois", "month"]],
+            { selected: params[:date_filter] },
+            class: "px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" %>
+      <% end %>
+    </div>
+
+    <div class="text-right">
+      <%= link_to "Réinitialiser les filtres", url, class: "text-sm text-gray-400 hover:underline" %>
+    </div>
+  </div>
+
+<% end %>

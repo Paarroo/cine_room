@@ -1,26 +1,37 @@
 <section class="py-20 lg:py-32 bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
     <!-- Header -->
-    <div class="text-center mb-16">
-      <h2 class="text-4xl lg:text-6xl font-bold mb-6">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl lg:text-6xl font-bold mb-4">
         <span class="gradient-text">Films</span> à l'affiche
       </h2>
-      <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto">
         Explorez notre collection de films sélectionnés avec soin.
       </p>
     </div>
 
-    <!-- Movies Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <% @movies.each do |movie| %>
-        <%= render partial: "movies/movie_card", locals: { movie: movie } %>
+    <!-- Turbo Frame for filters + results -->
+    <turbo-frame id="movies_results">
+      
+      <!-- Filter Form -->
+      <%= render partial: "shared/filter_form", locals: { url: movies_path, options: default_filter_options(:movies) } %>
+
+      <!-- Movies Grid -->
+      <% if @movies.any? %>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <% @movies.each do |movie| %>
+            <%= render partial: "movies/movie_card", locals: { movie: movie } %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-center text-lg text-gray-400 italic mt-12">Aucun film ne correspond à vos critères.</p>
       <% end %>
-    </div>
+    </turbo-frame>
 
     <!-- CTA -->
     <div class="text-center mt-16">
-      <%= link_to "Proposer un film", new_movie_path, class: "px-8 py-4 bg-gradient-to-r from-cinema-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
+      <%= link_to "Proposer un film", new_movie_path,
+        class: "px-8 py-4 bg-gradient-to-r from-cinema-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
     </div>
   </div>
 </section>

@@ -1,0 +1,120 @@
+<% return if movie.nil? || !movie.respond_to?(:id) %>
+
+<div class="movie-card glass-effect rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+  <!-- Card Header with Checkbox -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center space-x-3">
+      <input
+        type="checkbox"
+        class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
+        data-admin-movies-target="movieCheckbox"
+        data-movie-id="<%= safe_id(movie) %>"
+        data-action="change->admin-movies#updateBulkActions"
+      >
+
+      <!-- Movie Poster Placeholder -->
+      <div class="w-16 h-20 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-xs">
+        <%= safe_movie_title(movie).first(2).upcase %>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge">
+      <%= movie_status_badge(movie) %>
+    </div>
+  </div>
+
+  <!-- Movie Info -->
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold text-white mb-2 truncate">
+      <%= safe_movie_title(movie) %>
+    </h4>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-user mr-1"></i>
+      <%= safe_movie_director(movie) %>
+    </p>
+    <p class="text-sm text-gray-400 mb-1">
+      <i class="fas fa-calendar mr-1"></i>
+      <%= safe_movie_year(movie) %> • <%= safe_movie_duration(movie) %> min
+    </p>
+    <p class="text-sm text-gray-400 mb-2">
+      <i class="fas fa-tag mr-1"></i>
+      <%= safe_movie_genre(movie) %>
+    </p>
+
+    <!-- Creator Info -->
+    <p class="text-xs text-gray-500">
+      <i class="fas fa-user-plus mr-1"></i>
+      Créé par <%= safe_movie_creator(movie) %>
+      • <%= time_ago_in_words(movie.created_at) if movie.created_at %>
+    </p>
+  </div>
+
+  <!-- Synopsis Preview -->
+  <% synopsis = safe_movie_synopsis(movie) %>
+  <% if synopsis.present? && synopsis != 'Aucun synopsis disponible' %>
+    <div class="mb-4">
+      <p class="text-sm text-gray-300 line-clamp-2">
+        <%= truncate(synopsis, length: 120) %>
+      </p>
+    </div>
+  <% end %>
+
+  <!-- Events Count -->
+  <div class="mb-4 flex items-center space-x-4">
+    <div class="flex items-center text-xs text-gray-400">
+      <i class="fas fa-calendar-alt mr-1"></i>
+      <%= safe_movie_events_count(movie) %> événement<%= 's' if safe_movie_events_count(movie) > 1 %>
+    </div>
+    <div class="flex items-center text-xs text-gray-400">
+      <i class="fas fa-star mr-1"></i>
+      <%= safe_movie_reviews_count(movie) %> avis
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between pt-4 border-t border-white/10">
+    <!-- View Button -->
+    <%= link_to admin_movie_path(safe_id(movie)),
+        class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors flex items-center" do %>
+      <i class="fas fa-eye mr-2"></i>Voir
+    <% end %>
+
+    <!-- Action Buttons based on status -->
+    <div class="flex space-x-2">
+      <% if safe_movie_validation_status(movie) == 'pending' %>
+        <!-- Validate Button with Icon -->
+        <%= form_with url: admin_movie_path(safe_id(movie)),
+            method: :patch,
+            local: true,
+            class: "inline-block" do |f| %>
+          <%= f.hidden_field :status, value: 'approved' %>
+          <%= f.button type: 'submit',
+              class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors flex items-center",
+              data: { confirm: "Valider ce film ?" } do %>
+            <i class="fas fa-check mr-1"></i>Valider
+          <% end %>
+        <% end %>
+
+        <!-- Reject Button with Icon -->
+        <%= form_with url: admin_movie_path(safe_id(movie)),
+            method: :patch,
+            local: true,
+            class: "inline-block" do |f| %>
+          <%= f.hidden_field :status, value: 'rejected' %>
+          <%= f.button type: 'submit',
+              class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors flex items-center",
+              data: { confirm: "Rejeter ce film ?" } do %>
+            <i class="fas fa-times mr-1"></i>Rejeter
+          <% end %>
+        <% end %>
+      <% else %>
+        <!-- Already processed indicator -->
+        <span class="text-xs text-gray-500 flex items-center">
+          <i class="fas fa-info-circle mr-1"></i>
+          Traité par <%= movie.validated_by&.full_name || 'Admin' %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 class ParticipationsController < ApplicationController
-  before_action :authenticate_user!  
-  before_action :set_participation, only: [:show, :destroy]
-  before_action :set_event, only: [:create]
+  before_action :authenticate_user!
+  before_action :set_participation, only: [ :show, :destroy ]
+  before_action :set_event, only: [ :create ]
 
   def index
     @participations = current_user.participations
@@ -30,8 +30,8 @@ class ParticipationsController < ApplicationController
     end
 
     session = Stripe::Checkout::Session.create(
-      payment_method_types: ['card'],
-      line_items: [{
+      payment_method_types: [ 'card' ],
+      line_items: [ {
         price_data: {
           currency: 'eur',
           unit_amount: @event.price_cents*100,
@@ -40,14 +40,14 @@ class ParticipationsController < ApplicationController
           }
         },
         quantity: seats
-      }],
+      } ],
       metadata: {
         user_id: current_user.id,
         event_id: @event.id,
         seats: seats
       },
       mode: 'payment',
-      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}", 
+      success_url: "#{stripe_success_url}?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: stripe_cancel_url(event_id: @event.id)
     )
 

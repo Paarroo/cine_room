@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
-      <%= link_to root_path, class: "flex items-center space-x-3 cursor-pointer" do %>
+      <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer" do %>
         <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
           <i class="fas fa-film text-white text-lg"></i>
         </div>
@@ -14,7 +14,7 @@
 
       <!-- Desktop navigation links -->
       <div class="hidden lg:flex items-center space-x-8">
-        <%= link_to root_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
+        <%= link_to public_site_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Accueil
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
@@ -77,7 +77,7 @@
   <!-- Mobile menu section -->
   <div data-navigation-target="mobileMenu" class="lg:hidden hidden nav-blur border-t border-white/10">
     <div class="px-4 py-6 space-y-4">
-      <%= link_to root_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+      <%= link_to public_site_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
         Accueil
       <% end %>
 

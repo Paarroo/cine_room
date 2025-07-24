@@ -1,0 +1,126 @@
+<!-- Admin Header with Stimulus Controller -->
+<header
+  class="admin-header sticky top-0 z-30 glass-effect border-b border-white/10 ml-64"
+  data-controller="admin-header"
+  data-admin-header-target="header"
+>
+  <div class="flex items-center justify-between h-16 px-6">
+    <!-- Left Side: Page Title & Breadcrumb -->
+    <div class="flex items-center space-x-4">
+      <!-- Mobile Menu Toggle -->
+      <button
+        class="lg:hidden w-10 h-10 glass-effect rounded-xl flex items-center justify-center text-muted hover:text-content transition-colors"
+        data-action="click->admin-header#toggleMobileMenu"
+        data-admin-header-target="mobileToggle"
+      >
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb hidden md:flex items-center space-x-2 text-sm" data-admin-header-target="breadcrumb">
+        <%= render 'shared/admin/breadcrumb' %>
+      </nav>
+
+      <!-- Page Title -->
+      <h1 class="page-title text-xl font-bold text-content font-display" data-admin-header-target="title">
+        <%= content_for(:page_title) || 'Dashboard' %>
+      </h1>
+    </div>
+
+    <!-- Right Side: Actions & User Menu -->
+    <div class="flex items-center space-x-4">
+      <!-- Quick Stats -->
+      <div class="hidden lg:flex items-center space-x-4" data-admin-header-target="quickStats">
+        <%= render 'shared/admin/quick_stats' %>
+      </div>
+
+      <!-- Search -->
+      <div class="relative" data-controller="admin-search" data-admin-header-target="search">
+        <button
+          class="w-10 h-10 glass-effect rounded-xl flex items-center justify-center text-muted hover:text-content transition-colors"
+          data-action="click->admin-search#toggleSearch"
+          data-admin-search-target="toggleBtn"
+        >
+          <i class="fas fa-search"></i>
+        </button>
+
+        <!-- Search Dropdown -->
+        <div
+          class="search-dropdown absolute right-0 top-12 w-80 glass-effect rounded-2xl border border-white/10 p-4 hidden"
+          data-admin-search-target="dropdown"
+        >
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted"></i>
+            <input
+              type="text"
+              placeholder="Rechercher films, événements, utilisateurs..."
+              class="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-content placeholder-muted focus:ring-2 focus:ring-primary focus:border-transparent"
+              data-admin-search-target="input"
+              data-action="input->admin-search#handleInput"
+            >
+          </div>
+
+          <!-- Search Results -->
+          <div
+            class="search-results mt-4 space-y-2 max-h-60 overflow-y-auto"
+            data-admin-search-target="results"
+          >
+            <!-- Results populated by Stimulus -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="relative" data-controller="admin-notifications" data-admin-header-target="notifications">
+        <button
+          class="w-10 h-10 glass-effect rounded-xl flex items-center justify-center text-muted hover:text-content transition-colors relative"
+          data-action="click->admin-notifications#toggleDropdown"
+          data-admin-notifications-target="toggleBtn"
+        >
+          <i class="fas fa-bell"></i>
+          <!-- Notification Badge -->
+          <% if (pending_count = Movie.where(validation_status: :pending).count + Participation.where(status: :pending).count) > 0 %>
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center">
+              <%= pending_count > 9 ? '9+' : pending_count %>
+            </span>
+          <% end %>
+        </button>
+
+        <!-- Notifications Dropdown -->
+        <%= render 'shared/admin/notifications_dropdown' %>
+      </div>
+
+      <!-- User Menu -->
+      <div class="relative" data-controller="admin-user-menu" data-admin-header-target="userMenu">
+        <button
+          class="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+          data-action="click->admin-user-menu#toggleDropdown"
+          data-admin-user-menu-target="toggleBtn"
+        >
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span class="text-xs font-bold text-white">
+              <%= current_user&.first_name&.first&.upcase || 'A' %>
+            </span>
+          </div>
+          <div class="hidden md:flex flex-col text-left">
+            <span class="text-sm font-medium text-content">
+              <%= current_user&.full_name || 'Admin' %>
+            </span>
+            <span class="text-xs text-muted">Administrateur</span>
+          </div>
+          <i class="fas fa-chevron-down text-muted text-xs"></i>
+        </button>
+
+        <!-- User Dropdown -->
+        <%= render 'shared/admin/user_dropdown' %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Breadcrumb -->
+  <div class="md:hidden px-6 pb-4">
+    <nav class="breadcrumb flex items-center space-x-2 text-sm">
+      <%= render 'shared/admin/breadcrumb' %>
+    </nav>
+  </div>
+</header>

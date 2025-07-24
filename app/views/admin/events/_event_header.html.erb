@@ -1,0 +1,151 @@
+<section class="event-header py-8">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Event Poster & Status -->
+        <div class="lg:col-span-1">
+          <!-- Event Visual Representation -->
+          <div class="w-full h-64 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-white text-4xl font-bold mb-6">
+            <%= @event.title.first(2).upcase %>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="text-center mb-6">
+            <% case @event.status %>
+            <% when 'upcoming' %>
+              <span class="px-6 py-3 bg-blue-500/20 text-blue-300 rounded-xl text-lg font-medium">
+                <i class="fas fa-calendar-plus mr-2"></i>À venir
+              </span>
+            <% when 'completed' %>
+              <span class="px-6 py-3 bg-green-500/20 text-green-300 rounded-xl text-lg font-medium">
+                <i class="fas fa-check-circle mr-2"></i>Terminé
+              </span>
+            <% when 'sold_out' %>
+              <span class="px-6 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-lg font-medium">
+                <i class="fas fa-star mr-2"></i>Complet
+              </span>
+            <% when 'cancelled' %>
+              <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                <i class="fas fa-times-circle mr-2"></i>Annulé
+              </span>
+            <% end %>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="glass-subtle rounded-xl p-4 text-center">
+              <div class="text-2xl font-bold text-primary mb-1">
+                <%= @event.participations.where(status: :confirmed).sum(:seats) %>
+              </div>
+              <div class="text-sm text-gray-400">Places vendues</div>
+            </div>
+            <div class="glass-subtle rounded-xl p-4 text-center">
+              <div class="text-2xl font-bold text-accent mb-1">
+                <%= number_to_currency(@revenue) %>
+              </div>
+              <div class="text-sm text-gray-400">Revenus</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Information -->
+        <div class="lg:col-span-2">
+          <div class="space-y-6">
+            <!-- Title & Basic Info -->
+            <div>
+              <h1 class="text-4xl font-bold gradient-text mb-3">
+                <%= @event.title %>
+              </h1>
+              <p class="text-xl text-gray-300 mb-4">
+                <%= @event.description if @event.description.present? %>
+              </p>
+            </div>
+
+            <!-- Event Details Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-1">Date</div>
+                <div class="text-lg font-semibold text-white">
+                  <%= @event.event_date.strftime("%d/%m/%Y") %>
+                </div>
+              </div>
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-1">Heure</div>
+                <div class="text-lg font-semibold text-white">
+                  <%= @event.start_time.strftime("%H:%M") %>
+                </div>
+              </div>
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-1">Capacité</div>
+                <div class="text-lg font-semibold text-white">
+                  <%= @event.max_capacity %> places
+                </div>
+              </div>
+              <div class="glass-subtle rounded-xl p-4">
+                <div class="text-sm text-gray-400 mb-1">Prix</div>
+                <div class="text-lg font-semibold text-white">
+                  <%= number_to_currency(@event.price_cents / 100.0) %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Venue Information -->
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-3">
+                <i class="fas fa-map-marker-alt text-primary mr-2"></i>Lieu
+              </h3>
+              <div class="glass-subtle rounded-xl p-6">
+                <h4 class="text-lg font-semibold text-white mb-2">
+                  <%= @event.venue_name %>
+                </h4>
+                <p class="text-gray-300">
+                  <%= @event.venue_address %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Movie Information -->
+            <% if @event.movie %>
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-film text-primary mr-2"></i>Film projeté
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex space-x-4">
+                    <div class="w-16 h-20 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xs">
+                      <%= @event.movie.title.first(2).upcase %>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="text-lg font-semibold text-white mb-2">
+                        <%= @event.movie.title %>
+                      </h4>
+                      <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span class="text-gray-400">Réalisateur:</span>
+                          <span class="text-white ml-2"><%= @event.movie.director %></span>
+                        </div>
+                        <div>
+                          <span class="text-gray-400">Année:</span>
+                          <span class="text-white ml-2"><%= @event.movie.year %></span>
+                        </div>
+                        <div>
+                          <span class="text-gray-400">Genre:</span>
+                          <span class="text-white ml-2"><%= @event.movie.genre %></span>
+                        </div>
+                        <div>
+                          <span class="text-gray-400">Durée:</span>
+                          <span class="text-white ml-2"><%= @event.movie.duration %> min</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

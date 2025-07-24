@@ -1,0 +1,368 @@
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section pt-6 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_users_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Utilisateurs
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white"><%= @user.full_name.present? ? @user.full_name : @user.email %></span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- User Profile Header -->
+  <section class="user-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- User Avatar & Basic Info -->
+          <div class="lg:col-span-1">
+            <!-- Avatar -->
+            <div class="w-full max-w-xs mx-auto">
+              <div class="w-48 h-48 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-6xl font-bold mb-6 mx-auto">
+                <%= @user.full_name.present? ? @user.full_name.first(2).upcase : @user.email.first(2).upcase %>
+              </div>
+            </div>
+
+            <!-- Role Badge -->
+            <div class="text-center mb-6">
+              <% case @user.role %>
+              <% when 'admin' %>
+                <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-crown mr-2"></i>Administrateur
+                </span>
+              <% when 'creator' %>
+                <span class="px-6 py-3 bg-purple-500/20 text-purple-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-palette mr-2"></i>Créateur
+                </span>
+              <% else %>
+                <span class="px-6 py-3 bg-blue-500/20 text-blue-300 rounded-xl text-lg font-medium">
+                  <i class="fas fa-user mr-2"></i>Utilisateur
+                </span>
+              <% end %>
+            </div>
+
+            <!-- Action Buttons -->
+            <% if @user != current_user %>
+              <div class="space-y-3">
+                <% if @user.user? %>
+                  <%= button_to admin_user_path(@user, role: 'creator'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Promouvoir en créateur ?" } do %>
+                    <i class="fas fa-palette mr-2"></i>Promouvoir Créateur
+                  <% end %>
+                <% elsif @user.creator? %>
+                  <%= button_to admin_user_path(@user, role: 'admin'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Promouvoir en administrateur ?" } do %>
+                    <i class="fas fa-crown mr-2"></i>Promouvoir Admin
+                  <% end %>
+                <% elsif @user.admin? %>
+                  <%= button_to admin_user_path(@user, role: 'user'),
+                      method: :patch,
+                      class: "w-full px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                      data: { confirm: "Rétrograder cet administrateur ?" } do %>
+                    <i class="fas fa-arrow-down mr-2"></i>Rétrograder
+                  <% end %>
+                <% end %>
+
+                <%= button_to reset_password_admin_user_path(@user),
+                    method: :put,
+                    class: "w-full px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+                    data: { confirm: "Réinitialiser le mot de passe ?" } do %>
+                  <i class="fas fa-key mr-2"></i>Réinitialiser MDP
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- User Information -->
+          <div class="lg:col-span-1">
+            <div class="space-y-6">
+              <!-- Name & Email -->
+              <div>
+                <h1 class="text-4xl font-bold gradient-text mb-3">
+                  <%= @user.full_name.present? ? @user.full_name : 'Nom non renseigné' %>
+                </h1>
+                <p class="text-xl text-gray-300">
+                  <i class="fas fa-envelope mr-2"></i><%= @user.email %>
+                </p>
+              </div>
+
+              <!-- User Details Grid -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Inscription</div>
+                  <div class="text-lg font-semibold text-white"><%= @user.created_at.strftime("%d/%m/%Y") %></div>
+                </div>
+                <div class="glass-subtle rounded-xl p-4">
+                  <div class="text-sm text-gray-400 mb-1">Dernière connexion</div>
+                  <div class="text-lg font-semibold text-white">
+                    <%= @user.last_sign_in_at&.strftime("%d/%m/%Y") || 'Jamais' %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bio -->
+              <% if @user.bio.present? %>
+                <div>
+                  <h3 class="text-xl font-semibold text-white mb-3">
+                    <i class="fas fa-quote-left text-primary mr-2"></i>Bio
+                  </h3>
+                  <div class="glass-subtle rounded-xl p-6">
+                    <p class="text-gray-300 leading-relaxed">
+                      <%= simple_format(@user.bio) %>
+                    </p>
+                  </div>
+                </div>
+              <% end %>
+
+              <!-- Profile Completion -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-tasks text-primary mr-2"></i>Complétude du profil
+                </h3>
+                <div class="glass-subtle rounded-xl p-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-300">Progression</span>
+                    <span class="text-primary font-semibold"><%= @profile_completion[:percentage] %>%</span>
+                  </div>
+                  <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300"
+                         style="width: <%= @profile_completion[:percentage] %>%"></div>
+                  </div>
+                  <div class="text-sm text-gray-400 mt-2">
+                    <%= @profile_completion[:completed_fields] %>/<%= @profile_completion[:total_fields] %> champs remplis
+                  </div>
+                </div>
+              </div>
+
+              <!-- Activity Summary -->
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  <i class="fas fa-chart-bar text-primary mr-2"></i>Résumé d'activité
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-primary mb-1"><%= @user_activity[:movies_created] %></div>
+                    <div class="text-sm text-gray-400">Films créés</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-green-400 mb-1"><%= @user_activity[:events_attended] %></div>
+                    <div class="text-sm text-gray-400">Événements</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-400 mb-1"><%= @user_activity[:reviews_written] %></div>
+                    <div class="text-sm text-gray-400">Avis écrits</div>
+                  </div>
+                  <div class="glass-subtle rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-accent mb-1"><%= number_to_currency(@user_activity[:total_spent]) %></div>
+                    <div class="text-sm text-gray-400">Total dépensé</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Movies Section -->
+  <% if @recent_movies.any? %>
+    <section class="movies-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-film text-primary mr-3"></i>
+              Films récents
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @user.movies.count %> film<%= 's' if @user.movies.count > 1 %> au total
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% @recent_movies.each do |movie| %>
+              <div class="glass-subtle rounded-xl p-6 hover:bg-white/10 transition-colors">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-semibold text-white truncate">
+                    <%= movie.title %>
+                  </h4>
+                  <% case movie.validation_status %>
+                  <% when 'approved' %>
+                    <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-lg text-xs font-medium">
+                      Validé
+                    </span>
+                  <% when 'pending' %>
+                    <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-lg text-xs font-medium">
+                      En attente
+                    </span>
+                  <% when 'rejected' %>
+                    <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded-lg text-xs font-medium">
+                      Rejeté
+                    </span>
+                  <% end %>
+                </div>
+
+                <div class="space-y-2 mb-4">
+                  <div class="text-sm text-gray-400">
+                    <i class="fas fa-user-tie mr-2"></i><%= movie.director %>
+                  </div>
+                  <div class="text-sm text-gray-400">
+                    <i class="fas fa-calendar mr-2"></i><%= movie.year %> • <%= movie.duration %> min
+                  </div>
+                  <div class="text-sm text-gray-400">
+                    <i class="fas fa-tag mr-2"></i><%= movie.genre %>
+                  </div>
+                </div>
+
+                <div class="pt-4 border-t border-white/10">
+                  <%= link_to admin_movie_path(movie),
+                      class: "inline-flex items-center px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors" do %>
+                    <i class="fas fa-eye mr-2"></i>Voir le film
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Recent Participations Section -->
+  <% if @recent_participations.any? %>
+    <section class="participations-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-ticket-alt text-primary mr-3"></i>
+              Réservations récentes
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @user.participations.count %> réservation<%= 's' if @user.participations.count > 1 %> au total
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <% @recent_participations.each do |participation| %>
+              <div class="glass-subtle rounded-xl p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold">
+                      <%= participation.event.title.first(2).upcase %>
+                    </div>
+                    <div>
+                      <h4 class="text-lg font-semibold text-white">
+                        <%= participation.event.title %>
+                      </h4>
+                      <p class="text-sm text-gray-400">
+                        <%= participation.event.event_date.strftime("%d %B %Y à %H:%M") %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="text-right">
+                    <% case participation.status %>
+                    <% when 'confirmed' %>
+                      <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm font-medium">
+                        Confirmé
+                      </span>
+                    <% when 'pending' %>
+                      <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-lg text-sm font-medium">
+                        En attente
+                      </span>
+                    <% when 'cancelled' %>
+                      <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium">
+                        Annulé
+                      </span>
+                    <% end %>
+                    <div class="text-sm text-gray-400 mt-1">
+                      <%= participation.seats %> place<%= 's' if participation.seats > 1 %> •
+                      <%= number_to_currency((participation.event.price_cents * participation.seats) / 100.0) %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Recent Reviews Section -->
+  <% if @recent_reviews.any? %>
+    <section class="reviews-section py-8">
+      <div class="container-app">
+        <div class="glass-effect rounded-3xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-white">
+              <i class="fas fa-star text-primary mr-3"></i>
+              Avis récents
+            </h3>
+            <span class="text-sm text-gray-400">
+              <%= @user.reviews.count %> avis au total
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <% @recent_reviews.each do |review| %>
+              <div class="glass-subtle rounded-xl p-6">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 class="text-lg font-semibold text-white mb-1">
+                      <%= review.movie.title %>
+                    </h4>
+                    <p class="text-sm text-gray-400">
+                      <%= review.event.title %> • <%= review.created_at.strftime("%d %B %Y") %>
+                    </p>
+                  </div>
+
+                  <div class="flex items-center space-x-1">
+                    <% review.rating.times do %>
+                      <i class="fas fa-star text-yellow-400"></i>
+                    <% end %>
+                    <% (5 - review.rating).times do %>
+                      <i class="fas fa-star text-gray-600"></i>
+                    <% end %>
+                    <span class="text-sm text-gray-400 ml-2">
+                      <%= review.rating %>/5
+                    </span>
+                  </div>
+                </div>
+
+                <% if review.comment.present? %>
+                  <p class="text-gray-300 text-sm leading-relaxed">
+                    <%= simple_format(review.comment) %>
+                  </p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Back to List Button -->
+  <section class="back-section py-8">
+    <div class="container-app text-center">
+      <%= link_to admin_users_path, class: "btn-secondary" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Retour à la liste des utilisateurs
+      <% end %>
+    </div>
+  </section>
+</div>

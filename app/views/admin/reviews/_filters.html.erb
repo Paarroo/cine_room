@@ -1,0 +1,162 @@
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-filter text-primary mr-2"></i>
+          Filtres et Recherche
+        </h3>
+
+        <!-- Clear Filters Button -->
+        <%= link_to admin_reviews_path,
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
+          <i class="fas fa-times mr-2"></i>Effacer les filtres
+        <% end %>
+      </div>
+
+      <!-- Search and Filter Form -->
+      <%= form_with url: admin_reviews_path, method: :get,
+          class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+          data: { turbo_frame: "_top" } do |form| %>
+
+        <!-- Search in Comments -->
+        <div class="form-group">
+          <%= form.label :q, "Recherche", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.text_field :q,
+              value: params[:q],
+              placeholder: "Commentaires, films...",
+              class: "form-input" %>
+        </div>
+
+        <!-- Filter by Rating -->
+        <div class="form-group">
+          <%= form.label :rating, "Note", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :rating,
+              options_for_select([
+                ['Toutes les notes', ''],
+                ['⭐ 1 étoile', '1'],
+                ['⭐⭐ 2 étoiles', '2'],
+                ['⭐⭐⭐ 3 étoiles', '3'],
+                ['⭐⭐⭐⭐ 4 étoiles', '4'],
+                ['⭐⭐⭐⭐⭐ 5 étoiles', '5']
+              ], params[:rating]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Content Type -->
+        <div class="form-group">
+          <%= form.label :content_type, "Type de contenu", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :content_type,
+              options_for_select([
+                ['Tous les avis', ''],
+                ['Avec commentaire', 'with_comment'],
+                ['Note uniquement', 'rating_only'],
+                ['Avec note', 'with_rating']
+              ], params[:content_type]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Time Period -->
+        <div class="form-group">
+          <%= form.label :time_period, "Période", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :time_period,
+              options_for_select([
+                ['Toutes les périodes', ''],
+                ['Aujourd\'hui', 'today'],
+                ['Cette semaine', 'week'],
+                ['Ce mois', 'month'],
+                ['Récents (30 jours)', 'recent']
+              ], params[:time_period]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by Movie Genre -->
+        <div class="form-group">
+          <%= form.label :genre, "Genre de film", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :genre,
+              options_for_select([
+                ['Tous les genres', '']
+              ] + Movie.joins(:reviews).distinct.pluck(:genre).compact.map { |g| [g, g] }, params[:genre]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Filter by User Role -->
+        <div class="form-group">
+          <%= form.label :user_role, "Rôle utilisateur", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :user_role,
+              options_for_select([
+                ['Tous les rôles', ''],
+                ['Utilisateur', 'user'],
+                ['Créateur', 'creator'],
+                ['Administrateur', 'admin']
+              ], params[:user_role]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="form-group">
+          <%= form.label :sort, "Trier par", class: "block text-sm font-medium text-gray-300 mb-2" %>
+          <%= form.select :sort,
+              options_for_select([
+                ['Plus récent', 'newest'],
+                ['Plus ancien', 'oldest'],
+                ['Note la plus haute', 'rating_desc'],
+                ['Note la plus basse', 'rating_asc']
+              ], params[:sort]),
+              {},
+              { class: "form-input" } %>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group flex items-end">
+          <%= form.submit "Appliquer les filtres",
+              class: "w-full btn-primary" %>
+        </div>
+      <% end %>
+
+      <!-- Active Filters Display -->
+      <% if params.slice(:q, :rating, :content_type, :time_period, :genre, :user_role, :sort).values.any?(&:present?) %>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="text-sm text-gray-400 mr-2">Filtres actifs :</span>
+
+            <% if params[:q].present? %>
+              <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs">
+                Recherche: "<%= params[:q] %>"
+              </span>
+            <% end %>
+
+            <% if params[:rating].present? %>
+              <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">
+                Note: <%= params[:rating] %> étoile<%= 's' if params[:rating].to_i > 1 %>
+              </span>
+            <% end %>
+
+            <% if params[:content_type].present? %>
+              <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+                Type: <%= params[:content_type] == 'with_comment' ? 'Avec commentaire' : params[:content_type] == 'rating_only' ? 'Note seule' : 'Avec note' %>
+              </span>
+            <% end %>
+
+            <% if params[:time_period].present? %>
+              <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+                Période: <%= params[:time_period].humanize %>
+              </span>
+            <% end %>
+
+            <% if params[:genre].present? %>
+              <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs">
+                Genre: <%= params[:genre] %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

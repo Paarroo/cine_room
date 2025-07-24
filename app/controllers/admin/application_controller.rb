@@ -1,14 +1,21 @@
 class Admin::ApplicationController < ApplicationController
-  before_action :authenticate_admin_user!
+  before_action :authenticate_user!
+  before_action :ensure_admin_access
 
-  protected
+  private
+
+  def ensure_admin_access
+    unless current_user&.admin?
+      redirect_to root_path, alert: 'Accès administrateur requis'
+    end
+  end
 
   def authenticate_admin_user!
     authenticate_user!
-    access_denied unless current_user&.admin?
+    ensure_admin_access
   end
 
-  def access_denied(exception = nil)
-    redirect_to root_path, alert: "Tu n'as pas les droits nécessaires pour accéder à cet espace !"
+  def current_admin_user
+    current_user if current_user&.admin?
   end
 end

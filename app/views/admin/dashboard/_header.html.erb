@@ -1,0 +1,93 @@
+<div class="dashboard-header">
+  <div class="container-app">
+    <!-- Welcome Section -->
+    <div class="welcome-section glass-effect rounded-3xl p-8 mt-20">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <!-- Welcome Content -->
+      <div class="flex-1 min-width-0">
+        <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+          Bonjour Admin !
+        </h1>
+        <p class="text-xl text-gray-300 mb-2">
+          Tableau de bord CinéRoom
+        </p>
+        <p class="text-gray-400 text-base">
+          <%= Date.current.strftime("%A %d %B %Y").capitalize %>
+        </p>
+      </div>
+
+      <!-- Quick Stats Summary -->
+      <div class="mt-6 lg:mt-0 flex flex-wrap gap-6">
+        <div class="text-center">
+          <div class="text-3xl font-bold gradient-text mb-1">
+            <%= @metrics[:total_users] %>
+          </div>
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
+            Utilisateurs
+          </div>
+        </div>
+
+        <div class="text-center">
+          <div class="text-3xl font-bold text-accent mb-1">
+            <%= @metrics[:upcoming_events] %>
+          </div>
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
+            Événements
+          </div>
+        </div>
+
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-400 mb-1">
+            <%= number_to_currency(@metrics[:total_revenue], precision: 0) %>
+          </div>
+          <div class="text-sm text-gray-400 uppercase tracking-wider">
+            Revenus
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Status Indicator -->
+    <div class="mt-8 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center">
+          <div class="status-indicator online mr-2"></div>
+          <span class="text-sm text-green-400 font-medium">Système opérationnel</span>
+        </div>
+
+        <% if @quick_stats[:pending_movies] > 0 || @quick_stats[:pending_participations] > 0 %>
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            <span class="text-sm text-yellow-400">Attention requise</span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Last Update Time -->
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-clock mr-1"></i>
+        Dernière mise à jour : <%= Time.current.strftime("%H:%M:%S") %>
+      </div>
+    </div>
+
+    <!-- Notification Badges -->
+    <% if @quick_stats[:pending_movies] > 0 || @quick_stats[:pending_participations] > 0 %>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <% if @quick_stats[:pending_movies] > 0 %>
+          <div class="notification-badge">
+            <i class="fas fa-film mr-2 text-primary"></i>
+            <span><%= @quick_stats[:pending_movies] %> film<%= @quick_stats[:pending_movies] > 1 ? 's' : '' %> en attente de validation</span>
+          </div>
+        <% end %>
+
+        <% if @quick_stats[:pending_participations] > 0 %>
+          <div class="notification-badge notification-badge--blue  ml-3">
+            <i class="fas fa-clock mr-2 text-accent"></i>
+            <span><%= @quick_stats[:pending_participations] %> réservation<%= @quick_stats[:pending_participations] > 1 ? 's' : '' %> en attente</span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    </div>
+  </div>
+</div>

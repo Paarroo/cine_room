@@ -16,7 +16,7 @@ FactoryBot.define do
     end
 
     trait :creator do
-      role { :user }
+      role { :creator }
       bio { "Passionné de cinéma indépendant, je crée des films depuis #{rand(2..15)} ans." }
     end
   end

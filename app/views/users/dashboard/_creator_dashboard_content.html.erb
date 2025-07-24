@@ -1,58 +1,92 @@
-<% if current_user.creator? %>
-  <section class=" bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 min-h-screen">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+<% if published_movies.present? %>
+  <section class="bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 min-h-screen pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Button to publish a new movie -->
-      <div class="flex justify-end mb-8">
+      <!-- 🔄 Creator status + Publish movie button -->
+      <div class="flex justify-between items-center mb-12">
+        <% if current_user.movies.exists? %>
+          <% if current_user.creator? %>
+            <span class="inline-flex items-center px-4 py-2 bg-green-600/20 text-green-300 text-sm font-medium rounded-full border border-green-600/30">
+              <i class="fas fa-check-circle mr-2"></i>Statut de créateur : Validé
+            </span>
+          <% else %>
+            <span class="inline-flex items-center px-4 py-2 bg-red-600/20 text-red-300 text-sm font-medium rounded-full border border-red-600/30">
+              <i class="fas fa-times-circle mr-2"></i>Statut de créateur : Non validé
+            </span>
+          <% end %>
+        <% end %>
+
         <%= link_to "Publier un nouveau film", new_movie_path, class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg" %>
       </div>
 
-      <!-- Published Movies Section -->
-      <div class="glass-effect p-6 rounded-2xl mb-16">
-        <h3 class="text-2xl font-semibold text-white mb-4">
-          <i class="fas fa-film mr-2 text-cinema-blue"></i>Mes films publiés
-        </h3>
 
-        <% if published_movies.any? %>
-          <div class="space-y-4">
-            <% published_movies.each do |movie| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
-                <h4 class="text-xl font-semibold text-white"><%= movie.title %></h4>
-                <p class="text-sm text-gray-300 mt-1"><%= movie.genre %> — <%= movie.year %></p>
-                <p class="text-sm text-gray-400">Réalisé par <%= movie.director %></p>
-              </div>
-            <% end %>
+      <% sections = {
+        approved: ["Mes films publiés", "fas fa-check-circle text-green-400"],
+        pending: ["En attente de validation", "fas fa-clock text-yellow-400"],
+        rejected: ["Films refusés", "fas fa-times-circle text-red-400"]
+      } %>
+
+      <% sections.each do |status, (title, icon_class)| %>
+        <% movies = current_user.movies.where(validation_status: status) %>
+
+        <div class="glass-effect p-6 rounded-2xl mb-12">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-semibold text-white">
+              <i class="<%= icon_class %> mr-2"></i><%= title %>
+            </h3>
+            <span class="text-sm text-gray-400"><%= pluralize(movies.count, "film") %></span>
           </div>
-        <% else %>
-          <p class="text-gray-400 text-lg italic">Aucun film publié pour le moment.</p>
-        <% end %>
-      </div>
 
-      <!-- Created Events Section -->
-      <div class="glass-effect p-6 rounded-2xl">
-        <h3 class="text-2xl font-semibold text-white mb-4">
-          <i class="fas fa-calendar-alt mr-2 text-cinema-blue"></i>Mes événements
-        </h3>
+          <% if movies.any? %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <% movies.each do |movie| %>
+                <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200 hover:shadow-xl transition-all duration-300">
+                  <h4 class="text-lg font-semibold text-white truncate mb-1"><%= movie.title %></h4>
+                  <p class="text-sm text-gray-400 truncate"><%= movie.genre %> — <%= movie.year %></p>
+                  <p class="text-sm text-gray-500 truncate mb-3">Réalisé par <%= movie.director %></p>
 
-        <% if created_events.any? %>
-          <div class="space-y-4">
-            <% created_events.each do |event| %>
-              <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
-                <h4 class="text-xl font-semibold text-white"><%= event.title %></h4>
-                <p class="text-sm text-gray-300">Le <%= l(event.event_date, format: :long) %></p>
-                <p class="text-sm text-gray-400">Film associé : <%= event.movie.title %></p>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <p class="text-gray-400 text-lg italic">Aucun événement organisé pour le moment.</p>
-        <% end %>
-      </div>
+                  <div class="flex justify-between items-center mt-auto">
+                    <%= link_to "Voir", movie_path(movie), class: "text-xs px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition" %>
+                    <% unless status == :approved %>
+                      <%= link_to "Modifier", edit_movie_path(movie), class: "text-xs px-4 py-2 bg-cinema-blue hover:bg-blue-600 rounded-full text-white transition" %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-400 text-lg italic">Aucun film <%= status == :approved ? "publié" : status == :pending ? "en attente" : "refusé" %> pour le moment.</p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- 📅 Events section (only for creators) -->
+      <% if current_user.creator? %>
+        <div class="glass-effect p-6 rounded-2xl">
+          <h3 class="text-2xl font-semibold text-white mb-4">
+            <i class="fas fa-calendar-alt mr-2 text-cinema-blue"></i>Mes événements
+          </h3>
+
+          <% if created_events.any? %>
+            <div class="space-y-4">
+              <% created_events.each do |event| %>
+                <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
+                  <h4 class="text-lg font-semibold text-white"><%= event.title %></h4>
+                  <p class="text-sm text-gray-300">Le <%= l(event.event_date, format: :long) %></p>
+                  <p class="text-sm text-gray-400">Film associé : <%= event.movie.title %></p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-400 text-lg italic">Aucun événement organisé pour le moment.</p>
+          <% end %>
+        </div>
+      <% end %>
 
     </div>
   </section>
 <% else %>
-  <!-- Not a creator yet -->
+  <!-- 🧑‍💼 Non-creator user CTA -->
   <section class="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 px-6 text-center">
     <div>
       <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Vous souhaitez devenir créateur ?</h2>

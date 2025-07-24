@@ -1,0 +1,393 @@
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb-section pt-6 pb-4">
+    <div class="container-app">
+      <nav class="flex items-center space-x-2 text-sm">
+        <%= link_to admin_dashboard_index_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <i class="fas fa-home mr-1"></i>Dashboard
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_events_path, class: "text-gray-400 hover:text-primary transition-colors" do %>
+          Événements
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <%= link_to admin_event_path(@event), class: "text-gray-400 hover:text-primary transition-colors" do %>
+          <%= @event.title %>
+        <% end %>
+        <i class="fas fa-chevron-right text-gray-600"></i>
+        <span class="text-white">Modifier</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Edit Form Header -->
+  <section class="form-header py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <div class="text-center mb-8">
+          <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+            <i class="fas fa-edit mr-4"></i>
+            Modifier l'événement
+          </h1>
+          <p class="text-xl text-gray-300 mb-2">
+            Modification : <%= @event.title %>
+          </p>
+          <p class="text-gray-400 text-base">
+            ID: #<%= @event.id %> • Créé le <%= @event.created_at.strftime("%d/%m/%Y") %>
+          </p>
+        </div>
+
+        <!-- Current Status Display -->
+        <div class="text-center mb-8">
+          <% case @event.status %>
+          <% when 'upcoming' %>
+            <span class="px-6 py-3 bg-blue-500/20 text-blue-300 rounded-xl text-lg font-medium">
+              <i class="fas fa-calendar-plus mr-2"></i>Événement à venir
+            </span>
+          <% when 'completed' %>
+            <span class="px-6 py-3 bg-green-500/20 text-green-300 rounded-xl text-lg font-medium">
+              <i class="fas fa-check-circle mr-2"></i>Événement terminé
+            </span>
+          <% when 'sold_out' %>
+            <span class="px-6 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-lg font-medium">
+              <i class="fas fa-star mr-2"></i>Événement complet
+            </span>
+          <% when 'cancelled' %>
+            <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+              <i class="fas fa-times-circle mr-2"></i>Événement annulé
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Edit Form Section -->
+  <section class="edit-form py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-6">
+        <%= form_with model: [:admin, @event],
+            class: "space-y-8",
+            data: {
+              controller: "admin-form",
+              admin_form_auto_save_value: "true"
+            } do |form| %>
+
+          <!-- Error Messages -->
+          <% if @event.errors.any? %>
+            <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-exclamation-triangle text-red-400 text-xl mr-3"></i>
+                <h3 class="text-lg font-semibold text-red-400">
+                  <%= pluralize(@event.errors.count, "erreur") %> empêche(nt) la sauvegarde :
+                </h3>
+              </div>
+              <ul class="list-disc list-inside space-y-1">
+                <% @event.errors.full_messages.each do |message| %>
+                  <li class="text-red-300"><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-info-circle text-primary mr-3"></i>
+              Informations générales
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Event Title -->
+              <div class="form-group">
+                <%= form.label :title, "Titre de l'événement", class: "form-label" %>
+                <%= form.text_field :title,
+                    class: "form-input",
+                    placeholder: "Ex: Soirée cinéma spéciale",
+                    required: true %>
+              </div>
+
+              <!-- Movie Selection -->
+              <div class="form-group">
+                <%= form.label :movie_id, "Film projeté", class: "form-label" %>
+                <%= form.select :movie_id,
+                    options_from_collection_for_select(@movies, :id, :title, @event.movie_id),
+                    { prompt: "Sélectionner un film..." },
+                    { class: "form-input" } %>
+              </div>
+
+              <!-- Event Date -->
+              <div class="form-group">
+                <%= form.label :event_date, "Date de l'événement", class: "form-label" %>
+                <%= form.date_field :event_date,
+                    class: "form-input",
+                    required: true %>
+              </div>
+
+              <!-- Start Time -->
+              <div class="form-group">
+                <%= form.label :start_time, "Heure de début", class: "form-label" %>
+                <%= form.time_field :start_time,
+                    class: "form-input",
+                    required: true %>
+              </div>
+
+              <!-- Max Capacity -->
+              <div class="form-group">
+                <%= form.label :max_capacity, "Capacité maximale", class: "form-label" %>
+                <%= form.number_field :max_capacity,
+                    class: "form-input",
+                    min: 1,
+                    max: 1000,
+                    required: true %>
+                <div class="text-sm text-gray-400 mt-1">
+                  Nombre maximum de places disponibles
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="form-group">
+                <%= form.label :price_cents, "Prix (en centimes)", class: "form-label" %>
+                <div class="relative">
+                  <%= form.number_field :price_cents,
+                      class: "form-input pr-12",
+                      min: 0,
+                      step: 1,
+                      placeholder: "Ex: 1500 pour 15€" %>
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
+                    centimes
+                  </div>
+                </div>
+                <div class="text-sm text-gray-400 mt-1">
+                  Prix actuel : <%= number_to_currency(@event.price_cents / 100.0) %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group mt-6">
+              <%= form.label :description, "Description", class: "form-label" %>
+              <%= form.text_area :description,
+                  class: "form-input",
+                  rows: 4,
+                  placeholder: "Description détaillée de l'événement..." %>
+            </div>
+          </div>
+
+          <!-- Venue Information Section -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-map-marker-alt text-primary mr-3"></i>
+              Lieu de l'événement
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Venue Name -->
+              <div class="form-group">
+                <%= form.label :venue_name, "Nom du lieu", class: "form-label" %>
+                <%= form.text_field :venue_name,
+                    class: "form-input",
+                    placeholder: "Ex: Cinéma Rex",
+                    list: "venues-list" %>
+                <datalist id="venues-list">
+                  <% @venues.each do |venue| %>
+                    <option value="<%= venue %>">
+                  <% end %>
+                </datalist>
+              </div>
+
+              <!-- Venue Address -->
+              <div class="form-group">
+                <%= form.label :venue_address, "Adresse complète", class: "form-label" %>
+                <%= form.text_area :venue_address,
+                    class: "form-input",
+                    rows: 3,
+                    placeholder: "Adresse complète du lieu..." %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Management Section -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-cog text-primary mr-3"></i>
+              Gestion du statut
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Current Status Display -->
+              <div class="form-group">
+                <label class="form-label">Statut actuel</label>
+                <div class="p-4 bg-white/5 rounded-xl">
+                  <div class="flex items-center space-x-3">
+                    <% case @event.status %>
+                    <% when 'upcoming' %>
+                      <i class="fas fa-calendar-plus text-blue-400 text-xl"></i>
+                      <span class="text-blue-400 font-semibold">À venir</span>
+                    <% when 'completed' %>
+                      <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                      <span class="text-green-400 font-semibold">Terminé</span>
+                    <% when 'sold_out' %>
+                      <i class="fas fa-star text-yellow-400 text-xl"></i>
+                      <span class="text-yellow-400 font-semibold">Complet</span>
+                    <% when 'cancelled' %>
+                      <i class="fas fa-times-circle text-red-400 text-xl"></i>
+                      <span class="text-red-400 font-semibold">Annulé</span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Change -->
+              <div class="form-group">
+                <%= form.label :status, "Modifier le statut", class: "form-label" %>
+                <%= form.select :status,
+                    [
+                      ['À venir', 'upcoming'],
+                      ['Terminé', 'completed'],
+                      ['Complet', 'sold_out'],
+                      ['Annulé', 'cancelled']
+                    ],
+                    { selected: @event.status },
+                    {
+                      class: "form-input",
+                      data: { action: "change->admin-form#confirmStatusChange" }
+                    } %>
+                <div class="text-sm text-gray-400 mt-1">
+                  ⚠️ Attention : Changer le statut peut affecter les participants
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Statistics -->
+          <div class="form-section">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+              <i class="fas fa-chart-bar text-primary mr-3"></i>
+              Statistiques actuelles
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-blue-400 mb-1">
+                  <%= @event.participations.count %>
+                </div>
+                <div class="text-sm text-gray-400">Réservations</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-green-400 mb-1">
+                  <%= @event.participations.where(status: :confirmed).sum(:seats) %>
+                </div>
+                <div class="text-sm text-gray-400">Places vendues</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-yellow-400 mb-1">
+                  <%= @event.max_capacity - @event.participations.where(status: :confirmed).sum(:seats) %>
+                </div>
+                <div class="text-sm text-gray-400">Places restantes</div>
+              </div>
+
+              <div class="glass-subtle rounded-xl p-4 text-center">
+                <div class="text-2xl font-bold text-accent mb-1">
+                  <%= number_to_currency(@event.participations.where(status: :confirmed).sum("#{@event.price_cents} * participations.seats") / 100.0) %>
+                </div>
+                <div class="text-sm text-gray-400">Revenus</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions pt-8 border-t border-white/10">
+            <div class="flex flex-col sm:flex-row gap-4 justify-between">
+              <!-- Cancel & Back -->
+              <div class="flex gap-4">
+                <%= link_to admin_event_path(@event),
+                    class: "btn-secondary" do %>
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Annuler
+                <% end %>
+
+                <%= link_to admin_events_path,
+                    class: "px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-xl transition-colors font-semibold flex items-center" do %>
+                  <i class="fas fa-list mr-2"></i>
+                  Liste des événements
+                <% end %>
+              </div>
+
+              <!-- Save Actions -->
+              <div class="flex gap-4">
+                <%= form.submit "Sauvegarder les modifications",
+                    class: "btn-primary",
+                    data: {
+                      admin_form_target: "submitButton",
+                      confirm: "Êtes-vous sûr de vouloir sauvegarder ces modifications ?"
+                    } %>
+
+                <button type="button"
+                        class="px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center"
+                        data-action="click->admin-form#saveDraft">
+                  <i class="fas fa-save mr-2"></i>
+                  Sauvegarder brouillon
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-6">
+        <h3 class="text-xl font-bold text-white mb-4">Actions rapides</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- View Event -->
+          <%= link_to admin_event_path(@event),
+              class: "flex items-center justify-center px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors" do %>
+            <i class="fas fa-eye mr-2"></i>
+            Voir l'événement
+          <% end %>
+
+          <!-- Manage Participants -->
+          <%= link_to admin_participations_path(event_id: @event.id),
+              class: "flex items-center justify-center px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors" do %>
+            <i class="fas fa-users mr-2"></i>
+            Gérer les participants
+          <% end %>
+
+          <!-- Delete Event -->
+          <%= button_to admin_event_path(@event),
+              method: :delete,
+              class: "flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full",
+              data: { confirm: "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible." } do %>
+            <i class="fas fa-trash mr-2"></i>
+            Supprimer l'événement
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+.form-label {
+  @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors;
+}
+
+.form-section {
+  @apply bg-white/5 rounded-2xl p-8;
+}
+
+.form-group {
+  @apply space-y-2;
+}
+</style>

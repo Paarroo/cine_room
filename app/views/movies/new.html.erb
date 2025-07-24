@@ -1,9 +1,18 @@
-<% content_for :title, "New movie" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">New movie</h1>
 
-  <%= render "form", movie: @movie %>
+<section class="py-20 lg:py-32 bg-gradient-to-br from-dark-400 via-dark-300 to-dark-400 min-h-screen">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
-  <%= link_to "Back to movies", movies_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-</div>
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl lg:text-6xl font-bold mb-4">
+        <span class="gradient-text">Publier</span> un film
+      </h2>
+      <p class="text-xl text-gray-400">Partagez votre vision avec la communauté CineRoom</p>
+    </div>
+
+    <%= render partial: "form", locals: { movie: @movie } %>
+
+
+  </div>
+</section>

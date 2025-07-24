@@ -1,5 +1,6 @@
 <section class="py-20 lg:py-32 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
     <div class="text-center mb-16">
       <h2 class="text-4xl lg:text-6xl font-bold mb-6">
         <span class="gradient-text">Créateurs</span> en vedette
@@ -9,27 +10,33 @@
       </p>
     </div>
 
+    <!-- Featured creators grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <% User.joins("INNER JOIN movies ON movies.creator_id = users.id").distinct.each do |creator| %>
+      <% @creators.each do |creator| %>
         <% initials = "#{creator.first_name.first}#{creator.last_name.first}".upcase %>
-        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card" data-target="#">
+        <div class="creator-card rounded-3xl overflow-hidden card-hover group cursor-pointer nav-card relative" data-target="#">
+          <%= link_to creator_path(creator), class: "absolute inset-0 z-10", data: { turbo: false} do %><% end %>
           <div class="relative h-80 bg-gradient-to-br from-gold-500/20 to-amber-600/20">
             <div class="absolute inset-0 bg-gradient-to-t from-dark-400 via-transparent to-transparent"></div>
 
+            <!-- Badge -->
             <div class="absolute top-6 left-6">
               <span class="glass-effect px-4 py-2 rounded-full text-sm font-medium">
                 <i class="fas fa-award mr-2 text-gold-500"></i>Auteur indépendant
               </span>
             </div>
 
+            <!-- Creator details -->
             <div class="absolute bottom-6 left-6 right-6">
               <div class="w-16 h-16 bg-gradient-to-br from-gold-500 to-gold-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4">
                 <%= initials %>
               </div>
               <h3 class="text-2xl font-bold mb-2"><%= "#{creator.first_name} #{creator.last_name}" %></h3>
-              <p class="text-gray-300 mb-3"><%=  "Réalisateur·rice" %></p>
+              <p class="text-gray-300 mb-3">Réalisateur·rice</p>
               <div class="flex items-center space-x-4 text-sm text-gray-400">
-                <span><i class="fas fa-film mr-1"></i><%= Movie.where(creator_id: creator.id).count %> films</span>
+                <span>
+                  <i class="fas fa-film mr-1"></i><%= creator.movies.approved.count %> films
+                </span>
               </div>
             </div>
           </div>
@@ -37,8 +44,9 @@
       <% end %>
     </div>
 
+    <!-- CTA button -->
     <div class="text-center mt-16">
-      <%= link_to "Voir tous les créateurs", "creators#index", class: "nav-btn px-8 py-4 glass-effect hover:bg-white/10 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
+      <%= link_to "Voir tous les créateurs", creators_path, class: "nav-btn px-8 py-4 glass-effect hover:bg-white/10 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105" %>
     </div>
   </div>
 </section>

@@ -12,7 +12,6 @@ class Event < ApplicationRecord
 
   before_save :update_status_if_sold_out
 
-
   scope :by_title, ->(q) {
     joins(:movie).where("movies.title ILIKE ?", "%#{q}%") if q.present?
   }
@@ -43,14 +42,25 @@ class Event < ApplicationRecord
       .by_date_filter(params[:date_filter])
   end
 
-
   def available_spots
-  reserved_seats = participations.where(status: 'confirmed').sum(:seats)
-  max_capacity - reserved_seats
+    reserved_seats = participations.where(status: 'confirmed').sum(:seats)
+    max_capacity - reserved_seats
   end
 
   def sold_out?
     available_spots <= 0
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    [
+      "title", "description", "venue_name", "venue_address",
+      "event_date", "start_time", "max_capacity", "price_cents",
+      "status", "latitude", "longitude", "created_at", "updated_at"
+    ]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [ "movie", "participations", "users", "reviews" ]
   end
 
   private

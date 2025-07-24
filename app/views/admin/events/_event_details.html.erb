@@ -1,0 +1,72 @@
+<section class="event-details py-8">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-white">
+          <i class="fas fa-chart-bar text-primary mr-3"></i>
+          Statistiques détaillées
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Total Reservations -->
+        <div class="glass-subtle rounded-xl p-6 text-center">
+          <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-ticket-alt text-blue-400 text-xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-blue-400 mb-2">
+            <%= @participations.count %>
+          </div>
+          <div class="text-sm text-gray-400">Total Réservations</div>
+        </div>
+
+        <!-- Confirmed Seats -->
+        <div class="glass-subtle rounded-xl p-6 text-center">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-users text-green-400 text-xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-green-400 mb-2">
+            <%= @participations.where(status: :confirmed).sum(:seats) %>
+          </div>
+          <div class="text-sm text-gray-400">Places Confirmées</div>
+        </div>
+
+        <!-- Available Seats -->
+        <div class="glass-subtle rounded-xl p-6 text-center">
+          <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-chair text-yellow-400 text-xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-yellow-400 mb-2">
+            <%= @event.max_capacity - @participations.where(status: :confirmed).sum(:seats) %>
+          </div>
+          <div class="text-sm text-gray-400">Places Disponibles</div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="glass-subtle rounded-xl p-6 text-center">
+          <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-euro-sign text-purple-400 text-xl"></i>
+          </div>
+          <div class="text-3xl font-bold text-purple-400 mb-2">
+            <%= number_to_currency(@revenue) %>
+          </div>
+          <div class="text-sm text-gray-400">Revenus Générés</div>
+        </div>
+      </div>
+
+      <!-- Capacity Progress Bar -->
+      <div class="mt-8">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-300">Taux de remplissage</span>
+          <span class="text-sm font-medium text-primary">
+            <%= ((@participations.where(status: :confirmed).sum(:seats).to_f / @event.max_capacity) * 100).round(1) %>%
+          </span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-3">
+          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300"
+               style="width: <%= ((@participations.where(status: :confirmed).sum(:seats).to_f / @event.max_capacity) * 100).round(1) %>%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

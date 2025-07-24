@@ -1,0 +1,14 @@
+<div
+  class="admin-dashboard min-h-screen bg-dark-400",
+  data-controller="admin-dashboard admin-chart admin-flash",
+  data-admin-dashboard-refresh-interval-value="30000",
+  data-admin-dashboard-auto-refresh-value="true"
+>
+  <%= render 'admin/dashboard/header' %>
+  <%= render 'admin/dashboard/quick_actions' %>
+  <%= render 'admin/dashboard/metrics_cards' %>
+  <%= render 'admin/dashboard/charts_section' %>
+  <%= render 'admin/dashboard/management' %>
+  <%= render 'admin/dashboard/system_status' %>
+  <%= render 'admin/dashboard/recent_activity' %>
+</div>

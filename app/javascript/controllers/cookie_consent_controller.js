@@ -31,14 +31,33 @@ export default class extends Controller {
     document.getElementById('cookie-decline-btn')?.addEventListener('click', () => this.declineAllCookies())
     document.getElementById('cookie-settings-btn')?.addEventListener('click', () => this.showSettings())
     
+    // Privacy page button
+    document.getElementById('privacy-cookie-settings-btn')?.addEventListener('click', () => this.showSettings())
+    
     // Modal buttons
     document.getElementById('cookie-modal-close')?.addEventListener('click', () => this.hideSettings())
     document.getElementById('cookie-save-preferences')?.addEventListener('click', () => this.savePreferences())
     document.getElementById('cookie-accept-all-modal')?.addEventListener('click', () => this.acceptAllFromModal())
     
+    // Switch change events for immediate visual feedback
+    document.getElementById('analytics-cookies')?.addEventListener('change', (e) => {
+      console.log('Analytics cookies toggle:', e.target.checked)
+    })
+    
+    document.getElementById('marketing-cookies')?.addEventListener('change', (e) => {
+      console.log('Marketing cookies toggle:', e.target.checked)
+    })
+    
     // Close modal when clicking outside
     document.getElementById('cookie-settings-modal')?.addEventListener('click', (e) => {
       if (e.target.id === 'cookie-settings-modal') {
+        this.hideSettings()
+      }
+    })
+    
+    // ESC key to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
         this.hideSettings()
       }
     })
@@ -71,13 +90,23 @@ export default class extends Controller {
     const modal = document.getElementById('cookie-settings-modal')
     if (modal) {
       modal.style.display = 'flex'
+      document.body.classList.add('modal-open')
       document.body.style.overflow = 'hidden'
       
       // Load current preferences
       const consent = this.getCookieConsent()
       if (consent) {
-        document.getElementById('analytics-cookies').checked = consent.analytics || false
-        document.getElementById('marketing-cookies').checked = consent.marketing || false
+        const analyticsCheckbox = document.getElementById('analytics-cookies')
+        const marketingCheckbox = document.getElementById('marketing-cookies')
+        
+        if (analyticsCheckbox) analyticsCheckbox.checked = consent.analytics || false
+        if (marketingCheckbox) marketingCheckbox.checked = consent.marketing || false
+      }
+      
+      // Focus management for accessibility
+      const closeButton = document.getElementById('cookie-modal-close')
+      if (closeButton) {
+        setTimeout(() => closeButton.focus(), 100)
       }
     }
   }
@@ -86,7 +115,15 @@ export default class extends Controller {
     const modal = document.getElementById('cookie-settings-modal')
     if (modal) {
       modal.style.display = 'none'
+      document.body.classList.remove('modal-open')
       document.body.style.overflow = 'auto'
+      
+      // Return focus to the button that opened the modal
+      const settingsButton = document.getElementById('cookie-settings-btn') || 
+                            document.getElementById('privacy-cookie-settings-btn')
+      if (settingsButton) {
+        settingsButton.focus()
+      }
     }
   }
 
@@ -104,7 +141,7 @@ export default class extends Controller {
     this.hideBanner()
     
     // Show success message
-    this.showConsentMessage('All cookies accepted', 'success')
+    this.showConsentMessage('Tous les cookies acceptés', 'success')
   }
 
   declineAllCookies() {
@@ -121,7 +158,7 @@ export default class extends Controller {
     this.hideBanner()
     
     // Show success message
-    this.showConsentMessage('Cookie preferences saved', 'info')
+    this.showConsentMessage('Préférences de cookies sauvegardées', 'info')
   }
 
   savePreferences() {
@@ -142,7 +179,7 @@ export default class extends Controller {
     this.hideBanner()
     
     // Show success message
-    this.showConsentMessage('Cookie preferences saved', 'success')
+    this.showConsentMessage('Préférences de cookies sauvegardées', 'success')
   }
 
   acceptAllFromModal() {
@@ -340,5 +377,82 @@ export default class extends Controller {
     localStorage.removeItem('cookieConsent')
     // Reload page to show banner again
     window.location.reload()
+  }
+
+  // Public method to show settings modal
+  static showSettingsModal() {
+    const modal = document.getElementById('cookie-settings-modal')
+    if (modal) {
+      modal.style.display = 'flex'
+      document.body.style.overflow = 'hidden'
+      
+      // Load current preferences
+      try {
+        const consent = localStorage.getItem('cookieConsent')
+        if (consent) {
+          const consentData = JSON.parse(consent)
+          const analyticsCheckbox = document.getElementById('analytics-cookies')
+          const marketingCheckbox = document.getElementById('marketing-cookies')
+          
+          if (analyticsCheckbox) analyticsCheckbox.checked = consentData.analytics || false
+          if (marketingCheckbox) marketingCheckbox.checked = consentData.marketing || false
+        }
+      } catch (error) {
+        console.error('Error loading cookie preferences:', error)
+      }
+    }
+  }
+}
+
+// Make methods globally accessible
+window.CookieConsentController = {
+  showSettings: () => {
+    const modal = document.getElementById('cookie-settings-modal')
+    if (modal) {
+      modal.style.display = 'flex'
+      document.body.classList.add('modal-open')
+      document.body.style.overflow = 'hidden'
+      
+      // Load current preferences
+      try {
+        const consent = localStorage.getItem('cookieConsent')
+        if (consent) {
+          const consentData = JSON.parse(consent)
+          const analyticsCheckbox = document.getElementById('analytics-cookies')
+          const marketingCheckbox = document.getElementById('marketing-cookies')
+          
+          if (analyticsCheckbox) analyticsCheckbox.checked = consentData.analytics || false
+          if (marketingCheckbox) marketingCheckbox.checked = consentData.marketing || false
+        }
+      } catch (error) {
+        console.error('Error loading cookie preferences:', error)
+      }
+      
+      // Focus management
+      const closeButton = document.getElementById('cookie-modal-close')
+      if (closeButton) {
+        setTimeout(() => closeButton.focus(), 100)
+      }
+    }
+  },
+  
+  revokeConsent: () => {
+    localStorage.removeItem('cookieConsent')
+    document.cookie = 'cookie_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+    document.cookie = 'analytics_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+    document.cookie = 'marketing_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+    window.location.reload()
+  },
+  
+  hasConsentFor: (type) => {
+    try {
+      const consent = localStorage.getItem('cookieConsent')
+      if (!consent) return false
+      
+      const consentData = JSON.parse(consent)
+      return consentData[type] === true
+    } catch (error) {
+      return false
+    }
   }
 }

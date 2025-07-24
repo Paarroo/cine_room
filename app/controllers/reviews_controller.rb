@@ -1,6 +1,6 @@
 class ReviewsController < ApplicationController
   before_action :set_review, only: [ :show, :edit, :update, :destroy ]
-  before_action :set_event, only: [ :new, :create ]
+  before_action :set_event, only: [ :new, :create, :update ]
 
   def index
     @reviews = Review.includes(:user, :movie, :event)
@@ -35,7 +35,7 @@ class ReviewsController < ApplicationController
 
   def update
     if @review.update(review_params)
-      redirect_to @review.event, notice: 'Avis modifié avec succés'
+      redirect_to @review.event, notice: 'Commentaire modifié avec succés'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -44,7 +44,7 @@ class ReviewsController < ApplicationController
   def destroy
     event = @review.event
     @review.destroy!
-    redirect_to event, notice: 'Review deleted.'
+    redirect_to event, notice: 'Commentaire supprimé avec succés'
   end
 
   private

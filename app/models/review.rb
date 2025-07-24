@@ -7,6 +7,4 @@ class Review < ApplicationRecord
   validates :user_id, uniqueness: { scope: [ :movie_id, :event_id ], message: "Tu as déjà commenté ce film" }
   validates :comment, length: { minimum: 10, maximum: 1000 }, presence: true
 
-  validate :movie_matches_event
-
 end

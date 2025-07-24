@@ -74,7 +74,8 @@ if Rails.env.production?
   movie_titles = [
     "Le Dernier Voyage", "Nuits de Tokyo", "L'Écho du Temps", 
     "Reflets d'Automne", "La Danse des Ombres", "Horizon Perdu",
-    "Les Murmures du Vent", "Clair de Lune", "L'Art de Vivre"
+    "Les Murmures du Vent", "Clair de Lune", "L'Art de Vivre",
+    "Les Secrets du Passé", "Un Nouveau Monde", "La Quête Éternelle"
   ]
   
   creators.each_with_index do |creator, i|

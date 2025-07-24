@@ -213,43 +213,97 @@ export default class extends Controller {
   // Cookie management utilities
   saveCookieConsent(consentData) {
     try {
+      // Validate consent data before saving
+      if (!consentData || typeof consentData !== 'object') {
+        throw new Error('Invalid consent data structure')
+      }
+
+      // Ensure required fields are present
+      const validatedData = {
+        essential: true, // Always true
+        analytics: Boolean(consentData.analytics),
+        marketing: Boolean(consentData.marketing),
+        timestamp: consentData.timestamp || new Date().toISOString(),
+        version: consentData.version || '1.0'
+      }
+
       // Save to localStorage for persistence
-      localStorage.setItem('cookieConsent', JSON.stringify(consentData))
+      localStorage.setItem('cookieConsent', JSON.stringify(validatedData))
       
-      // Also set a cookie for server-side access (essential cookies only)
+      // Also set HTTP cookies for server-side access
       this.setCookie('cookie_consent', 'true', 365)
-      this.setCookie('analytics_consent', consentData.analytics ? 'true' : 'false', 365)
-      this.setCookie('marketing_consent', consentData.marketing ? 'true' : 'false', 365)
+      this.setCookie('analytics_consent', validatedData.analytics ? 'true' : 'false', 365)
+      this.setCookie('marketing_consent', validatedData.marketing ? 'true' : 'false', 365)
+      
+      console.log('Cookie consent saved successfully:', validatedData)
       
     } catch (error) {
       console.error('Error saving cookie consent:', error)
+      // Show user feedback on error
+      this.showConsentMessage('Erreur lors de la sauvegarde des préférences', 'error')
     }
   }
 
   getCookieConsent() {
     try {
       const consent = localStorage.getItem('cookieConsent')
-      return consent ? JSON.parse(consent) : null
+      if (!consent) return null
+      
+      const parsedConsent = JSON.parse(consent)
+      
+      // Validate structure of loaded data
+      if (!parsedConsent || typeof parsedConsent !== 'object') {
+        console.warn('Invalid consent data structure, clearing...')
+        localStorage.removeItem('cookieConsent')
+        return null
+      }
+      
+      // Check if data has required fields
+      if (!parsedConsent.hasOwnProperty('essential') || 
+          !parsedConsent.hasOwnProperty('analytics') || 
+          !parsedConsent.hasOwnProperty('marketing')) {
+        console.warn('Incomplete consent data, clearing...')
+        localStorage.removeItem('cookieConsent')
+        return null
+      }
+      
+      return parsedConsent
+      
     } catch (error) {
-      console.error('Error reading cookie consent:', error)
+      console.error('Error reading/parsing cookie consent:', error)
+      // Clear corrupted data
+      localStorage.removeItem('cookieConsent')
       return null
     }
   }
 
   applyCookieSettings(consentData) {
+    // Validate consent data structure
+    if (!consentData || typeof consentData !== 'object') {
+      console.warn('Invalid consent data:', consentData)
+      return
+    }
+
     // Apply analytics cookies
-    if (consentData.analytics) {
+    if (consentData.analytics === true) {
       this.enableAnalyticsCookies()
     } else {
       this.disableAnalyticsCookies()
     }
 
     // Apply marketing cookies
-    if (consentData.marketing) {
+    if (consentData.marketing === true) {
       this.enableMarketingCookies()
     } else {
       this.disableMarketingCookies()
     }
+
+    // Log current consent state for debugging
+    console.log('Applied cookie settings:', {
+      analytics: consentData.analytics,
+      marketing: consentData.marketing,
+      timestamp: consentData.timestamp
+    })
   }
 
   enableAnalyticsCookies() {
@@ -496,5 +550,44 @@ window.CookieConsentController = {
     } catch (error) {
       return false
     }
+  },
+
+  // Debug method to diagnose cookie issues
+  debugCookieState: () => {
+    console.group('🍪 Cookie Consent Debug Info')
+    
+    // Check localStorage
+    const localStorage_data = localStorage.getItem('cookieConsent')
+    console.log('LocalStorage data:', localStorage_data)
+    if (localStorage_data) {
+      try {
+        console.log('Parsed localStorage:', JSON.parse(localStorage_data))
+      } catch (e) {
+        console.error('LocalStorage parsing error:', e)
+      }
+    }
+    
+    // Check HTTP cookies
+    console.log('HTTP Cookies:')
+    console.log('- cookie_consent:', document.cookie.match(/cookie_consent=([^;]*)/)?.[1] || 'not set')
+    console.log('- analytics_consent:', document.cookie.match(/analytics_consent=([^;]*)/)?.[1] || 'not set')
+    console.log('- marketing_consent:', document.cookie.match(/marketing_consent=([^;]*)/)?.[1] || 'not set')
+    
+    // Check banner state
+    const banner = document.getElementById('cookie-consent-banner')
+    console.log('Banner element:', banner ? 'exists' : 'missing')
+    if (banner) {
+      console.log('Banner display:', banner.style.display)
+      console.log('Banner classes:', banner.className)
+    }
+    
+    // Check modal state
+    const modal = document.getElementById('cookie-settings-modal')
+    console.log('Modal element:', modal ? 'exists' : 'missing')
+    if (modal) {
+      console.log('Modal display:', modal.style.display)
+    }
+    
+    console.groupEnd()
   }
 }

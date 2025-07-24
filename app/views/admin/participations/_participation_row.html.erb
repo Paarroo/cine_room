@@ -1,6 +1,6 @@
 <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
   <!-- Checkbox -->
-  <td class="py-4 px-2">
+  <td class="py-3 px-1 w-8">
     <input
       type="checkbox"
       class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary participation-checkbox"
@@ -10,139 +10,118 @@
   </td>
 
   <!-- User -->
-  <td class="py-4 px-2">
-    <div class="flex items-center space-x-2 min-w-0">
-      <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-        <%= data[:user_name].present? ? data[:user_name].first(2).upcase : 'U' %>
+  <td class="py-3 px-1 min-w-0 max-w-32">
+    <div class="flex items-center space-x-1">
+      <div class="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+        <%= data[:user_name].present? ? data[:user_name].first(1).upcase : 'U' %>
       </div>
-      <div class="min-w-0">
-        <div class="text-white font-medium text-sm truncate">
-          <%= data[:user_name] %>
+      <div class="min-w-0 flex-1">
+        <div class="text-white font-medium text-xs truncate">
+          <%= truncate(data[:user_name], length: 12) %>
         </div>
-        <% if data[:user_link]&.email %>
-          <div class="text-gray-400 text-xs truncate">
-            <%= data[:user_link].email %>
-          </div>
-        <% end %>
       </div>
     </div>
   </td>
 
   <!-- Event -->
-  <td class="py-4 px-2">
-    <div class="min-w-0">
-      <div class="text-white font-medium text-sm truncate">
-        <%= link_to data[:event_title], admin_participation_path(data[:id]),
-            class: "hover:text-primary transition-colors" %>
-      </div>
-      <% if data[:event_link]&.venue_name %>
-        <div class="text-gray-400 text-xs truncate">
-          <%= data[:event_link].venue_name %>
-        </div>
-      <% end %>
+  <td class="py-3 px-1 min-w-0 max-w-36">
+    <div class="text-white font-medium text-xs truncate">
+      <%= link_to truncate(data[:event_title], length: 15), admin_participation_path(data[:id]),
+          class: "hover:text-primary transition-colors" %>
     </div>
-  </td>
-
-  <!-- Movie -->
-  <td class="py-4 px-2">
-    <% if data[:movie_title].present? %>
-      <div class="flex items-center space-x-2 min-w-0">
-        <div class="w-6 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-          <%= data[:movie_title].first(1) %>
-        </div>
-        <div class="min-w-0">
-          <div class="text-white text-sm truncate">
-            <%= truncate(data[:movie_title], length: 15) %>
-          </div>
-          <% if data[:movie_link]&.year %>
-            <div class="text-gray-400 text-xs">
-              <%= data[:movie_link].year %>
-            </div>
-          <% end %>
-        </div>
+    <% if data[:event_link]&.venue_name %>
+      <div class="text-gray-400 text-xs truncate">
+        <%= truncate(data[:event_link].venue_name, length: 12) %>
       </div>
-    <% else %>
-      <span class="text-gray-500 text-sm">-</span>
     <% end %>
   </td>
 
-  <!-- Event Date -->
-  <td class="py-4 px-2">
+  <!-- Movie -->
+  <td class="py-3 px-1 min-w-0 max-w-28">
+    <% if data[:movie_title].present? %>
+      <div class="flex items-center space-x-1">
+        <div class="w-4 h-6 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+          <%= data[:movie_title].first(1) %>
+        </div>
+        <div class="text-white text-xs truncate">
+          <%= truncate(data[:movie_title], length: 8) %>
+        </div>
+      </div>
+    <% else %>
+      <span class="text-gray-500 text-xs">-</span>
+    <% end %>
+  </td>
+
+  <!-- Date -->
+  <td class="py-3 px-1 w-16">
     <% if data[:event_date] %>
-      <div class="text-white text-sm">
+      <div class="text-white text-xs">
         <%= data[:event_date].strftime("%d/%m") %>
       </div>
       <div class="text-gray-400 text-xs">
         <%= data[:event_link]&.start_time&.strftime("%H:%M") %>
       </div>
     <% else %>
-      <span class="text-gray-500 text-sm">-</span>
+      <span class="text-gray-500 text-xs">-</span>
     <% end %>
   </td>
 
-  <!-- Seats -->
-  <td class="py-4 px-2">
-    <div class="flex items-center space-x-1">
-      <i class="fas fa-users text-gray-400 text-xs"></i>
-      <span class="text-white font-medium"><%= data[:seats] %></span>
+  <!-- Places -->
+  <td class="py-3 px-1 w-12 text-center">
+    <span class="text-white font-medium text-xs"><%= data[:seats] %></span>
+  </td>
+
+  <!-- Prix -->
+  <td class="py-3 px-1 w-16">
+    <div class="text-primary font-semibold text-xs">
+      <%= number_to_currency(data[:total_price], precision: 0) %>
     </div>
   </td>
 
-  <!-- Total Price -->
-  <td class="py-4 px-2">
-    <div class="text-primary font-semibold text-sm">
-      <%= data[:formatted_total_price] %>
-    </div>
-  </td>
-
-  <!-- Status -->
-  <td class="py-4 px-2">
+  <!-- Statut -->
+  <td class="py-3 px-1 w-20">
     <% case data[:status] %>
     <% when 'pending' %>
-      <span class="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-lg text-xs font-medium">
-        <i class="fas fa-clock mr-1"></i><%= data[:status_humanized] %>
+      <span class="px-1 py-0.5 bg-yellow-500/20 text-yellow-300 rounded text-xs">
+        <i class="fas fa-clock"></i>
       </span>
     <% when 'confirmed' %>
-      <span class="px-2 py-1 bg-green-500/20 text-green-300 rounded-lg text-xs font-medium">
-        <i class="fas fa-check mr-1"></i><%= data[:status_humanized] %>
+      <span class="px-1 py-0.5 bg-green-500/20 text-green-300 rounded text-xs">
+        <i class="fas fa-check"></i>
       </span>
     <% when 'cancelled' %>
-      <span class="px-2 py-1 bg-red-500/20 text-red-300 rounded-lg text-xs font-medium">
-        <i class="fas fa-times mr-1"></i><%= data[:status_humanized] %>
+      <span class="px-1 py-0.5 bg-red-500/20 text-red-300 rounded text-xs">
+        <i class="fas fa-times"></i>
       </span>
     <% end %>
   </td>
 
-  <!-- Payment -->
-  <td class="py-4 px-2 text-center">
+  <!-- Paiement -->
+  <td class="py-3 px-1 w-8 text-center">
     <% if data[:has_payment] %>
-      <div class="text-green-400" title="Paiement effectué">
-        <i class="fas fa-credit-card"></i>
-      </div>
+      <i class="fas fa-credit-card text-green-400 text-xs"></i>
     <% else %>
-      <div class="text-gray-500" title="Aucun paiement">
-        <i class="fas fa-credit-card"></i>
-      </div>
+      <i class="fas fa-credit-card text-gray-500 text-xs"></i>
     <% end %>
   </td>
 
   <!-- Actions -->
-  <td class="py-4 px-2">
-    <div class="flex items-center space-x-1">
-      <!-- View Button -->
+  <td class="py-3 px-1 w-20">
+    <div class="flex items-center space-x-0.5">
+      <!-- View -->
       <%= link_to admin_participation_path(data[:id]),
-          class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
+          class: "p-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
           title: "Voir" do %>
         <i class="fas fa-eye"></i>
       <% end %>
 
-      <!-- Status-based single action -->
+      <!-- Action selon statut -->
       <% case data[:status] %>
       <% when 'pending' %>
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'confirmed' },
-            class: "px-2 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors",
+            class: "p-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors",
             data: { confirm: "Confirmer ?" },
             title: "Confirmer" do %>
           <i class="fas fa-check"></i>
@@ -151,7 +130,7 @@
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'cancelled' },
-            class: "px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
+            class: "p-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
             data: { confirm: "Annuler ?" },
             title: "Annuler" do %>
           <i class="fas fa-times"></i>
@@ -160,8 +139,8 @@
         <%= button_to admin_participation_path(data[:id]),
             method: :patch,
             params: { status: 'pending' },
-            class: "px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
-            data: { confirm: "Remettre en attente ?" },
+            class: "p-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
+            data: { confirm: "Restaurer ?" },
             title: "Restaurer" do %>
           <i class="fas fa-undo"></i>
         <% end %>

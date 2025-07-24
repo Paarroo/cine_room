@@ -20,24 +20,6 @@
               <%= @stats[:total] %> réservations au total • <%= @stats[:pending] %> en attente
             </p>
           </div>
-
-          <!-- Bulk Actions -->
-          <div class="bulk-actions hidden" id="bulk-actions">
-            <button
-              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
-              data-action="click->admin-participations#bulkConfirm"
-            >
-              <i class="fas fa-check mr-2"></i>
-              Confirmer sélection
-            </button>
-            <button
-              class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
-              data-action="click->admin-participations#bulkCancel"
-            >
-              <i class="fas fa-times mr-2"></i>
-              Annuler sélection
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -76,6 +58,24 @@
               <%= @formatted_participations.count %> résultats
             </span>
           </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions hidden" id="bulk-actions">
+          <button
+            class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
+            data-action="click->admin-participations#bulkConfirm"
+          >
+            <i class="fas fa-check mr-2"></i>
+            Confirmer sélection
+          </button>
+          <button
+            class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
+            data-action="click->admin-participations#bulkCancel"
+          >
+            <i class="fas fa-times mr-2"></i>
+            Annuler sélection
+          </button>
         </div>
 
         <!-- Participations Table -->

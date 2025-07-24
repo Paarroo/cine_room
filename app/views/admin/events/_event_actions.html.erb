@@ -1,0 +1,108 @@
+<section class="event-actions py-8">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-white">
+          <i class="fas fa-cog text-primary mr-3"></i>
+          Actions administrateur
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Complete Event -->
+        <% if @event.upcoming? %>
+          <%= button_to admin_event_path(@event),
+              method: :patch,
+              params: { status: 'completed' },
+              class: "w-full px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+              data: { confirm: "Marquer cet événement comme terminé ?" } do %>
+            <i class="fas fa-check-circle mr-2"></i>Marquer terminé
+          <% end %>
+        <% end %>
+
+        <!-- Cancel Event -->
+        <% if @event.upcoming? || @event.sold_out? %>
+          <%= button_to admin_event_path(@event),
+              method: :patch,
+              params: { status: 'cancelled' },
+              class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+              data: { confirm: "Annuler cet événement ?" } do %>
+            <i class="fas fa-times-circle mr-2"></i>Annuler événement
+          <% end %>
+        <% end %>
+
+        <!-- Reopen Event -->
+        <% if @event.cancelled? %>
+          <%= button_to admin_event_path(@event),
+              method: :patch,
+              params: { status: 'upcoming' },
+              class: "w-full px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+              data: { confirm: "Rouvrir cet événement ?" } do %>
+            <i class="fas fa-undo mr-2"></i>Rouvrir événement
+          <% end %>
+        <% end %>
+
+        <!-- Export Participations -->
+        <button
+          class="w-full px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+          onclick="exportParticipations(<%= @event.id %>)"
+        >
+          <i class="fas fa-download mr-2"></i>Exporter participants
+        </button>
+
+        <!-- Send Notification -->
+        <button
+          class="w-full px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+          onclick="sendEventNotification(<%= @event.id %>)"
+        >
+          <i class="fas fa-bell mr-2"></i>Notifier participants
+        </button>
+
+        <!-- Event Statistics -->
+        <%= link_to "#statistics",
+            class: "w-full px-6 py-3 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-xl transition-colors font-semibold flex items-center justify-center" do %>
+          <i class="fas fa-chart-line mr-2"></i>Statistiques détaillées
+        <% end %>
+
+        <!-- Edit Event -->
+        <%= link_to edit_admin_event_path(@event),
+            class: "w-full px-6 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-xl transition-colors font-semibold flex items-center justify-center" do %>
+          <i class="fas fa-edit mr-2"></i>Modifier événement
+        <% end %>
+
+        <!-- Delete Event -->
+        <%= button_to admin_event_path(@event),
+            method: :delete,
+            class: "w-full px-6 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
+            data: { confirm: "Supprimer définitivement cet événement ? Cette action est irréversible." } do %>
+          <i class="fas fa-trash mr-2"></i>Supprimer
+        <% end %>
+      </div>
+
+      <!-- Technical Information -->
+      <div class="mt-8 pt-6 border-t border-white/10">
+        <h4 class="text-lg font-semibold text-white mb-4">
+          <i class="fas fa-info-circle text-primary mr-2"></i>Informations techniques
+        </h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <span class="text-gray-400">ID Événement:</span>
+            <span class="text-white ml-2">#<%= @event.id %></span>
+          </div>
+          <div>
+            <span class="text-gray-400">Créé le:</span>
+            <span class="text-white ml-2"><%= @event.created_at.strftime("%d/%m/%Y") %></span>
+          </div>
+          <div>
+            <span class="text-gray-400">Modifié le:</span>
+            <span class="text-white ml-2"><%= @event.updated_at.strftime("%d/%m/%Y") %></span>
+          </div>
+          <div>
+            <span class="text-gray-400">Statut:</span>
+            <span class="text-white ml-2"><%= @event.status.humanize %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

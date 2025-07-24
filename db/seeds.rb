@@ -16,6 +16,10 @@ if Rails.env.production?
   # Also disable all ActionMailer deliveries during seeding
   ActionMailer::Base.perform_deliveries = false
   
+  # Disable ActiveJob completely during seeding to avoid SolidQueue issues
+  original_queue_adapter = ActiveJob::Base.queue_adapter
+  ActiveJob::Base.queue_adapter = :test
+  
   # Temporarily skip poster validation during seeding by using save!(validate: false)
   
   
@@ -183,6 +187,9 @@ if Rails.env.production?
   
   # Re-enable ActionMailer deliveries
   ActionMailer::Base.perform_deliveries = true
+  
+  # Restore original queue adapter
+  ActiveJob::Base.queue_adapter = original_queue_adapter
   
   puts " Production seeding complete!"
   puts "Created:"

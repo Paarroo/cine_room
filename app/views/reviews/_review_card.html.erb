@@ -1,0 +1,28 @@
+<!-- Review partial - displays a single review with full/empty stars -->
+<div class="p-4 bg-white/5 border border-white/10 rounded-xl text-gray-300">
+  <!-- Review header with author and rating -->
+  <div class="flex justify-between items-center mb-2">
+    <span class="font-semibold"><%= review.user.first_name %></span>
+
+    <!-- Display full and empty stars without spacing -->
+    <span class="text-yellow-400">
+      <% 5.times do |i| %>
+        <% if i < review.rating.to_i %>
+          <i class="fas fa-star"></i>
+        <% else %>
+          <i class="far fa-star"></i>
+        <% end %>
+      <% end %>
+    </span>
+  </div>
+
+  <!-- Review comment -->
+  <p class="text-sm"><%= review.comment %></p>
+
+  <!-- Show event context only when rendered from movie page -->
+  <% if local_assigns[:show_event_context] && review.event.present? %>
+    <p class="text-xs text-gray-500 mt-2 italic">
+      Vu lors de : <%= link_to review.event.title, event_path(review.event), class: "underline hover:text-gold-400" %>
+    </p>
+  <% end %>
+</div>

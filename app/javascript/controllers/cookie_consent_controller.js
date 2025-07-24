@@ -9,17 +9,36 @@ export default class extends Controller {
   }
 
   initializeCookieConsent() {
-    // Check if user has already made a choice
+    // Check if user has already made a choice (check both localStorage and cookies)
     const consentData = this.getCookieConsent()
+    const cookieChoice = this.getCookie('cookie_consent')
     
-    if (!consentData) {
+    // If we have localStorage data but no HTTP cookie, sync them
+    if (consentData && !cookieChoice) {
+      this.saveCookieConsent(consentData)
+    }
+    // If we have HTTP cookie but no localStorage, recreate localStorage from cookies
+    else if (!consentData && cookieChoice === 'true') {
+      const syncedData = {
+        essential: true,
+        analytics: this.getCookie('analytics_consent') === 'true',
+        marketing: this.getCookie('marketing_consent') === 'true',
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+      }
+      localStorage.setItem('cookieConsent', JSON.stringify(syncedData))
+    }
+    
+    const finalConsentData = this.getCookieConsent()
+    
+    if (!finalConsentData) {
       // Show banner after a short delay for better UX
       setTimeout(() => {
         this.showBanner()
       }, 1000)
     } else {
       // Apply existing consent preferences
-      this.applyCookieSettings(consentData)
+      this.applyCookieSettings(finalConsentData)
     }
 
     this.bindEventListeners()
@@ -307,7 +326,11 @@ export default class extends Controller {
   setCookie(name, value, days) {
     const expires = new Date()
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000))
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`
+    
+    // Add Secure flag for HTTPS
+    const isSecure = window.location.protocol === 'https:' ? ';Secure' : ''
+    
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax${isSecure}`
   }
 
   getCookie(name) {
@@ -437,10 +460,29 @@ window.CookieConsentController = {
   },
   
   revokeConsent: () => {
+    // Remove localStorage
     localStorage.removeItem('cookieConsent')
-    document.cookie = 'cookie_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
-    document.cookie = 'analytics_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
-    document.cookie = 'marketing_consent=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+    
+    // Remove HTTP cookies with all possible domain variations
+    const cookies = ['cookie_consent', 'analytics_consent', 'marketing_consent']
+    const domains = ['', window.location.hostname, '.' + window.location.hostname]
+    
+    cookies.forEach(cookieName => {
+      domains.forEach(domain => {
+        const domainAttr = domain ? `;domain=${domain}` : ''
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/${domainAttr}`
+      })
+    })
+    
+    // Also remove third-party cookies
+    const thirdPartyCookies = ['_ga', '_ga_', '_gid', '_gat', '_gtag_', '_fbp', '_fbc']
+    thirdPartyCookies.forEach(cookieName => {
+      domains.forEach(domain => {
+        const domainAttr = domain ? `;domain=${domain}` : ''
+        document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/${domainAttr}`
+      })
+    })
+    
     window.location.reload()
   },
   

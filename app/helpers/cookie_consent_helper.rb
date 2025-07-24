@@ -17,7 +17,7 @@ module CookieConsentHelper
 
   # Check if user has made any cookie choice
   def cookie_choice_made?
-    cookies[:cookie_consent].present?
+    cookies[:cookie_consent].present? && cookies[:cookie_consent] != ''
   end
 
   # Render analytics scripts only if consent is given

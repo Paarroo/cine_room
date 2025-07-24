@@ -13,6 +13,9 @@ if Rails.env.production?
   puts "Disabling welcome emails for seeding process..."
   User.skip_callback(:create, :after, :send_welcome_email)
   
+  # Also disable all ActionMailer deliveries during seeding
+  ActionMailer::Base.perform_deliveries = false
+  
   # Create a default poster for seeding
   puts "Creating default poster for movies..."
   require 'open-uri'
@@ -193,6 +196,9 @@ if Rails.env.production?
   # Re-enable welcome email callback for normal user registration
   puts "Re-enabling welcome emails for normal operation..."
   User.set_callback(:create, :after, :send_welcome_email)
+  
+  # Re-enable ActionMailer deliveries
+  ActionMailer::Base.perform_deliveries = true
   
   # Clean up temporary poster file
   File.delete(default_poster_path) if File.exist?(default_poster_path)

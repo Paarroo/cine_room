@@ -71,12 +71,14 @@ if Rails.env.production?
     2.times do |j|
       movies << Movie.create!(
         title: movie_titles[i*2 + j],
-        description: "Un film captivant qui explore les thèmes universels de l'humanité à travers une histoire unique et touchante.",
+        synopsis: "Un film captivant qui explore les thèmes universels de l'humanité à travers une histoire unique et touchante.",
+        director: creator.full_name,
         genre: ["Drame", "Thriller", "Comédie", "Romance", "Action"].sample,
         duration: [90, 105, 120, 135, 150].sample,
-        release_date: Date.current - rand(1..5).years,
+        year: Date.current.year - rand(1..5),
+        language: "Français",
         user: creator,
-        status: 'approved',
+        validation_status: 'approved',
         validated_by: admin,
         validated_at: Time.current
       )
@@ -89,11 +91,10 @@ if Rails.env.production?
     rand(1..3).times do
       events << Event.create!(
         title: "Projection de #{movie.title}",
-        description: "Venez découvrir ce magnifique film dans une ambiance conviviale.",
-        start_date: Time.current + rand(1..30).days,
-        end_date: Time.current + rand(31..60).days,
-        location: ["Cinéma Le Grand Rex", "MK2 Bibliothèque", "Pathé Châtelet", "UGC Ciné Cité"].sample,
-        address: ["1 bd Poissonnière, Paris", "128-162 Av. de France, Paris", "Place du Châtelet, Paris", "19 Rue Berger, Paris"].sample,
+        venue_name: ["Cinéma Le Grand Rex", "MK2 Bibliothèque", "Pathé Châtelet", "UGC Ciné Cité"].sample,
+        venue_address: ["1 bd Poissonnière, Paris", "128-162 Av. de France, Paris", "Place du Châtelet, Paris", "19 Rue Berger, Paris"].sample,
+        event_date: Date.current + rand(1..30).days,
+        start_time: Time.current.change(hour: [18, 19, 20, 21].sample, min: [0, 30].sample),
         max_capacity: [20, 30, 40, 50].sample,
         price_cents: [800, 1000, 1200, 1500].sample,
         status: 'upcoming',
@@ -107,14 +108,13 @@ if Rails.env.production?
   movies.sample(3).each do |movie|
     past_events << Event.create!(
       title: "Projection de #{movie.title} (passée)",
-      description: "Projection terminée avec succès.",
-      start_date: Time.current - rand(30..90).days,
-      end_date: Time.current - rand(10..29).days,
-      location: "Cinéma Vintage",
-      address: "15 Rue de la Paix, Paris",
+      venue_name: "Cinéma Vintage",
+      venue_address: "15 Rue de la Paix, Paris",
+      event_date: Date.current - rand(30..90).days,
+      start_time: Time.current.change(hour: 20, min: 0),
       max_capacity: 25,
       price_cents: 1000,
-      status: 'completed',
+      status: 'finished',
       movie: movie
     )
   end
@@ -128,7 +128,7 @@ if Rails.env.production?
       Participation.create!(
         user: user,
         event: event,
-        status: event.completed? ? 'confirmed' : ['pending', 'confirmed'].sample,
+        status: event.finished? ? 'confirmed' : ['pending', 'confirmed'].sample,
         seats: rand(1..3),
         total_price_cents: event.price_cents * rand(1..3)
       )
@@ -164,7 +164,7 @@ if Rails.env.production?
   puts "Created:"
   puts "  Users: #{User.count} (#{User.where(role: 'admin').count} admin, #{User.where(role: 'creator').count} creators, #{User.where(role: 'user').count} users)"
   puts "  Movies: #{Movie.count}"
-  puts "  Events: #{Event.count} (#{Event.where(status: 'upcoming').count} upcoming, #{Event.where(status: 'completed').count} completed)"
+  puts "  Events: #{Event.count} (#{Event.where(status: 'upcoming').count} upcoming, #{Event.where(status: 'finished').count} finished)"
   puts "  Participations: #{Participation.count}"
   puts "  Reviews: #{Review.count}"
   exit

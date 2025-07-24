@@ -35,6 +35,8 @@ gem "view_component"
 
 gem "image_processing", "~> 1.2"
 gem "aws-sdk-s3", require: false
+gem 'cloudinary'
+gem 'activestorage-cloudinary-service'
 
 gem "premailer-rails"
 gem "nokogiri"
@@ -116,8 +118,6 @@ group :development do
   gem 'devise-i18n'
   gem 'http_accept_language'
 
-  gem 'cloudinary'
-  gem 'activestorage-cloudinary-service'
 end
 group :test do
   gem "capybara"

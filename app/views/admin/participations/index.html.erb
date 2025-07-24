@@ -1,56 +1,34 @@
-<%= render 'admin/dashboard/navbar' %>
-
 <div
   class="admin-dashboard min-h-screen bg-dark-400"
   data-controller="admin-dashboard admin-flash admin-participations"
 >
   <!-- Page Header -->
   <div class="dashboard-header">
-    <div class="welcome-section glass-effect rounded-3xl p-8 mt-20">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <!-- Title Section -->
-        <div class="flex-1 min-width-0">
-          <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
-            <i class="fas fa-ticket-alt mr-4"></i>
-            Gestion des Réservations
-          </h1>
-          <p class="text-xl text-gray-300 mb-2">
-            Administration des participations utilisateurs
-          </p>
-          <p class="text-gray-400 text-base">
-            <%= @stats[:total] %> réservations au total • <%= @stats[:pending] %> en attente
-          </p>
-        </div>
-
-          <!-- Bulk Actions -->
-          <div class="bulk-actions hidden" id="bulk-actions">
-            <button
-              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
-              data-action="click->admin-participations#bulkConfirm"
-            >
-              <i class="fas fa-check mr-2"></i>
-              Confirmer sélection
-            </button>
-            <button
-              class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
-              data-action="click->admin-participations#bulkCancel"
-            >
-              <i class="fas fa-times mr-2"></i>
-              Annuler sélection
-            </button>
+    <div class="container-app">
+      <div class="welcome-section glass-effect rounded-3xl p-8 mt-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <!-- Title Section -->
+          <div class="flex-1 min-width-0">
+            <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+              <i class="fas fa-ticket-alt mr-4"></i>
+              Gestion des Réservations
+            </h1>
+            <p class="text-xl text-gray-300 mb-2">
+              Administration des participations utilisateurs
+            </p>
+            <p class="text-gray-400 text-base">
+              <%= @stats[:total] %> réservations au total • <%= @stats[:pending] %> en attente
+            </p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Cards -->
   <%= render 'stats_cards' %>
 
-  <!-- Filters Section -->
   <%= render 'filters' %>
 
-  <!-- Participations List -->
   <section class="participations-list py-8">
     <div class="container-app">
       <div
@@ -69,9 +47,9 @@
             <label class="flex items-center space-x-2">
               <input
                 type="checkbox"
+                id="select-all-participations"
                 class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-                data-admin-participations-target="selectAll"
-                data-action="change->admin-participations#toggleSelectAll"
+                onchange="toggleAllParticipations(this)"
               >
               <span class="text-sm text-gray-400">Tout sélectionner</span>
             </label>
@@ -82,24 +60,40 @@
           </div>
         </div>
 
+        <!-- Bulk Actions -->
+        <div class="bulk-actions hidden" id="bulk-actions">
+          <button
+            class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
+            data-action="click->admin-participations#bulkConfirm"
+          >
+            <i class="fas fa-check mr-2"></i>
+            Confirmer sélection
+          </button>
+          <button
+            class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
+            data-action="click->admin-participations#bulkCancel"
+          >
+            <i class="fas fa-times mr-2"></i>
+            Annuler sélection
+          </button>
+        </div>
+
         <!-- Participations Table -->
         <% if @formatted_participations.any? %>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-white/10">
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">
-                    <input type="checkbox" class="w-4 h-4" data-admin-participations-target="selectAll">
-                  </th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Utilisateur</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Événement</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Film</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Date</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Places</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Prix Total</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Statut</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Paiement</th>
-                  <th class="text-left py-3 px-4 text-gray-300 font-medium">Actions</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Sél.</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Utilisateur</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Événement</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Film</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Date</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Places</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Prix</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Statut</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">💳</th>
+                  <th class="text-left py-3 px-2 text-gray-300 font-medium text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,9 +129,29 @@
           </div>
         <% end %>
       </div>
-    </div>@
+    </div>
   </section>
 
-  <!-- Revenue Summary -->
   <%= render 'revenue_summary' %>
 </div>
+
+<script>
+function toggleAllParticipations(selectAllCheckbox) {
+  const checkboxes = document.querySelectorAll('.participation-checkbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+  });
+  updateBulkActions();
+}
+
+function updateBulkActions() {
+  const checkboxes = document.querySelectorAll('.participation-checkbox:checked');
+  const bulkActions = document.getElementById('bulk-actions');
+
+  if (checkboxes.length > 0) {
+    bulkActions.classList.remove('hidden');
+  } else {
+    bulkActions.classList.add('hidden');
+  }
+}
+</script>

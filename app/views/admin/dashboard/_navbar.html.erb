@@ -1,10 +1,10 @@
 <!-- Admin Navbar - Combined with positioning fix -->
 <nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50">
-  <div class="h-16 max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-around items-center h-full">
+  <div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-full">
 
       <!-- Logo Section - Admin Version -->
-      <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0", style: "margin-left: 0rem;" do %>
+      <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0" do %>
         <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
           <i class="fas fa-cog text-white text-lg"></i>
         </div>
@@ -14,11 +14,8 @@
         </div>
       <% end %>
 
-
       <!-- Admin Navigation Links -->
-      <div class="hidden lg:flex items-center space-x-6 flex-1 justify-start">
-
-
+      <div class="hidden lg:flex items-center space-x-6">
         <!-- Dashboard -->
         <%= link_to admin_dashboard_index_path,
             class: "admin-nav-link #{'active' if current_page?(admin_dashboard_index_path)}" do %>
@@ -53,10 +50,10 @@
           <i class="fas fa-ticket-alt mr-2"></i>
           Réservations
         <% end %>
+      </div>
 
       <!-- Admin Actions Section -->
-
-
+      <div class="hidden lg:flex items-center space-x-4">
         <!-- User Profile Admin -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">

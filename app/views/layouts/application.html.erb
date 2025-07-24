@@ -32,7 +32,11 @@
   </head>
 
   <body class="bg-surface text-white min-h-screen flex flex-col">
-    <%= render 'shared/navbar' %>
+    <% if params[:controller]&.start_with?('admin/') %>
+      <%= render 'admin/dashboard/navbar' %>
+    <% else %>
+      <%= render 'shared/navbar' %>
+    <% end %>
     <%= render 'shared/alerts' %>
 
     <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-grow">

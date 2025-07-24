@@ -12,7 +12,22 @@ FactoryBot.define do
     trailer_url { "https://www.youtube.com/watch?v=#{Faker::Alphanumeric.alpha(number: 11)}" }
     validation_status { :pending }
 
-    association :user, factory: %i[user creator]
+    trait :approved do
+      validation_status { :approved }
+      association :validated_by, factory: [:user, :admin]
+    end
+
+    trait :rejected do
+      validation_status { :rejected }
+      association :validated_by, factory: [:user, :admin]
+    end
+
+    trait :validated do
+      validation_status { :approved }
+      association :validated_by, factory: [:user, :admin]
+    end
+
+    association :user, factory: [:user, :creator]
 
     after(:build) do |movie|
       movie.authorship_confirmed = "1"

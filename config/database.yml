@@ -26,3 +26,27 @@ cable:
   production:
     <<: *default
     url: <%= ENV["DATABASE_URL"] %>
+
+# SolidCache configuration for Rails 8
+cache:
+  development:
+    <<: *default
+    database: cineroom_development
+  test:
+    <<: *default
+    database: cineroom_test
+  production:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+
+# SolidQueue configuration for Rails 8
+queue:
+  development:
+    <<: *default
+    database: cineroom_development
+  test:
+    <<: *default
+    database: cineroom_test
+  production:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>

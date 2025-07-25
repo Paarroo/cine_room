@@ -1,26 +1,59 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <style>
-      body { background-color: #111827; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
-      .btn { background-color: #fbbf24; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
-    </style>
-  </head>
-  <body>
-    <h1>Bienvenue sur CinéRoom 🎬</h1>
-    <p>Bonjour <%= @resource.email %>,</p>
-
-    <p>Merci de vous être inscrit !</p>
-
-    <p>Veuillez confirmer votre compte en cliquant ci-dessous :</p>
-
-    <p>
-      <a href="<%= confirmation_url(@resource, confirmation_token: @token) %>" class="btn">
-        Confirmer mon compte
-      </a>
-    </p>
-
-    <p>— L’équipe CinéRoom</p>
-  </body>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation de compte - CinéRoom</title>
+  <%= stylesheet_link_tag 'application', 'data-turbo-track': 'reload' %>
+</head>
+<body class="bg-surface text-content">
+  <div class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-2xl w-full glass-effect rounded-3xl overflow-hidden">
+      <!-- Header -->
+      <div class="text-center p-8 border-b border-white/10 bg-gradient-to-r from-primary/10 to-gold-500/10">
+        <div class="w-20 h-20 bg-gradient-to-br from-primary to-gold-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <i class="fas fa-film text-white text-3xl"></i>
+        </div>
+        <div class="text-3xl font-bold mb-2 gradient-text">CinéRoom</div>
+        <div class="text-sm text-muted uppercase tracking-widest">Cinéma Indépendant</div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8 text-center">
+        <h1 class="text-4xl font-bold mb-8">
+          Bienvenue sur <span class="gradient-text">CinéRoom</span> 🎬
+        </h1>
+        
+        <div class="glass-subtle rounded-2xl p-8 mb-8 text-left max-w-lg mx-auto">
+          <p class="text-lg mb-6 text-center">Bonjour <span class="text-primary font-medium"><%= @resource.email %></span>,</p>
+          
+          <p class="text-muted mb-6 text-center leading-relaxed">Merci de vous être inscrit sur notre plateforme dédiée au cinéma indépendant ! Vous êtes sur le point de découvrir des expériences cinématographiques uniques.</p>
+          
+          <p class="text-muted mb-8 text-center">Pour finaliser votre inscription et accéder à nos événements exclusifs, veuillez confirmer votre compte :</p>
+          
+          <div class="text-center mb-6">
+            <%= link_to confirmation_url(@resource, confirmation_token: @token), 
+                class: "btn-primary inline-flex items-center text-decoration-none px-8 py-4 text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300" do %>
+              <i class="fas fa-check-circle mr-3 text-xl"></i>
+              Confirmer mon compte
+            <% end %>
+          </div>
+          
+          <div class="text-center bg-primary/5 rounded-xl p-4 border border-primary/20">
+            <p class="text-sm text-muted">
+              <i class="fas fa-clock mr-2 text-primary"></i>
+              Ce lien expire dans 24 heures pour votre sécurité
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="text-center p-8 border-t border-white/10 bg-gradient-to-r from-surface to-dark-300">
+        <p class="text-muted mb-3 text-lg">À bientôt pour vos premières découvertes cinématographiques !</p>
+        <p class="text-primary font-bold text-xl">— L'équipe CinéRoom</p>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

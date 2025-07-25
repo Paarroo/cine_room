@@ -1,12 +1,94 @@
 <!DOCTYPE html>
-<html>
-  <body style="font-family: sans-serif; background-color: #111827; color: #e5e7eb; padding: 2rem;">
-    <h1 style="color: #10b981;">Votre compte est verrouillé</h1>
-    <p>Bonjour <%= @resource.email %>,</p>
-    <p>Vous pouvez déverrouiller votre compte en cliquant sur le bouton suivant :</p>
-    <p>
-      <a href="<%= unlock_url(@resource, unlock_token: @token) %>" style="background: #10b981; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">Déverrouiller mon compte</a>
-    </p>
-    <p>Si vous n'avez pas tenté de vous connecter, nous vous conseillons de changer votre mot de passe.</p>
-  </body>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compte verrouillé - CinéRoom</title>
+  <%= stylesheet_link_tag 'application', 'data-turbo-track': 'reload' %>
+</head>
+<body class="bg-surface text-content">
+  <div class="container-app section-padding">
+    <div class="max-w-2xl mx-auto glass-effect rounded-3xl overflow-hidden">
+      <!-- Header -->
+      <div class="text-center p-8 border-b border-white/10">
+        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-unlock text-white text-2xl"></i>
+        </div>
+        <div class="brand-name text-2xl font-bold mb-1">CinéRoom</div>
+        <div class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8">
+        <h1 class="text-3xl font-bold text-center mb-6">
+          Compte <span class="text-green-400">verrouillé</span>
+        </h1>
+        
+        <!-- Lock warning -->
+        <div class="glass-subtle rounded-2xl p-6 mb-6 border border-yellow-400/30 bg-yellow-400/5">
+          <div class="flex items-start space-x-4">
+            <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            </div>
+            <div>
+              <p class="mb-4">Bonjour <span class="text-yellow-400 font-medium"><%= @resource.email %></span>,</p>
+              
+              <p class="text-muted mb-4">
+                Votre compte CinéRoom a été temporairement verrouillé pour des raisons de sécurité 
+                suite à plusieurs tentatives de connexion incorrectes.
+              </p>
+
+              <p class="text-muted mb-6">
+                Ne vous inquiétez pas, vous pouvez le déverrouiller facilement :
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- CTA Button -->
+        <div class="text-center mb-6">
+          <%= link_to unlock_url(@resource, unlock_token: @token), 
+              class: "btn-primary inline-flex items-center text-decoration-none bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700" do %>
+            <i class="fas fa-unlock-alt mr-3"></i>
+            Déverrouiller mon compte
+          <% end %>
+        </div>
+        
+        <!-- Security recommendation -->
+        <div class="glass-subtle rounded-2xl p-6 mb-6 border border-cinema-red/30 bg-cinema-red/5">
+          <div class="flex items-start space-x-4">
+            <div class="w-12 h-12 bg-cinema-red/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <i class="fas fa-shield-alt text-cinema-red"></i>
+            </div>
+            <div>
+              <h4 class="text-content font-bold mb-2">Sécurité recommandée</h4>
+              <p class="text-cinema-red text-sm mb-4">
+                Si vous n'avez pas tenté de vous connecter récemment, 
+                nous vous conseillons de changer votre mot de passe après déverrouillage.
+              </p>
+              <div class="space-y-2">
+                <%= link_to new_user_password_path, 
+                    class: "btn-secondary inline-flex items-center text-decoration-none mr-3" do %>
+                  <i class="fas fa-key mr-2"></i>
+                  Changer mon mot de passe
+                <% end %>
+                <%= link_to "mailto:support@cineroom.fr", 
+                    class: "glass-effect hover:bg-white/10 text-content font-medium px-4 py-2 rounded-xl text-sm transition-colors inline-flex items-center text-decoration-none" do %>
+                  <i class="fas fa-question-circle mr-2"></i>
+                  Aide & Support
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="text-center p-8 border-t border-white/10">
+        <p class="text-muted mb-2">Votre sécurité nous tient à cœur,</p>
+        <p class="text-primary font-medium">— L'équipe CinéRoom</p>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

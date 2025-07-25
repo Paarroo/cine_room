@@ -49,14 +49,17 @@ class User < ApplicationRecord
     # Skip avatar attachment in production seeds to avoid file access issues
     return if Rails.env.production? && defined?(Rails.application.config.seed_in_progress)
     
+    # Skip in production if seed_in_progress config is set
+    return if Rails.env.production? && Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress
+    
     begin
       avatar.attach(
         io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
         filename: "default-avatar.jpg",
         content_type: "image/jpeg"
       )
-    rescue Errno::ENOENT
-      Rails.logger.warn "Default avatar file not found, skipping attachment"
+    rescue Errno::ENOENT, StandardError => e
+      Rails.logger.warn "Avatar attachment failed: #{e.message}"
     end
   end
 

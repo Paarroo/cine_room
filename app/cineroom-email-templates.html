@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CinéRoom Email Templates</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: {
+              100: "#1a1a1a",
+              200: "#151515",
+              300: "#111111",
+              400: "#0a0a0a",
+            },
+            gold: {
+              400: "#fbbf24",
+              500: "#f59e0b",
+              600: "#d97706",
+            },
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="bg-dark-400 text-white font-sans antialiased p-8">
+
+  <!-- Navigation entre templates -->
+  <div class="max-w-6xl mx-auto mb-8">
+    <div class="glass-effect rounded-2xl p-6">
+      <h1 class="text-3xl font-bold mb-4">
+        <span class="gradient-text">CinéRoom</span> Email Templates
+      </h1>
+      <div class="flex flex-wrap gap-3">
+        <button onclick="showTemplate('confirmation')" class="template-btn active px-4 py-2 bg-gold-500 text-white rounded-lg font-medium transition-all duration-200">
+          Confirmation
+        </button>
+        <button onclick="showTemplate('email-changed')" class="template-btn px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition-all duration-200">
+          Email changé
+        </button>
+        <button onclick="showTemplate('password-change')" class="template-btn px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition-all duration-200">
+          Mot de passe
+        </button>
+        <button onclick="showTemplate('reset-password')" class="template-btn px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition-all duration-200">
+          Reset password
+        </button>
+        <button onclick="showTemplate('unlock')" class="template-btn px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition-all duration-200">
+          Déverrouillage
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Container -->
+  <div class="max-w-4xl mx-auto">
+
+    <!-- 1. CONFIRMATION INSTRUCTIONS -->
+    <div id="confirmation" class="template-content">
+      <div class="glass-effect rounded-3xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gold-500/20 to-amber-600/20 p-8 border-b border-white/10">
+          <h2 class="text-2xl font-bold mb-2">confirmation_instructions.html.erb</h2>
+          <p class="text-gray-400">Email de confirmation d'inscription</p>
+        </div>
+        
+        <div class="p-8">
+          <div class="bg-dark-300 rounded-2xl p-8 border border-white/10">
+            <!-- Email Content -->
+            <div class="max-w-2xl mx-auto">
+              <!-- Header with logo -->
+              <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-gold-500 to-gold-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-film text-white text-2xl"></i>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="text-2xl font-bold tracking-tight">CinéRoom</span>
+                  <span class="text-xs text-gray-400 uppercase tracking-widest">Premium Cinema</span>
+                </div>
+              </div>
+
+              <!-- Welcome message -->
+              <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-4">
+                  Bienvenue sur <span class="gradient-text">CinéRoom</span> 🎬
+                </h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-gold-500 to-gold-600 rounded-full mx-auto"></div>
+              </div>
+
+              <!-- Content -->
+              <div class="bg-white/5 rounded-2xl p-6 mb-8">
+                <p class="text-lg text-gray-300 mb-4">
+                  Bonjour <span class="text-gold-400 font-medium">[email@example.com]</span>,
+                </p>
+                
+                <p class="text-gray-300 mb-6 leading-relaxed">
+                  Merci de vous être inscrit sur notre plateforme dédiée au cinéma indépendant ! 
+                  Vous êtes sur le point de découvrir des expériences cinématographiques uniques.
+                </p>
+
+                <p class="text-gray-300 mb-6">
+                  Pour finaliser votre inscription et accéder à nos événements exclusifs, 
+                  veuillez confirmer votre compte :
+                </p>
+
+                <!-- CTA Button -->
+                <div class="text-center mb-6">
+                  <a href="#" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold rounded-xl text-lg transition-all duration-300 hover:scale-105 text-decoration-none">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    Confirmer mon compte
+                  </a>
+                </div>
+
+                <div class="text-center">
+                  <p class="text-sm text-gray-400">
+                    Ce lien expire dans 24 heures pour votre sécurité
+                  </p>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="text-center">
+                <p class="text-gray-400 mb-2">
+                  À bientôt pour vos premières découvertes cinématographiques !
+                </p>
+                <p class="text-gold-400 font-medium">
+                  — L'équipe CinéRoom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EMAIL CHANGED -->
+    <div id="email-changed" class="template-content hidden">
+      <div class="glass-effect rounded-3xl overflow-hidden">
+        <div class="bg-gradient-to-r from-yellow-500/20 to-orange-600/20 p-8 border-b border-white/10">
+          <h2 class="text-2xl font-bold mb-2">email_changed.html.erb</h2>
+          <p class="text-gray-400">Notification de changement d'email</p>
+        </div>
+        
+        <div class="p-8">
+          <div class="bg-dark-300 rounded-2xl p-8 border border-white/10">
+            <div class="max-w-2xl mx-auto">
+              <!-- Header -->
+              <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-envelope-open-text text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold">
+                  Adresse e-mail <span class="text-yellow-400">modifiée</span>
+                </h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full mx-auto mt-4"></div>
+              </div>
+
+              <!-- Content -->
+              <div class="bg-yellow-500/10 border border-yellow-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-info-circle text-yellow-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-300 mb-4">
+                      Bonjour,
+                    </p>
+                    
+                    <p class="text-gray-300 mb-4">
+                      Nous vous confirmons que votre adresse e-mail a bien été changée en :
+                    </p>
+                    
+                    <div class="bg-white/5 rounded-xl p-4 mb-4">
+                      <p class="text-gold-400 font-bold text-lg">
+                        [nouvelle-email@example.com]
+                      </p>
+                    </div>
+
+                    <div class="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
+                      <p class="text-red-200 text-sm">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Important :</strong> Si vous n'êtes pas à l'origine de ce changement, 
+                        veuillez nous contacter immédiatement à support@cineroom.fr
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="text-center">
+                <p class="text-gray-400 mb-2">
+                  Merci de votre confiance,
+                </p>
+                <p class="text-gold-400 font-medium">
+                  — L'équipe CinéRoom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PASSWORD CHANGE -->
+    <div id="password-change" class="template-content hidden">
+      <div class="glass-effect rounded-3xl overflow-hidden">
+        <div class="bg-gradient-to-r from-red-500/20 to-pink-600/20 p-8 border-b border-white/10">
+          <h2 class="text-2xl font-bold mb-2">password_change.html.erb</h2>
+          <p class="text-gray-400">Notification de changement de mot de passe</p>
+        </div>
+        
+        <div class="p-8">
+          <div class="bg-dark-300 rounded-2xl p-8 border border-white/10">
+            <div class="max-w-2xl mx-auto">
+              <!-- Header -->
+              <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-key text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold">
+                  Mot de passe <span class="text-red-400">modifié</span>
+                </h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mx-auto mt-4"></div>
+              </div>
+
+              <!-- Content -->
+              <div class="bg-green-500/10 border border-green-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-300 mb-4">
+                      Bonjour,
+                    </p>
+                    
+                    <p class="text-gray-300 mb-4">
+                      <strong>Bonne nouvelle !</strong> Votre mot de passe a été changé avec succès.
+                    </p>
+                    
+                    <div class="bg-white/5 rounded-xl p-4 mb-4">
+                      <div class="flex items-center text-sm text-gray-400">
+                        <i class="fas fa-clock mr-2 text-green-400"></i>
+                        <span>Modifié le : [Date et heure]</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-red-500/10 border border-red-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-shield-alt text-red-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-white font-bold mb-2">Sécurité de votre compte</h4>
+                    <p class="text-red-200 text-sm mb-4">
+                      Si vous n'êtes pas à l'origine de cette modification, 
+                      votre compte pourrait être compromis.
+                    </p>
+                    <div class="space-y-2">
+                      <a href="#" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition-colors">
+                        <i class="fas fa-key mr-2"></i>
+                        Changer mon mot de passe
+                      </a>
+                      <a href="#" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-colors ml-3">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Contacter le support
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="text-center">
+                <p class="text-gray-400 mb-2">
+                  Votre sécurité est notre priorité,
+                </p>
+                <p class="text-gold-400 font-medium">
+                  — L'équipe CinéRoom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. RESET PASSWORD -->
+    <div id="reset-password" class="template-content hidden">
+      <div class="glass-effect rounded-3xl overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500/20 to-indigo-600/20 p-8 border-b border-white/10">
+          <h2 class="text-2xl font-bold mb-2">reset_password_instructions.html.erb</h2>
+          <p class="text-gray-400">Instructions de réinitialisation</p>
+        </div>
+        
+        <div class="p-8">
+          <div class="bg-dark-300 rounded-2xl p-8 border border-white/10">
+            <div class="max-w-2xl mx-auto">
+              <!-- Header -->
+              <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-lock text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold">
+                  Réinitialisez votre <span class="text-blue-400">mot de passe</span>
+                </h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto mt-4"></div>
+              </div>
+
+              <!-- Content -->
+              <div class="bg-blue-500/10 border border-blue-400/30 rounded-2xl p-6 mb-6">
+                <p class="text-gray-300 mb-4">
+                  Bonjour <span class="text-blue-400 font-medium">[email@example.com]</span>,
+                </p>
+                
+                <p class="text-gray-300 mb-6">
+                  Vous avez demandé la réinitialisation de votre mot de passe CinéRoom. 
+                  Pas de problème, cela arrive à tout le monde !
+                </p>
+
+                <p class="text-gray-300 mb-6">
+                  Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe sécurisé :
+                </p>
+
+                <!-- CTA Button -->
+                <div class="text-center mb-6">
+                  <a href="#" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl text-lg transition-all duration-300 hover:scale-105">
+                    <i class="fas fa-key mr-3"></i>
+                    Réinitialiser mon mot de passe
+                  </a>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4">
+                  <p class="text-sm text-gray-400 text-center">
+                    <i class="fas fa-clock mr-2 text-blue-400"></i>
+                    Ce lien est valide pendant 6 heures
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-gray-500/10 border border-gray-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-info-circle text-gray-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-white font-bold mb-2">Vous n'avez rien demandé ?</h4>
+                    <p class="text-gray-300 text-sm">
+                      Si vous n'avez pas demandé cette réinitialisation, 
+                      vous pouvez ignorer cet e-mail en toute sécurité. 
+                      Votre mot de passe actuel reste inchangé.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="text-center">
+                <p class="text-gray-400 mb-2">
+                  Besoin d'aide ? Contactez-nous,
+                </p>
+                <p class="text-gold-400 font-medium">
+                  — L'équipe CinéRoom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. UNLOCK INSTRUCTIONS -->
+    <div id="unlock" class="template-content hidden">
+      <div class="glass-effect rounded-3xl overflow-hidden">
+        <div class="bg-gradient-to-r from-green-500/20 to-emerald-600/20 p-8 border-b border-white/10">
+          <h2 class="text-2xl font-bold mb-2">unlock_instructions.html.erb</h2>
+          <p class="text-gray-400">Instructions de déverrouillage</p>
+        </div>
+        
+        <div class="p-8">
+          <div class="bg-dark-300 rounded-2xl p-8 border border-white/10">
+            <div class="max-w-2xl mx-auto">
+              <!-- Header -->
+              <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-unlock text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold">
+                  Compte <span class="text-green-400">verrouillé</span>
+                </h1>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mx-auto mt-4"></div>
+              </div>
+
+              <!-- Content -->
+              <div class="bg-orange-500/10 border border-orange-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-exclamation-triangle text-orange-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-gray-300 mb-4">
+                      Bonjour <span class="text-orange-400 font-medium">[email@example.com]</span>,
+                    </p>
+                    
+                    <p class="text-gray-300 mb-4">
+                      Votre compte CinéRoom a été temporairement verrouillé pour des raisons de sécurité 
+                      suite à plusieurs tentatives de connexion incorrectes.
+                    </p>
+
+                    <p class="text-gray-300 mb-6">
+                      Ne vous inquiétez pas, vous pouvez le déverrouiller facilement :
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CTA Button -->
+              <div class="text-center mb-6">
+                <a href="#" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl text-lg transition-all duration-300 hover:scale-105">
+                  <i class="fas fa-unlock-alt mr-3"></i>
+                  Déverrouiller mon compte
+                </a>
+              </div>
+
+              <div class="bg-red-500/10 border border-red-400/30 rounded-2xl p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="fas fa-shield-alt text-red-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-white font-bold mb-2">Sécurité recommandée</h4>
+                    <p class="text-red-200 text-sm mb-4">
+                      Si vous n'avez pas tenté de vous connecter récemment, 
+                      nous vous conseillons de changer votre mot de passe après déverrouillage.
+                    </p>
+                    <div class="space-y-2">
+                      <a href="#" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition-colors">
+                        <i class="fas fa-key mr-2"></i>
+                        Changer mon mot de passe
+                      </a>
+                      <a href="#" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-colors ml-3">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Aide & Support
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="text-center">
+                <p class="text-gray-400 mb-2">
+                  Votre sécurité nous tient à cœur,
+                </p>
+                <p class="text-gold-400 font-medium">
+                  — L'équipe CinéRoom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showTemplate(templateId) {
+      // Hide all templates
+      document.querySelectorAll('.template-content').forEach(template => {
+        template.classList.add('hidden');
+      });
+      
+      // Show selected template
+      document.getElementById(templateId).classList.remove('hidden');
+      
+      // Update button states
+      document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-gold-500', 'text-white');
+        btn.classList.add('bg-white/10', 'text-gray-300');
+      });
+      
+      // Activate current button
+      event.target.classList.add('active', 'bg-gold-500', 'text-white');
+      event.target.classList.remove('bg-white/10', 'text-gray-300');
+    }
+  </script>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ puts " Seeding the database..."
 
 if Rails.env.production?
   puts "Production seeding - creating complete dataset without FactoryBot..."
+  Rails.application.config.seed_in_progress = true
   
   # Disable welcome email during seeding only
   puts "Disabling welcome emails for seeding process..."

@@ -32,11 +32,11 @@ if Rails.env.production?
 
   puts "Creating admin users from environment variables..."
   admin = User.create!(
-    email: ENV.fetch('ADMIN_EMAIL', 'admin@cineroom.com'),
+    email: ENV.fetch('GMAIL_USERNAME', 'codes.sources.0@gmail.com'),
     first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
     last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
-    password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
-    password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123'),
+    password: 'password123',
+    password_confirmation: 'password123',
     role: 'admin',
     confirmed_at: Time.current
   )
@@ -208,11 +208,11 @@ User.destroy_all
 
 puts "Creating admin user from environment variables..."
 admin = FactoryBot.create(:user, :admin,
-  email: ENV.fetch('ADMIN_EMAIL', 'admin@cineroom.com'),
+  email: ENV.fetch('GMAIL_USERNAME', 'codes.sources.0@gmail.com'),
   first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
   last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
-  password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
-  password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123')
+  password: 'password123',
+  password_confirmation: 'password123'
 )
 
 puts "Creating #{10} regular users..."

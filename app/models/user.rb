@@ -62,7 +62,7 @@ class User < ApplicationRecord
   end
 
   def send_welcome_email
-    UserMailer.welcome_email(self).deliver_later
+    UserMailer.welcome_email(self).deliver_now
   end
 
   def saved_change_to_name?

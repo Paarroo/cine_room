@@ -40,37 +40,6 @@ class Admin::DashboardController < Admin::ApplicationController
     end
   end
 
-  # Export data functionality for various entity types
-  def export_data
-    data_type = params[:type] || 'users'
-
-    respond_to do |format|
-      format.json do
-        case data_type
-        when 'users'
-          data = export_users_data
-        when 'events'
-          data = export_events_data
-        when 'movies'
-          data = export_movies_data
-        when 'participations'
-          data = export_participations_data
-        else
-          data = { error: 'Type non supporté' }
-        end
-
-        render json: {
-          success: true,
-          data: data,
-          filename: "#{data_type}_export_#{Date.current.strftime('%Y%m%d')}.csv"
-        }
-      end
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: 500 }
-    end
-  end
 
   # Real database backup functionality with pg_dump
   def backup_database

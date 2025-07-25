@@ -215,15 +215,13 @@ export default class extends Controller {
     button.disabled = true
 
     try {
-      const response = await fetch('/admin/dashboard/export', {
-        method: 'POST',
+      const response = await fetch(`/admin/exports?type=${dataType}`, {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-Token': this.getCSRFToken()
-        },
-        body: JSON.stringify({ type: dataType })
+        }
       })
 
       if (response.ok) {

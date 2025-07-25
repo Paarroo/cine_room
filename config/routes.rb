@@ -44,9 +44,9 @@ Rails.application.routes.draw do
     end
 
     # Exports
-    resources :exports, only: [ :create ] do
-      collection do
-        post :data
+    resource :exports, only: [ :show ] do
+      member do
+        get :data
       end
     end
 
@@ -72,11 +72,15 @@ Rails.application.routes.draw do
           patch :bulk
         end
       end
+
+      # Export nested resource
+      resource :export, only: [ :show ]
     end
 
     # Events with status
     resources :events do
       resource :status, only: [ :show, :update ]
+      resource :export, only: [ :show ]
     end
 
     # Users role
@@ -85,6 +89,7 @@ Rails.application.routes.draw do
       member do
         patch :reset_password
       end
+      resource :export, only: [ :show ]
     end
 
     # Participations with confirmation
@@ -100,6 +105,9 @@ Rails.application.routes.draw do
           patch :bulk
         end
       end
+
+      # Export nested resource
+      resource :export, only: [ :show ]
     end
 
     resources :reviews do

@@ -33,7 +33,7 @@ gem 'activestorage-cloudinary-service'
 gem "premailer-rails"
 gem "nokogiri"
 gem "geocoder"
-gem "leaflet-rails"
+# gem "leaflet-rails" # Using CDN instead
 gem "sidekiq"
 gem "bootsnap", require: false
 gem "kamal", require: false

@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import L from "leaflet"
 
 // Connect this controller to the Stimulus application
 export default class extends Controller {
@@ -12,12 +11,27 @@ export default class extends Controller {
   }
 
   connect() {
-    // Initialize map centered on venue coordinates or default to Paris
-    const lat = this.latitudeValue || 48.8566;
-    const lng = this.longitudeValue || 2.3522;
-    
-    // Create map instance
-    this.map = L.map(this.element, {
+    // Wait for Leaflet to be available
+    this.initializeMap();
+  }
+
+  async initializeMap() {
+    // Ensure Leaflet is loaded
+    if (typeof L === 'undefined') {
+      // Wait a bit and try again
+      setTimeout(() => this.initializeMap(), 100);
+      return;
+    }
+
+    try {
+      // Initialize map centered on venue coordinates or default to Paris
+      const lat = parseFloat(this.latitudeValue) || 48.8566;
+      const lng = parseFloat(this.longitudeValue) || 2.3522;
+      
+      console.log('Initializing map with coordinates:', lat, lng);
+      
+      // Create map instance
+      this.map = L.map(this.element, {
       center: [lat, lng],
       zoom: 15,
       scrollWheelZoom: false,
@@ -61,8 +75,26 @@ export default class extends Controller {
     
     marker.bindPopup(popupContent);
 
-    // Fit map to show marker with some padding
-    this.map.setView([lat, lng], 15);
+      // Fit map to show marker with some padding
+      this.map.setView([lat, lng], 15);
+
+      // Hide loading indicator
+      const loading = this.element.querySelector('.map-loading');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      // Show error message in loading div
+      const loading = this.element.querySelector('.map-loading');
+      if (loading) {
+        loading.innerHTML = `
+          <i class="fas fa-exclamation-triangle text-red-400 mr-2"></i>
+          <span>Erreur de chargement de la carte</span>
+        `;
+      }
+    }
   }
 
   disconnect() {

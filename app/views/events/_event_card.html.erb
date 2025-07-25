@@ -5,19 +5,11 @@
   <div class="relative h-72 bg-gradient-to-br from-red-500/20 to-pink-500/20">
     <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
 
-    <!-- "Popular" badge -->
-    <div class="absolute top-4 left-4">
-      <span class="bg-red-500/20 border border-red-500/30 px-3 py-1 rounded-full text-xs font-medium text-red-300">
-        <i class="fas fa-fire mr-1"></i>Populaire
-      </span>
-    </div>
+    <%= image_tag event.image,
+        alt: "#{event.title} poster",
+        class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
+        style: "min-width: 100%; min-height: 100%;" %>
 
-    <!-- Favorite button -->
-    <div class="absolute top-4 right-4 z-20">
-      <button onclick="event.stopPropagation();" class="w-10 h-10 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-        <i class="far fa-heart text-sm"></i>
-      </button>
-    </div>
 
     <!-- Title + director -->
     <div class="absolute bottom-4 left-4">

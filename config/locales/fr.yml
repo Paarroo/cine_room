@@ -1,34 +1,43 @@
----
 fr:
-  active_admin:
-    actions:
-      confirm: Êtes-vous sûr ?
-      destroy: Supprimer
-      edit: Modifier %{resource}
-      new: Nouveau %{resource}
-    dashboard:
-      welcome: Bienvenue sur le tableau de bord d'administration
-    headers:
-      filters: Filtres
-    menu:
-      creators: Créateurs
-      dashboard: Tableau de bord
-      events: Événements
-      movies: Films
-      users: Utilisateurs
+  hello: Bonjour
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d %b"
+      long: "%d %B %Y"
+      weekday: "%A %d %B %Y"
+
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d %b %H:%M"
+      long: "%A %d %B %Y à %Hh%M"
+
   activerecord:
+    models:
+      creator: Créateur
+      event: Événement
+      movie: Film
+      user: Utilisateur
     attributes:
       creator:
         bio: Biographie
       event:
         event_date: Date
         start_time: Heure de début
+        title: Titre
+        venue_name: Lieu
+        venue_address: Adresse du lieu
+        max_capacity: Capacité max
+        price_cents: Prix
       movie:
         director: Réalisateur
         duration: Durée
         genre: Genre
         title: Titre
         year: Année
+        trailer_url: Bande-annonce
       user:
         current_password: Mot de passe actuel
         email: E‑mail
@@ -37,40 +46,38 @@ fr:
         password: Mot de passe
         password_confirmation: Confirmation
         remember_me: Se souvenir de moi
-    models:
-      creator: Créateur
-      event: Événement
-      movie: Film
-      user: Utilisateur
-  date:
-    formats:
-      default: "%d/%m/%Y"
-      long: "%d %B %Y"
-  devise:
-    shared:
-      links:
-        didn_t_receive_confirmation_instructions: Instructions de confirmation non
-          reçues ?
-        didn_t_receive_unlock_instructions: Instructions de déblocage non reçues ?
-        forgot_your_password: Mot de passe oublié ?
-        sign_in: Se connecter
-        sign_in_with: Se connecter avec %{provider}
-        sign_up: S'inscrire
+
   errors:
     format: "%{attribute} %{message}"
     messages:
       blank: ne peut pas être vide
       invalid: n’est pas valide
       not_found: introuvable
-      not_saved: Not saved
+      not_saved: non enregistré
       too_long: est trop long (maximum %{count} caractères)
       too_short: est trop court (minimum %{count} caractères)
-  hello: Bonjour
-  time:
-    formats:
-      default: "%d/%m/%Y %H:%M"
+      taken: est déjà utilisé
+      confirmation: ne correspond pas à la confirmation
+
   views:
     actions:
       cancel: Annuler
       save: Enregistrer
       submit: Soumettre
+
+  active_admin:
+    dashboard:
+      welcome: Bienvenue sur le tableau de bord d'administration
+    actions:
+      confirm: Êtes-vous sûr ?
+      destroy: Supprimer
+      edit: Modifier %{resource}
+      new: Nouveau %{resource}
+    headers:
+      filters: Filtres
+    menu:
+      creators: Créateurs
+      dashboard: Tableau de bord
+      events: Événements
+      movies: Films
+      users: Utilisateurs

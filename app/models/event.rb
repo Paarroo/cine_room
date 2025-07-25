@@ -1,11 +1,13 @@
 class Event < ApplicationRecord
   before_save :auto_set_finished_status
   before_save :update_status_if_sold_out
+  after_create_commit :attach_default_image
 
   belongs_to :movie
   has_many :participations, dependent: :destroy
   has_many :users, through: :participations
   has_many :reviews, dependent: :destroy
+  has_one_attached :image
 
   # Geocoding for venue address
   geocoded_by :venue_address
@@ -87,6 +89,16 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def attach_default_image
+    return if image.attached?
+
+    image.attach(
+      io: File.open(Rails.root.join("app/assets/images/default-event.jpg")),
+      filename: "default-event.jpg",
+      content_type: "image/jpeg"
+    )
+  end
 
   def should_geocode?
     venue_address_changed? || (latitude.blank? || longitude.blank?)

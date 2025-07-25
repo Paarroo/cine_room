@@ -250,18 +250,18 @@
                   <p class="text-gray-400 text-sm"><%= @event.venue_address %></p>
                 </div>
 
-                <!-- Interactive Map -->
-                <div class="h-40 bg-white/5 rounded-xl overflow-hidden relative"
+                <!-- Interactive Map with CinéRoom styling -->
+                <div class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
                      data-controller="map"
                      data-map-latitude-value="<%= @event.latitude || '' %>"
                      data-map-longitude-value="<%= @event.longitude || '' %>"
                      data-map-venue-name-value="<%= @event.venue_name %>"
                      data-map-venue-address-value="<%= @event.venue_address %>">
                   
-                  <!-- Loading state (will be replaced by map) -->
+                  <!-- Loading state with CinéRoom theme -->
                   <div class="map-loading" data-map-target="loading">
                     <div class="spinner"></div>
-                    <span>Chargement de la carte...</span>
+                    <span class="text-sm font-medium">Chargement de la carte...</span>
                   </div>
                 </div>
 

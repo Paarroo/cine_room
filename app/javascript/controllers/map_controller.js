@@ -32,26 +32,30 @@ export default class extends Controller {
       maxZoom: 19
     }).addTo(this.map);
 
-    // Custom marker icon
+    // Custom marker icon matching app theme
     const customIcon = L.divIcon({
       className: 'custom-marker',
       html: `
-        <div class="flex items-center justify-center w-8 h-8 bg-gold-500 rounded-full text-white text-sm font-bold shadow-lg">
+        <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full text-white text-lg font-bold shadow-lg border-2 border-white">
           <i class="fas fa-map-marker-alt"></i>
         </div>
       `,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
+      iconSize: [40, 40],
+      iconAnchor: [20, 40]
     });
 
     // Add marker for venue
     const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
     
-    // Add popup with venue information
+    // Add popup with venue information matching app theme
     const popupContent = `
-      <div class="text-center">
-        <h3 class="font-bold text-gray-800 mb-1">${this.venueNameValue}</h3>
-        <p class="text-sm text-gray-600">${this.venueAddressValue}</p>
+      <div class="text-center p-2">
+        <h3 class="font-bold text-dark-400 mb-2 text-lg">${this.venueNameValue}</h3>
+        <p class="text-sm text-gray-600 mb-3">${this.venueAddressValue}</p>
+        <div class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-gold-500 to-gold-600 text-white text-xs font-semibold rounded-full">
+          <i class="fas fa-map-marker-alt mr-1"></i>
+          Lieu de l'événement
+        </div>
       </div>
     `;
     

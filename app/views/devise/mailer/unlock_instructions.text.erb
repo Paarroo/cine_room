@@ -1,37 +1,25 @@
-🔐 Votre compte CinéRoom est verrouillé
+🔒 COMPTE VERROUILLÉ - CINÉROOM 🔒
+
+════════════════════════════════════════════════════
 
 Bonjour <%= @resource.email %>,
 
-🛡️ SÉCURITÉ ACTIVÉE : Votre compte CinéRoom a été temporairement verrouillé
-suite à plusieurs tentatives de connexion incorrectes.
+⚠️ Votre compte CinéRoom a été temporairement verrouillé pour des raisons de sécurité suite à plusieurs tentatives de connexion incorrectes.
 
-🔓 DÉVERROUILLER VOTRE COMPTE
-────────────────────────────────────────────────────────────────────────────────
+🔓 Ne vous inquiétez pas, vous pouvez le déverrouiller facilement :
 
-Ne vous inquiétez pas ! Vous pouvez déverrouiller votre compte facilement :
+🔗 <%= unlock_url(@resource, unlock_token: @token) %>
 
-👉 <%= unlock_url(@resource, unlock_token: @token) %>
+📱 Si vous n'arrivez pas à cliquer sur le lien, copiez-le et collez-le dans votre navigateur.
 
-⏰ Ce lien de déverrouillage n'expire pas, mais nous recommandons de
-l'utiliser rapidement.
+────────────────────────────────────────────────────
 
-🔒 SÉCURITÉ RECOMMANDÉE
-────────────────────────────────────────────────────────────────────────────────
+🛡️  SÉCURITÉ RECOMMANDÉE
 
-Si vous N'AVEZ PAS tenté de vous connecter récemment :
+Si vous n'avez pas tenté de vous connecter récemment, nous vous conseillons de changer votre mot de passe après déverrouillage.
 
-⚠️ ACTIONS RECOMMANDÉES :
-1. 🔓 Déverrouillez d'abord votre compte (lien ci-dessus)
-2. 🔑 Changez immédiatement votre mot de passe
-3. 🔍 Vérifiez l'activité de votre compte
-4. 📧 Contactez-nous si quelque chose semble suspect
+════════════════════════════════════════════════════
 
-📞 BESOIN D'AIDE ?
-────────────────────────────────────────────────────────────────────────────────
-• Support technique : support@cineroom.fr
-• Urgence sécurité : securite@cineroom.fr
-• Téléphone : 01 23 45 67 89 (9h-18h)
-
-Votre sécurité nous tient à cœur.
+🔐 Votre sécurité nous tient à cœur,
 
 — L'équipe CinéRoom 🎬

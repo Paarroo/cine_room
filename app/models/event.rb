@@ -7,6 +7,10 @@ class Event < ApplicationRecord
   has_many :users, through: :participations
   has_many :reviews, dependent: :destroy
 
+  # Geocoding for venue address
+  geocoded_by :venue_address
+  after_validation :geocode, if: :venue_address_changed?
+
   validates :title, :venue_name, :venue_address, :event_date, :start_time, :max_capacity, :price_cents, presence: true
   validates :max_capacity, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :price_cents, numericality: { greater_than: 0 }

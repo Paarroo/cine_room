@@ -20,7 +20,7 @@ if Rails.env.production?
   original_queue_adapter = ActiveJob::Base.queue_adapter
   ActiveJob::Base.queue_adapter = :test
   
-  # Temporarily skip poster validation during seeding by using save!(validate: false)
+  # Skip validations during seeding to avoid poster requirement
   
   
   puts "Cleaning database..."
@@ -94,16 +94,7 @@ if Rails.env.production?
         validated_at: Time.current,
         authorship_confirmed: "1"
       )
-      
-      # Create a minimal poster for validation compliance
-      poster_blob = ActiveStorage::Blob.create_and_upload!(
-        io: StringIO.new("\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x01\x00H\x00H\x00\x00\xFF\xDB\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07	\x09\x08\n\x0C\x14\r\x0C\x0B\x0B\x0C\x19\x12\x13\x0F\x14\x1D\x1A\x1F\x1E\x1D\x1A\x1C\x1C $.' \",#\x1C\x1C(7),01444\x1F'9=82<.342\xFF\xC0\x00\x11\x08\x00\x01\x00\x01\x01\x01\x11\x00\x02\x11\x01\x03\x11\x01\xFF\xC4\x00\x14\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\xFF\xC4\x00\x14\x10\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xFF\xDA\x00\x0C\x03\x01\x00\x02\x11\x03\x11\x00\x3F\x00\xAA\xFF\xD9"),
-        filename: "default_poster.jpg",
-        content_type: "image/jpeg"
-      )
-      
-      movie.poster.attach(poster_blob)
-      movie.save! # Now save with validations enabled since poster is attached
+      movie.save!(validate: false) # Skip poster validation
       movies << movie
     end
   end

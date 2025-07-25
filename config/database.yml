@@ -14,3 +14,15 @@ test:
 production:
   <<: *default
   url: <%= ENV["DATABASE_URL"] %>
+
+# SolidCable configuration for Rails 8
+cable:
+  development:
+    <<: *default
+    database: cineroom_development
+  test:
+    <<: *default
+    database: cineroom_test
+  production:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>

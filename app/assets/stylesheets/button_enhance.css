@@ -1,0 +1,48 @@
+/* Enhanced booking button for better visibility */
+
+.booking-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.booking-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.booking-button:hover::before {
+  left: 100%;
+}
+
+/* Add glow effect on hover */
+.booking-button:hover {
+  box-shadow: 
+    0 0 20px rgba(245, 158, 11, 0.4),
+    0 8px 25px rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.02) !important;
+}
+
+/* Pulse animation for attention */
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+  }
+}
+
+.booking-button {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* Stop pulse on hover */
+.booking-button:hover {
+  animation: none;
+}

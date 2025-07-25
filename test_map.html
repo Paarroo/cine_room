@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Minimap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { 
+            height: 300px; 
+            width: 100%;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1f2937;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Minimap CinéRoom</h1>
+        <p>Test simple pour vérifier si Leaflet fonctionne :</p>
+        
+        <div id="map"></div>
+        
+        <div id="debug" style="margin-top: 20px; padding: 10px; background: #374151; border-radius: 8px;">
+            <h3>Debug Info:</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            log.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        addLog('1. Script chargé');
+        
+        if (typeof L !== 'undefined') {
+            addLog('2. ✅ Leaflet détecté');
+            
+            try {
+                // Coordonnées du Grand Rex
+                const map = L.map('map').setView([48.8719, 2.3472], 15);
+                addLog('3. ✅ Map créée');
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                addLog('4. ✅ Tuiles ajoutées');
+                
+                const marker = L.marker([48.8719, 2.3472]).addTo(map);
+                marker.bindPopup('<b>Le Grand Rex</b><br>1 Boulevard Poissonnière, 75002 Paris');
+                addLog('5. ✅ Marqueur ajouté');
+                
+                setTimeout(() => {
+                    map.invalidateSize();
+                    addLog('6. ✅ Taille de carte actualisée');
+                }, 100);
+                
+            } catch (error) {
+                addLog('❌ Erreur lors de la création de la carte: ' + error.message);
+            }
+        } else {
+            addLog('2. ❌ Leaflet non détecté');
+        }
+    </script>
+</body>
+</html>

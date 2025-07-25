@@ -251,12 +251,17 @@
                 </div>
 
                 <!-- Minimap -->
-                <div class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
+                <div class="h-48 bg-gray-800 rounded-xl relative border border-gold-500/20"
                      data-controller="map"
                      data-map-latitude-value="<%= @event.latitude %>"
                      data-map-longitude-value="<%= @event.longitude %>"
                      data-map-venue-name-value="<%= @event.venue_name %>"
-                     data-map-venue-address-value="<%= @event.venue_address %>">
+                     data-map-venue-address-value="<%= @event.venue_address %>"
+                     style="min-height: 192px;">
+                  <div class="map-placeholder">
+                    <i class="fas fa-map-marker-alt text-gold-500 text-2xl"></i>
+                    <p class="text-sm mt-2">Chargement de la carte...</p>
+                  </div>
                 </div>
 
                 <div class="space-y-2 text-sm">

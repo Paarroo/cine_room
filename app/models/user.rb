@@ -3,6 +3,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :trackable, :confirmable
 
 
+  before_create :skip_confirmation_for_admin
   after_create :send_welcome_email
   after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
@@ -14,6 +15,8 @@ class User < ApplicationRecord
   has_one_attached :avatar
 
   validate :name_cannot_be_changed_after_publishing, on: :update
+  validates :email, format: { with: /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/, message: "doit être une adresse email valide" }
+  validate :validate_email_domain, on: [:create, :update]
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
   scope :admin_users, -> { where(role: :admin) }
@@ -57,5 +60,27 @@ class User < ApplicationRecord
 
   def sync_director_name_to_movies
     movies.update_all(director: full_name)
+  end
+
+  def skip_confirmation_for_admin
+    if admin?
+      skip_confirmation!
+    end
+  end
+
+  def validate_email_domain
+    return unless email.present? && email.include?('@')
+    
+    domain = email.split('@').last
+    blocked_domains = %w[test.com fake.com example.org invalid.email nonexistent.domain]
+    
+    if blocked_domains.include?(domain.downcase)
+      errors.add(:email, "utilise un domaine email non valide")
+    end
+    
+    # Vérification basique du format du domaine
+    unless domain.match?(/\A[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/)
+      errors.add(:email, "doit utiliser un domaine valide")
+    end
   end
 end

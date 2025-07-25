@@ -30,13 +30,13 @@ if Rails.env.production?
   Movie.destroy_all
   User.destroy_all
 
-  puts "Creating admin user..."
+  puts "Creating admin users from environment variables..."
   admin = User.create!(
-    email: 'admin@cineroom.com',
-    first_name: 'Admin',
-    last_name: 'CinéRoom',
-    password: 'password123',
-    password_confirmation: 'password123',
+    email: ENV.fetch('ADMIN_EMAIL', 'admin@cineroom.com'),
+    first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
+    last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
+    password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
+    password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123'),
     role: 'admin',
     confirmed_at: Time.current
   )
@@ -206,8 +206,14 @@ Event.destroy_all
 Movie.destroy_all
 User.destroy_all
 
-puts "Creating admin user..."
-admin = FactoryBot.create(:user, :admin)
+puts "Creating admin user from environment variables..."
+admin = FactoryBot.create(:user, :admin,
+  email: ENV.fetch('ADMIN_EMAIL', 'admin@cineroom.com'),
+  first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
+  last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
+  password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
+  password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123')
+)
 
 puts "Creating #{10} regular users..."
 regular_users = FactoryBot.create_list(:user, 10)

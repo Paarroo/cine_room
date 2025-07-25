@@ -107,8 +107,8 @@ Rails.application.configure do
     config.action_mailer.smtp_settings = {
       address: "smtp.gmail.com",
       port: 587,
-      domain: "https://cineroom-95309b4cb0ca.herokuapp.com/",
-      authentication: "plain",
+      domain: "cineroom-95309b4cb0ca.herokuapp.com",
+      authentication: "login",
       enable_starttls_auto: true,
       user_name: ENV["GMAIL_USERNAME"],
       password: ENV["GMAIL_PASSWORD"]

@@ -124,9 +124,11 @@
         <% end %>
 
         <!-- Maintenance Mode Button -->
-        <%= link_to admin_maintenance_exports_path(format: :csv),
-            class: "management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
-            title: "Toggle maintenance mode" do %>
+        <%= button_to admin_system_maintenance_modes_path,
+            method: :post,
+            class: "management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium border-0",
+            title: "Toggle maintenance mode",
+            data: { confirm: "Activer le mode maintenance ?" } do %>
           <i class="fas fa-tools mr-2"></i>
           <span class="truncate">Mode Maintenance</span>
         <% end %>

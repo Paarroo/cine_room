@@ -128,7 +128,7 @@ if Rails.env.production?
     end
   end
 
-  puts "Creating some completed events..."
+  puts "Creating some finished events..."
   past_events = []
   movies.sample(3).each do |movie|
     past_events << Event.create!(
@@ -231,7 +231,7 @@ end
 puts "Creating events for approved movies..."
 approved_movies.each do |movie|
   FactoryBot.create_list(:event, rand(1..3), :upcoming, movie: movie)
-  FactoryBot.create_list(:event, rand(0..2), :completed, movie: movie) if [ true, false ].sample
+  FactoryBot.create_list(:event, rand(0..2), :finished, movie: movie) if [ true, false ].sample
 end
 
 puts "Creating some sold out events..."
@@ -246,7 +246,7 @@ Event.all.each do |event|
   participants_count = case event.status
   when 'upcoming'
     rand(1..5)
-  when 'completed'
+  when 'finished'
     rand(3..8)
   when 'sold_out'
     event.max_capacity
@@ -261,14 +261,14 @@ Event.all.each do |event|
     participation = FactoryBot.create(:participation,
       user: user,
       event: event,
-      status: event.completed? ? :confirmed : [ :pending, :confirmed ].sample,
+      status: event.finished? ? :confirmed : [ :pending, :confirmed ].sample,
       seats: rand(1..3)
     )
   end
 end
 
-puts "Creating reviews for completed events..."
-Event.completed.each do |event|
+puts "Creating reviews for finished events..."
+Event.finished.each do |event|
   event.participations.confirmed.each do |participation|
     next if rand > 0.7 # 70% chance de laisser un avis
 
@@ -292,7 +292,7 @@ puts " Database seeded successfully!"
 puts "Created:"
 puts "  Users: #{User.count} (#{User.admin_users.count} admin, #{User.creators.count} creators, #{User.regular_users.count} users)"
 puts "  Movies: #{Movie.count} (#{Movie.approved.count} approved, #{Movie.pending.count} pending)"
-puts "  Events: #{Event.count} (#{Event.upcoming.count} upcoming, #{Event.completed.count} completed, #{Event.sold_out.count} sold out)"
+puts "  Events: #{Event.count} (#{Event.upcoming.count} upcoming, #{Event.finished.count} finished, #{Event.sold_out.count} sold out)"
 puts "  Participations: #{Participation.count} (#{Participation.confirmed.count} confirmed)"
 puts " Reviews: #{Review.count}"
 puts " Seeding complete!"

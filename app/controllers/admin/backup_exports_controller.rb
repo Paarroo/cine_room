@@ -27,7 +27,7 @@ class Admin::BackupExportsController < Admin::ApplicationController
     CSV.generate(headers: true) do |csv|
       csv << ['Table', 'Records Count', 'Status', 'Backup Date']
       
-      backup_data.each do |table_info|
+      generate_backup_data.each do |table_info|
         csv << [
           table_info[:table],
           table_info[:count],

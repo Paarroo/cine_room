@@ -30,17 +30,6 @@ if Rails.env.production?
   Movie.destroy_all
   User.destroy_all
 
-  puts "Creating admin user..."
-  admin = User.create!(
-    email: 'admin@cineroom.com',
-    first_name: 'Admin',
-    last_name: 'CinéRoom',
-    password: 'password123',
-    password_confirmation: 'password123',
-    role: 'admin',
-    confirmed_at: Time.current
-  )
-
   puts "Creating regular users..."
   users = []
   10.times do |i|
@@ -90,7 +79,7 @@ if Rails.env.production?
         language: "Français",
         user: creator,
         validation_status: 'approved',
-        validated_by: admin,
+        validated_by: nil,
         validated_at: Time.current,
         authorship_confirmed: "1"
       )
@@ -206,9 +195,6 @@ Event.destroy_all
 Movie.destroy_all
 User.destroy_all
 
-puts "Creating admin user..."
-admin = FactoryBot.create(:user, :admin)
-
 puts "Creating #{10} regular users..."
 regular_users = FactoryBot.create_list(:user, 10)
 
@@ -218,7 +204,7 @@ creators = FactoryBot.create_list(:user, 5, :creator)
 puts "Creating approved movies for creators..."
 approved_movies = []
 creators.each do |creator|
-  movies = FactoryBot.create_list(:movie, rand(2..4), :approved, user: creator, validated_by: admin)
+  movies = FactoryBot.create_list(:movie, rand(2..4), :approved, user: creator, validated_by: nil)
   approved_movies.concat(movies)
 end
 

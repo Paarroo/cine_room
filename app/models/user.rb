@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   before_create :skip_confirmation_for_admin
   after_create :send_welcome_email
+  after_commit :attach_default_avatar, on: [:create]
   after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
   has_many :participations, dependent: :destroy
@@ -41,6 +42,16 @@ class User < ApplicationRecord
   end
 
   private
+
+  def attach_default_avatar
+    return if avatar.attached?
+
+    avatar.attach(
+      io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
+      filename: "default-avatar.jpg",
+      content_type: "image/jpeg"
+    )
+  end
 
   def name_cannot_be_changed_after_publishing
     return unless movies.exists?

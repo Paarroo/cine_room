@@ -93,11 +93,20 @@ class Event < ApplicationRecord
   def attach_default_image
     return if image.attached?
 
-    image.attach(
-      io: File.open(Rails.root.join("app/assets/images/default-event.jpg")),
-      filename: "default-event.jpg",
-      content_type: "image/jpeg"
-    )
+    default_image_path = Rails.root.join("app/assets/images/default-event.jpg")
+    
+    # Skip attachment if file doesn't exist (e.g., on Heroku during seed)
+    return unless File.exist?(default_image_path)
+
+    begin
+      image.attach(
+        io: File.open(default_image_path),
+        filename: "default-event.jpg",
+        content_type: "image/jpeg"
+      )
+    rescue => e
+      Rails.logger.warn "Could not attach default image: #{e.message}"
+    end
   end
 
   def should_geocode?

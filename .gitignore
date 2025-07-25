@@ -95,6 +95,9 @@ Icon
 # ZED EDITOR
 .zed/
 
+# CLAUDE CODE
+.claude
+
 # Ignore RubyMine files
 .idea/
 *.iml

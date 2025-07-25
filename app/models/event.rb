@@ -7,6 +7,12 @@ class Event < ApplicationRecord
   has_many :users, through: :participations
   has_many :reviews, dependent: :destroy
 
+  # Geocoding for venue address
+  geocoded_by :venue_address
+  after_validation :geocode, if: :should_geocode?
+  
+  before_save :ensure_geocoded_coordinates
+
   validates :title, :venue_name, :venue_address, :event_date, :start_time, :max_capacity, :price_cents, presence: true
   validates :max_capacity, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :price_cents, numericality: { greater_than: 0 }
@@ -81,6 +87,23 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def should_geocode?
+    venue_address_changed? || (latitude.blank? || longitude.blank?)
+  end
+
+  def ensure_geocoded_coordinates
+    if venue_address.present? && (latitude.blank? || longitude.blank?)
+      geocode
+      
+      # If geocoding fails, set default coordinates for Paris
+      if latitude.blank? || longitude.blank?
+        Rails.logger.warn "Geocoding failed for event #{id}: #{venue_address}. Using Paris coordinates."
+        self.latitude = 48.8566
+        self.longitude = 2.3522
+      end
+    end
+  end
 
   def update_status_if_sold_out
     self.status = 'sold_out' if sold_out? && upcoming?

@@ -250,12 +250,17 @@
                   <p class="text-gray-400 text-sm"><%= @event.venue_address %></p>
                 </div>
 
-                <div class="h-40 bg-white/5 rounded-xl overflow-hidden relative">
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="text-center text-gray-400">
-                      <i class="fas fa-map text-3xl mb-2"></i>
-                      <p class="text-sm">Carte interactive</p>
-                    </div>
+                <!-- Minimap -->
+                <div class="h-48 bg-gray-800 rounded-xl relative border border-gold-500/20"
+                     data-controller="map"
+                     data-map-latitude-value="<%= @event.latitude %>"
+                     data-map-longitude-value="<%= @event.longitude %>"
+                     data-map-venue-name-value="<%= @event.venue_name %>"
+                     data-map-venue-address-value="<%= @event.venue_address %>"
+                     style="min-height: 192px;">
+                  <div class="map-placeholder">
+                    <i class="fas fa-map-marker-alt text-gold-500 text-2xl"></i>
+                    <p class="text-sm mt-2">Chargement de la carte...</p>
                   </div>
                 </div>
 

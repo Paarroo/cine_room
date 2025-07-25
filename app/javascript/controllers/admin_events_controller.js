@@ -13,7 +13,7 @@ function filterParticipations(status) {
 
 function exportParticipations(eventId) {
   // Implementation for exporting participations
-  fetch(`/admin/events/${eventId}/export_participations`, {
+  fetch(`/admin/events/${eventId}/export`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',

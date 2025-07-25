@@ -1,33 +1,50 @@
 Rails.application.routes.draw do
   # ActiveAdmin.routes(self)
 
-
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
-
+  root 'pages#home'
 
   authenticated :user, ->(user) { user.admin? } do
     root to: 'admin/dashboard#index', as: :admin_authenticated_root
   end
 
-
   authenticated :user do
     root to: 'pages#home', as: :authenticated_root
   end
-
 
   unauthenticated do
     root to: 'pages#home', as: :public_home
   end
 
 
-  root 'pages#home'
-
-
   get '/home', to: 'pages#home', as: :public_site
 
+  devise_scope :user do
+    get '/users/sign_out', to: 'devise/sessions#destroy'
+  end
+
+  delete '/admin/logout', to: 'application#admin_logout'
+
+  get '/contact', to: 'pages#contact', as: :contact
+  get '/legal', to: 'pages#legal', as: :legal
+  get '/privacy', to: 'pages#privacy', as: :privacy
+  get '/terms', to: 'pages#terms', as: :terms
+  get '/about', to: 'pages#about', as: :about
+
+  get "/reservation/success", to: "reservations#success", as: :reservation_success
+
+  # Stripe payment processing
+  post "payments", to: "payments#create", as: :payments
+  get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
+  get "stripe_checkout/cancel", to: "stripe_checkout#cancel", as: :stripe_cancel
+
+  # Stripe webhooks
+  namespace :webhooks do
+    post 'stripe', to: 'stripe#receive'
+  end
 
   namespace :admin do
     root 'dashboard#index'
@@ -44,11 +61,18 @@ Rails.application.routes.draw do
     end
 
     # Exports
-    resources :exports, only: [ :create ] do
-      collection do
-        post :data
+    resource :exports, only: [ :show ] do
+      member do
+        get :data
       end
     end
+
+    # Global exports
+    resource :movies_exports, only: [ :show ], path: 'movies/export'
+    resource :events_exports, only: [ :show ], path: 'events/export'
+    resource :participations_exports, only: [ :show ], path: 'participations/export'
+    resource :backup_exports, only: [ :show ], path: 'backup/export'
+    resource :maintenance_exports, only: [ :show ], path: 'maintenance/export'
 
     # Backups
     resources :backups, only: [ :create ]
@@ -72,11 +96,15 @@ Rails.application.routes.draw do
           patch :bulk
         end
       end
+
+      # Export nested resource
+      resource :export, only: [ :show ]
     end
 
     # Events with status
     resources :events do
       resource :status, only: [ :show, :update ]
+      resource :export, only: [ :show ]
     end
 
     # Users role
@@ -85,6 +113,7 @@ Rails.application.routes.draw do
       member do
         patch :reset_password
       end
+      resource :export, only: [ :show ]
     end
 
     # Participations with confirmation
@@ -100,6 +129,9 @@ Rails.application.routes.draw do
           patch :bulk
         end
       end
+
+      # Export nested resource
+      resource :export, only: [ :show ]
     end
 
     resources :reviews do
@@ -133,9 +165,11 @@ Rails.application.routes.draw do
     end
 
     # System
-    resources :system_status, only: [ :show ], path: 'system/status'
-    resources :system_backups, only: [ :create ], path: 'system/backup'
-    resources :maintenance_modes, only: [ :create, :destroy ], path: 'system/maintenance'
+    namespace :system do
+      resources :status, only: [ :show ]
+      resources :backups, only: [ :create ]
+      resources :maintenance_modes, only: [ :create, :destroy ], path: 'maintenance'
+    end
   end
 
   namespace :users do
@@ -152,31 +186,20 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :events do
-    resources :reviews, only: [:new, :create, :edit, :update, :destroy]
-  end
+  namespace :api do
+    namespace :v1 do
+      resources :events, only: [ :index, :show ] do
+        resources :availabilities, only: [ :show ]
+      end
 
+      resources :movies, only: [ :index, :show ] do
+        resources :searches, only: [ :index ]
+      end
 
-  get '/contact', to: 'pages#contact', as: :contact
-  get '/legal', to: 'pages#legal', as: :legal
-  get '/privacy', to: 'pages#privacy', as: :privacy
-  get '/terms', to: 'pages#terms', as: :terms
-  get '/about', to: 'pages#about', as: :about
-
-  delete '/admin/logout', to: 'application#admin_logout'
-
-  devise_scope :user do
-    get '/users/sign_out', to: 'devise/sessions#destroy'
-  end
-
-  # Stripe payment processing
-  post "payments", to: "payments#create", as: :payments
-  get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
-  get "stripe_checkout/cancel", to: "stripe_checkout#cancel", as: :stripe_cancel
-  
-  # Stripe webhooks
-  namespace :webhooks do
-    post 'stripe', to: 'stripe#receive'
+      resources :users, only: [ :show ] do
+        resources :dashboard_stats, only: [ :show ]
+      end
+    end
   end
 
   resources :movies do
@@ -199,6 +222,7 @@ Rails.application.routes.draw do
   end
 
   resources :events do
+    resources :reviews, only: [ :new, :create, :edit, :update, :destroy ]
     resources :participations, only: [ :new, :create, :destroy ] do
       member do
         get :edit
@@ -256,28 +280,6 @@ Rails.application.routes.draw do
     resources :confirmations, only: [ :show ]
     resources :qr_codes, only: [ :show ]
     resources :cancellations, only: [ :create ]
-  end
-
-  get "/reservation/success", to: "reservations#success", as: :reservation_success
-
-  namespace :api do
-    namespace :v1 do
-      resources :events, only: [ :index, :show ] do
-        resources :availabilities, only: [ :show ]
-      end
-
-      resources :movies, only: [ :index, :show ] do
-        resources :searches, only: [ :index ]
-      end
-
-      resources :users, only: [ :show ] do
-        resources :dashboard_stats, only: [ :show ]
-      end
-    end
-  end
-
-  namespace :webhooks do
-    post 'stripe', to: 'stripe#handle'
   end
 
   if Rails.env.development?

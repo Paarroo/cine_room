@@ -30,16 +30,28 @@ if Rails.env.production?
   Movie.destroy_all
   User.destroy_all
 
-  puts "Creating admin user..."
-  admin = User.create!(
-    email: 'admin@cineroom.com',
+  puts "Creating admin users..."
+  admin1 = User.create!(
+    email: 'admin1@example.com',
     first_name: 'Admin',
-    last_name: 'CinéRoom',
+    last_name: 'One',
     password: 'password123',
     password_confirmation: 'password123',
     role: 'admin',
     confirmed_at: Time.current
   )
+  
+  admin2 = User.create!(
+    email: 'admin2@example.com',
+    first_name: 'Admin',
+    last_name: 'Two',
+    password: 'password123',
+    password_confirmation: 'password123',
+    role: 'admin',
+    confirmed_at: Time.current
+  )
+  
+  admin = admin1 # Keep compatibility with existing code
 
   puts "Creating regular users..."
   users = []
@@ -206,8 +218,10 @@ Event.destroy_all
 Movie.destroy_all
 User.destroy_all
 
-puts "Creating admin user..."
-admin = FactoryBot.create(:user, :admin)
+puts "Creating admin users..."
+admin1 = FactoryBot.create(:user, :admin, email: 'admin1@example.com', first_name: 'Admin', last_name: 'One', password: 'password123')
+admin2 = FactoryBot.create(:user, :admin, email: 'admin2@example.com', first_name: 'Admin', last_name: 'Two', password: 'password123')
+admin = admin1 # Keep compatibility with existing code
 
 puts "Creating #{10} regular users..."
 regular_users = FactoryBot.create_list(:user, 10)

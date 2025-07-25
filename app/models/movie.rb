@@ -17,6 +17,8 @@ class Movie < ApplicationRecord
     less_than_or_equal_to: Date.current.year
   }
   validate :authorship_must_be_confirmed, on: :create
+  validate :trailer_url_must_be_youtube
+
 
   enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
@@ -57,6 +59,14 @@ class Movie < ApplicationRecord
   end
 
   private
+
+  def trailer_url_must_be_youtube
+    return if trailer_url.blank?
+
+    unless trailer_url.match?(/\Ahttps:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+\z/)
+      errors.add(:trailer_url, "doit être un lien YouTube valide (youtube.com/watch?v= ou youtu.be/)")
+    end
+  end
 
   def authorship_must_be_confirmed
     if authorship_confirmed != "1"

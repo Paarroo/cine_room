@@ -116,24 +116,20 @@
         <% end %>
 
         <!-- Database Backup Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#backupDatabase"
-          title="Create database backup"
-        >
+        <%= link_to admin_backup_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Create database backup" do %>
           <i class="fas fa-database mr-2"></i>
           <span class="truncate">Sauvegarde BDD</span>
-        </button>
+        <% end %>
 
         <!-- Maintenance Mode Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#toggleMaintenanceMode"
-          title="Toggle maintenance mode"
-        >
+        <%= link_to admin_maintenance_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Toggle maintenance mode" do %>
           <i class="fas fa-tools mr-2"></i>
           <span class="truncate">Mode Maintenance</span>
-        </button>
+        <% end %>
       </div>
 
       <!-- Action Status Indicator -->

@@ -54,6 +54,8 @@ Rails.application.routes.draw do
     resource :movies_exports, only: [ :show ], path: 'movies/export'
     resource :events_exports, only: [ :show ], path: 'events/export'
     resource :participations_exports, only: [ :show ], path: 'participations/export'
+    resource :backup_exports, only: [ :show ], path: 'backup/export'
+    resource :maintenance_exports, only: [ :show ], path: 'maintenance/export'
 
     # Backups
     resources :backups, only: [ :create ]

@@ -1,13 +1,12 @@
 <% initials = "#{creator.first_name.first}#{creator.last_name.first}".upcase %>
 <div class="creator-card rounded-2xl overflow-hidden card-hover relative group cursor-pointer">
-  <%= link_to creator_path(creator), class: "absolute inset-0 z-10", data: { turbo: false } do %><% end %>
+  <%= link_to creator_path(creator), class: "absolute inset-0 z-30", data: { turbo: false } do %><% end %>
 
   <!-- Image or initials -->
-  <div class="relative h-72">
+  <div class="relative h-72 bg-dark-300 flex items-center justify-center">
     <% if creator.avatar.attached? %>
-      <%= image_tag creator.avatar.variant(resize_to_fill: [600, 288]).processed,
-          class: "w-full h-full object-cover object-center",
-          style: "min-width: 100%; min-height: 100%;",
+      <%= image_tag creator.avatar,
+          class: "max-h-full min-w-full object-cover z-0",
           alt: "#{creator.full_name} avatar" %>
     <% else %>
       <div class="w-full h-full bg-gradient-to-br from-gold-500/20 to-amber-600/20 flex items-center justify-center">
@@ -16,7 +15,7 @@
     <% end %>
 
     <!-- Overlay -->
-    <div class="absolute inset-0 bg-gradient-to-t from-dark-400/90 to-amber-600/20 z-5"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black-400/90 to-amber-600/20 z-10"></div>
   </div>
 
   <!-- Creator info -->

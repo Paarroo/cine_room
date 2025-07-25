@@ -258,12 +258,25 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
     hashdiff (1.2.0)
+    highline (3.1.2)
+      reline
     hirb (0.7.3)
     htmlentities (4.3.4)
     http_accept_language (2.1.1)
     http_parser.rb (0.8.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    i18n-tasks (1.0.15)
+      activesupport (>= 4.0.2)
+      ast (>= 2.1.0)
+      erubi
+      highline (>= 2.0.0)
+      i18n
+      parser (>= 3.2.2.1)
+      rails-i18n
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.8, >= 1.8.1)
+      terminal-table (>= 1.5.1)
     image_processing (1.14.0)
       mini_magick (>= 4.9.5, < 6)
       ruby-vips (>= 2.0.17, < 3)
@@ -663,6 +676,8 @@ GEM
     tailwindcss-ruby (4.1.11-arm64-darwin)
     tailwindcss-ruby (4.1.11-x86_64-linux-gnu)
     tailwindcss-ruby (4.1.11-x86_64-linux-musl)
+    terminal-table (4.0.0)
+      unicode-display_width (>= 1.1.1, < 4)
     thor (1.4.0)
     thruster (0.1.14)
     thruster (0.1.14-aarch64-linux)
@@ -690,6 +705,9 @@ GEM
     uniform_notifier (1.17.0)
     uri (1.0.3)
     useragent (0.16.11)
+    valid_email2 (7.0.13)
+      activemodel (>= 6.0)
+      mail (~> 2.5)
     vcr (6.3.1)
       base64
     view_component (3.23.2)
@@ -763,6 +781,7 @@ DEPENDENCIES
   guard-rails
   hirb
   http_accept_language
+  i18n-tasks
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
@@ -820,6 +839,7 @@ DEPENDENCIES
   turbo-rails
   turbo_power
   tzinfo-data
+  valid_email2
   vcr
   view_component
   web-console

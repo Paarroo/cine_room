@@ -169,8 +169,15 @@ Rails.application.routes.draw do
     get '/users/sign_out', to: 'devise/sessions#destroy'
   end
 
+  # Stripe payment processing
+  post "payments", to: "payments#create", as: :payments
   get "stripe_checkout/success", to: "stripe_checkout#success", as: :stripe_success
   get "stripe_checkout/cancel", to: "stripe_checkout#cancel", as: :stripe_cancel
+  
+  # Stripe webhooks
+  namespace :webhooks do
+    post 'stripe', to: 'stripe#receive'
+  end
 
   resources :movies do
     resources :reviews, except: [ :index ] do

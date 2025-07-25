@@ -1,73 +1,83 @@
 fr:
-  hello: "Bonjour"
+  hello: Bonjour
+
   date:
     formats:
       default: "%d/%m/%Y"
+      short: "%d %b"
       long: "%d %B %Y"
+      weekday: "%A %d %B %Y"
+
   time:
     formats:
       default: "%d/%m/%Y %H:%M"
+      short: "%d %b %H:%M"
+      long: "%A %d %B %Y à %Hh%M"
+
   activerecord:
     models:
-      user: "Utilisateur"
-      movie: "Film"
-      event: "Événement"
-      creator: "Créateur"
+      creator: Créateur
+      event: Événement
+      movie: Film
+      user: Utilisateur
     attributes:
-      user:
-        email: "E‑mail"
-        password: "Mot de passe"
-        password_confirmation: "Confirmation"
-        current_password: "Mot de passe actuel"
-        first_name: "Prénom"
-        last_name: "Nom"
-        remember_me: "Se souvenir de moi"
-      movie:
-        title: "Titre"
-        director: "Réalisateur"
-        genre: "Genre"
-        duration: "Durée"
-        year: "Année"
-      event:
-        event_date: "Date"
-        start_time: "Heure de début"
       creator:
-        bio: "Biographie"
+        bio: Biographie
+      event:
+        event_date: Date
+        start_time: Heure de début
+        title: Titre
+        venue_name: Lieu
+        venue_address: Adresse du lieu
+        max_capacity: Capacité max
+        price_cents: Prix
+      movie:
+        director: Réalisateur
+        duration: Durée
+        genre: Genre
+        title: Titre
+        year: Année
+        trailer_url: Bande-annonce
+      user:
+        current_password: Mot de passe actuel
+        email: E‑mail
+        first_name: Prénom
+        last_name: Nom
+        password: Mot de passe
+        password_confirmation: Confirmation
+        remember_me: Se souvenir de moi
+
   errors:
     format: "%{attribute} %{message}"
     messages:
-      blank: "ne peut pas être vide"
-      too_short: "est trop court (minimum %{count} caractères)"
-      too_long: "est trop long (maximum %{count} caractères)"
-      not_found: "introuvable"
-      invalid: "n’est pas valide"
+      blank: ne peut pas être vide
+      invalid: n’est pas valide
+      not_found: introuvable
+      not_saved: non enregistré
+      too_long: est trop long (maximum %{count} caractères)
+      too_short: est trop court (minimum %{count} caractères)
+      taken: est déjà utilisé
+      confirmation: ne correspond pas à la confirmation
+
   views:
     actions:
-      save: "Enregistrer"
-      submit: "Soumettre"
-      cancel: "Annuler"
+      cancel: Annuler
+      save: Enregistrer
+      submit: Soumettre
+
   active_admin:
     dashboard:
-      welcome: "Bienvenue sur le tableau de bord d'administration"
-    menu:
-      dashboard: "Tableau de bord"
-      users: "Utilisateurs"
-      movies: "Films"
-      events: "Événements"
-      creators: "Créateurs"
-    headers:
-      filters: "Filtres"
+      welcome: Bienvenue sur le tableau de bord d'administration
     actions:
-      new: "Nouveau %{resource}"
-      edit: "Modifier %{resource}"
-      destroy: "Supprimer"
-      confirm: "Êtes-vous sûr ?"
-  devise:
-    shared:
-      links:
-        sign_in: "Se connecter"
-        sign_up: "S'inscrire"
-        forgot_your_password: "Mot de passe oublié ?"
-        didn_t_receive_confirmation_instructions: "Instructions de confirmation non reçues ?"
-        didn_t_receive_unlock_instructions: "Instructions de déblocage non reçues ?"
-        sign_in_with: "Se connecter avec %{provider}"
+      confirm: Êtes-vous sûr ?
+      destroy: Supprimer
+      edit: Modifier %{resource}
+      new: Nouveau %{resource}
+    headers:
+      filters: Filtres
+    menu:
+      creators: Créateurs
+      dashboard: Tableau de bord
+      events: Événements
+      movies: Films
+      users: Utilisateurs

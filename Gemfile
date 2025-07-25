@@ -34,6 +34,7 @@ gem "premailer-rails"
 gem "nokogiri"
 gem "geocoder"
 # gem "leaflet-rails" # Using CDN instead
+gem "valid_email2"
 gem "sidekiq"
 gem "bootsnap", require: false
 gem "kamal", require: false
@@ -88,6 +89,7 @@ group :development do
   gem 'rails-i18n'
   gem 'devise-i18n'
   gem 'http_accept_language'
+  gem 'i18n-tasks'
 end
 
 group :test do

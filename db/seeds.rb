@@ -8,6 +8,7 @@ puts " Seeding the database..."
 
 if Rails.env.production?
   puts "Production seeding - creating complete dataset without FactoryBot..."
+  Rails.application.config.seed_in_progress = true
   
   # Disable welcome email during seeding only
   puts "Disabling welcome emails for seeding process..."
@@ -30,11 +31,11 @@ if Rails.env.production?
   Movie.destroy_all
   User.destroy_all
 
-  puts "Creating admin user..."
+  puts "Creating admin users from environment variables..."
   admin = User.create!(
-    email: 'admin@cineroom.com',
-    first_name: 'Admin',
-    last_name: 'CinéRoom',
+    email: ENV.fetch('GMAIL_USERNAME', 'codes.sources.0@gmail.com'),
+    first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
+    last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
     password: 'password123',
     password_confirmation: 'password123',
     role: 'admin',
@@ -206,8 +207,14 @@ Event.destroy_all
 Movie.destroy_all
 User.destroy_all
 
-puts "Creating admin user..."
-admin = FactoryBot.create(:user, :admin)
+puts "Creating admin user from environment variables..."
+admin = FactoryBot.create(:user, :admin,
+  email: ENV.fetch('GMAIL_USERNAME', 'codes.sources.0@gmail.com'),
+  first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Admin'),
+  last_name: ENV.fetch('ADMIN_LAST_NAME', 'User'),
+  password: 'password123',
+  password_confirmation: 'password123'
+)
 
 puts "Creating #{10} regular users..."
 regular_users = FactoryBot.create_list(:user, 10)

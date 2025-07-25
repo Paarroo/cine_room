@@ -690,6 +690,9 @@ GEM
     uniform_notifier (1.17.0)
     uri (1.0.3)
     useragent (0.16.11)
+    valid_email2 (7.0.13)
+      activemodel (>= 6.0)
+      mail (~> 2.5)
     vcr (6.3.1)
       base64
     view_component (3.23.2)
@@ -820,6 +823,7 @@ DEPENDENCIES
   turbo-rails
   turbo_power
   tzinfo-data
+  valid_email2
   vcr
   view_component
   web-console

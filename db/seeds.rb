@@ -32,21 +32,21 @@ if Rails.env.production?
 
   puts "Creating admin users..."
   admin1 = User.create!(
-    email: 'admin1@example.com',
-    first_name: 'Admin',
-    last_name: 'One',
-    password: 'password123',
-    password_confirmation: 'password123',
+    email: ENV.fetch('ADMIN_EMAIL', 'admin@example.com'),
+    first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Super'),
+    last_name: ENV.fetch('ADMIN_LAST_NAME', 'Admin'),
+    password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
+    password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123'),
     role: 'admin',
     confirmed_at: Time.current
   )
   
   admin2 = User.create!(
-    email: 'admin2@example.com',
-    first_name: 'Admin',
-    last_name: 'Two',
-    password: 'password123',
-    password_confirmation: 'password123',
+    email: ENV.fetch('ADMIN2_EMAIL', 'admin2@example.com'),
+    first_name: ENV.fetch('ADMIN2_FIRST_NAME', 'Marie'),
+    last_name: ENV.fetch('ADMIN2_LAST_NAME', 'Dubois'),
+    password: ENV.fetch('ADMIN2_PASSWORD', 'password123'),
+    password_confirmation: ENV.fetch('ADMIN2_PASSWORD', 'password123'),
     role: 'admin',
     confirmed_at: Time.current
   )
@@ -219,8 +219,20 @@ Movie.destroy_all
 User.destroy_all
 
 puts "Creating admin users..."
-admin1 = FactoryBot.create(:user, :admin, email: 'admin1@example.com', first_name: 'Admin', last_name: 'One', password: 'password123')
-admin2 = FactoryBot.create(:user, :admin, email: 'admin2@example.com', first_name: 'Admin', last_name: 'Two', password: 'password123')
+admin1 = FactoryBot.create(:user, :admin, 
+  email: ENV.fetch('ADMIN_EMAIL', 'admin@example.com'),
+  first_name: ENV.fetch('ADMIN_FIRST_NAME', 'Super'),
+  last_name: ENV.fetch('ADMIN_LAST_NAME', 'Admin'),
+  password: ENV.fetch('ADMIN_PASSWORD', 'password123'),
+  password_confirmation: ENV.fetch('ADMIN_PASSWORD', 'password123')
+)
+admin2 = FactoryBot.create(:user, :admin, 
+  email: ENV.fetch('ADMIN2_EMAIL', 'admin2@example.com'),
+  first_name: ENV.fetch('ADMIN2_FIRST_NAME', 'Marie'),
+  last_name: ENV.fetch('ADMIN2_LAST_NAME', 'Dubois'),
+  password: ENV.fetch('ADMIN2_PASSWORD', 'password123'),
+  password_confirmation: ENV.fetch('ADMIN2_PASSWORD', 'password123')
+)
 admin = admin1 # Keep compatibility with existing code
 
 puts "Creating #{10} regular users..."

@@ -49,6 +49,11 @@ Rails.application.routes.draw do
         get :data
       end
     end
+    
+    # Global exports
+    resource :movies_exports, only: [ :show ], path: 'movies/export'
+    resource :events_exports, only: [ :show ], path: 'events/export'
+    resource :participations_exports, only: [ :show ], path: 'participations/export'
 
     # Backups
     resources :backups, only: [ :create ]

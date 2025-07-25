@@ -92,37 +92,28 @@
       <!-- Action Buttons Grid - All uniform size -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Export Movies Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="movies"
-          title="Export movies list to CSV"
-        >
+        <%= link_to admin_movies_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export movies list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
           <span class="truncate">Export Films</span>
-        </button>
+        <% end %>
 
         <!-- Export Events Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="events"
-          title="Export events list to CSV"
-        >
+        <%= link_to admin_events_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export events list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
           <span class="truncate">Export Événements</span>
-        </button>
+        <% end %>
 
         <!-- Export Participations Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="participations"
-          title="Export participations list to CSV"
-        >
+        <%= link_to admin_participations_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export participations list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
           <span class="truncate">Export Réservations</span>
-        </button>
+        <% end %>
 
         <!-- Database Backup Button -->
         <button

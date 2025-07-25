@@ -250,31 +250,13 @@
                   <p class="text-gray-400 text-sm"><%= @event.venue_address %></p>
                 </div>
 
-                <!-- Interactive Map with CinéRoom styling -->
-                <div id="map-<%= @event.id %>" 
-                     class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
+                <!-- Minimap -->
+                <div class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
                      data-controller="map"
-                     data-map-latitude-value="<%= @event.latitude || '' %>"
-                     data-map-longitude-value="<%= @event.longitude || '' %>"
+                     data-map-latitude-value="<%= @event.latitude %>"
+                     data-map-longitude-value="<%= @event.longitude %>"
                      data-map-venue-name-value="<%= @event.venue_name %>"
                      data-map-venue-address-value="<%= @event.venue_address %>">
-                  
-                  <!-- Loading state with CinéRoom theme -->
-                  <div class="map-loading" data-map-target="loading">
-                    <div class="spinner"></div>
-                    <span class="text-sm font-medium">Chargement de la carte...</span>
-                  </div>
-                  
-                  <!-- Fallback static map if JavaScript fails -->
-                  <noscript>
-                    <div class="flex items-center justify-center h-full text-center text-gray-400">
-                      <div>
-                        <i class="fas fa-map-marker-alt text-gold-500 text-2xl mb-2"></i>
-                        <p class="text-sm"><%= @event.venue_name %></p>
-                        <p class="text-xs"><%= @event.venue_address %></p>
-                      </div>
-                    </div>
-                  </noscript>
                 </div>
 
                 <div class="space-y-2 text-sm">

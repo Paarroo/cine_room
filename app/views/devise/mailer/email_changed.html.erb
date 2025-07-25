@@ -1,9 +1,77 @@
 <!DOCTYPE html>
-<html>
-  <body style="font-family: sans-serif; background-color: #111827; color: #e5e7eb; padding: 2rem;">
-    <h1 style="color: #eab308;">Votre adresse e-mail a changé</h1>
-    <p>Bonjour,</p>
-    <p>Nous vous confirmons que votre adresse e-mail a bien été changée en : <strong><%= @resource.email %></strong>.</p>
-    <p>Si vous n’êtes pas à l’origine de ce changement, veuillez nous contacter immédiatement.</p>
-  </body>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email modifié - CinéRoom</title>
+  <%= stylesheet_link_tag 'application', 'data-turbo-track': 'reload' %>
+</head>
+<body class="bg-surface text-content">
+  <div class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-2xl w-full glass-effect rounded-3xl overflow-hidden">
+      <!-- Header -->
+      <div class="text-center p-8 border-b border-white/10 bg-gradient-to-r from-primary/10 to-amber-500/10">
+        <div class="w-20 h-20 bg-gradient-to-br from-primary to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <i class="fas fa-envelope-open-text text-white text-3xl"></i>
+        </div>
+        <div class="text-3xl font-bold mb-2 gradient-text">CinéRoom</div>
+        <div class="text-sm text-muted uppercase tracking-widest">Cinéma Indépendant</div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8 text-center">
+        <h1 class="text-4xl font-bold mb-8">
+          Adresse e-mail <span class="text-primary">modifiée</span> 📧
+        </h1>
+        
+        <div class="glass-subtle rounded-2xl p-8 mb-8 text-left max-w-lg mx-auto">
+          <!-- Confirmation message -->
+          <div class="bg-primary/5 rounded-xl p-6 mb-6 border border-primary/30">
+            <div class="flex items-start space-x-4">
+              <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-info-circle text-primary text-xl"></i>
+              </div>
+              <div>
+                <p class="text-lg mb-4 text-center">Bonjour,</p>
+                
+                <p class="text-muted mb-6 text-center leading-relaxed">
+                  Nous vous confirmons que votre adresse e-mail a bien été changée en :
+                </p>
+                
+                <div class="glass-subtle rounded-xl p-4 text-center">
+                  <p class="text-primary font-bold text-lg">
+                    <%= @resource.email %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Security warning -->
+          <div class="bg-cinema-red/5 rounded-xl p-6 border border-cinema-red/30">
+            <div class="flex items-start space-x-3">
+              <div class="w-10 h-10 bg-cinema-red/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-cinema-red"></i>
+              </div>
+              <div>
+                <p class="text-cinema-red text-xs text-center">
+                  <strong>Important :</strong> Si vous n'êtes pas à l'origine de ce changement, 
+                  veuillez nous contacter immédiatement à 
+                  <%= link_to "support@cineroom.fr", "mailto:support@cineroom.fr", 
+                      class: "text-primary underline hover:text-primary/80 font-medium" %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="text-center p-8 border-t border-white/10 bg-gradient-to-r from-surface to-dark-300">
+        <p class="text-muted mb-3 text-lg">Merci de votre confiance,</p>
+        <p class="text-primary font-bold text-xl">— L'équipe CinéRoom</p>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

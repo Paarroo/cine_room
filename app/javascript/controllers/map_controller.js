@@ -3,12 +3,13 @@ import { Controller } from "@hotwired/stimulus"
 // Connect this controller to the Stimulus application
 export default class extends Controller {
   static values = { 
-    apiKey: String,
     latitude: Number,
     longitude: Number,
     venueName: String,
     venueAddress: String
   }
+  
+  static targets = ["loading"]
 
   connect() {
     // Wait for Leaflet to be available
@@ -30,7 +31,7 @@ export default class extends Controller {
       
       console.log('Initializing map with coordinates:', lat, lng);
       
-      // Create map instance
+      // Create map instance directly on this element
       this.map = L.map(this.element, {
       center: [lat, lng],
       zoom: 15,
@@ -79,17 +80,15 @@ export default class extends Controller {
       this.map.setView([lat, lng], 15);
 
       // Hide loading indicator
-      const loading = this.element.querySelector('.map-loading');
-      if (loading) {
-        loading.style.display = 'none';
+      if (this.hasLoadingTarget) {
+        this.loadingTarget.style.display = 'none';
       }
 
     } catch (error) {
       console.error('Error initializing map:', error);
       // Show error message in loading div
-      const loading = this.element.querySelector('.map-loading');
-      if (loading) {
-        loading.innerHTML = `
+      if (this.hasLoadingTarget) {
+        this.loadingTarget.innerHTML = `
           <i class="fas fa-exclamation-triangle text-red-400 mr-2"></i>
           <span>Erreur de chargement de la carte</span>
         `;

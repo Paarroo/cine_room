@@ -251,7 +251,8 @@
                 </div>
 
                 <!-- Interactive Map with CinéRoom styling -->
-                <div class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
+                <div id="map-<%= @event.id %>" 
+                     class="h-40 glass-effect rounded-xl overflow-hidden relative border border-gold-500/20"
                      data-controller="map"
                      data-map-latitude-value="<%= @event.latitude || '' %>"
                      data-map-longitude-value="<%= @event.longitude || '' %>"
@@ -259,7 +260,7 @@
                      data-map-venue-address-value="<%= @event.venue_address %>">
                   
                   <!-- Loading state with CinéRoom theme -->
-                  <div class="map-loading" data-map-target="loading">
+                  <div class="map-loading absolute inset-0 z-10" data-map-target="loading">
                     <div class="spinner"></div>
                     <span class="text-sm font-medium">Chargement de la carte...</span>
                   </div>

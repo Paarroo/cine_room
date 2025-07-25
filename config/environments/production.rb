@@ -71,6 +71,7 @@ Rails.application.configure do
 
 
   config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
   # Use main database for SolidQueue instead of separate queue database
   # config.solid_queue.connects_to = { database: { writing: :queue } }
 

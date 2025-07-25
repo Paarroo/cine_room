@@ -45,12 +45,19 @@ class User < ApplicationRecord
 
   def attach_default_avatar
     return if avatar.attached?
-
-    avatar.attach(
-      io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
-      filename: "default-avatar.jpg",
-      content_type: "image/jpeg"
-    )
+    
+    # Skip avatar attachment in production seeds to avoid file access issues
+    return if Rails.env.production? && defined?(Rails.application.config.seed_in_progress)
+    
+    begin
+      avatar.attach(
+        io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
+        filename: "default-avatar.jpg",
+        content_type: "image/jpeg"
+      )
+    rescue Errno::ENOENT
+      Rails.logger.warn "Default avatar file not found, skipping attachment"
+    end
   end
 
   def name_cannot_be_changed_after_publishing

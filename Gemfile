@@ -88,6 +88,7 @@ group :development do
   gem 'rails-i18n'
   gem 'devise-i18n'
   gem 'http_accept_language'
+  gem 'i18n-tasks'
 end
 
 group :test do

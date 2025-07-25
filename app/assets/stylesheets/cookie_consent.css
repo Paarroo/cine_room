@@ -1,0 +1,253 @@
+/* Cookie Consent Styles */
+
+/* Ensure cookie banner is always visible with high contrast */
+#cookie-consent-banner {
+  background-color: #000000 !important;
+  border-top: 1px solid #3b82f6 !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8) !important;
+  z-index: 9999 !important;
+}
+
+#cookie-consent-banner h3 {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+#cookie-consent-banner p {
+  color: #e5e7eb !important;
+}
+
+/* Cookie Settings Modal */
+#cookie-settings-modal {
+  backdrop-filter: blur(4px);
+  z-index: 9999 !important;
+}
+
+.cookie-modal-content {
+  background-color: #000000 !important;
+  border: 1px solid #10b981 !important;
+}
+
+/* Ensure modal scrolling works properly */
+#cookie-settings-modal .flex-1 {
+  min-height: 0; /* Allow flexbox child to shrink */
+  max-height: calc(90vh - 200px); /* Reserve space for header and footer */
+}
+
+/* Improve scrollbar styling for the modal */
+#cookie-settings-modal .overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+#cookie-settings-modal .overflow-y-auto::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+#cookie-settings-modal .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+#cookie-settings-modal .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Ensure body doesn't interfere with modal scrolling */
+body.modal-open {
+  overflow: hidden;
+  padding-right: 0px; /* Prevent layout shift */
+}
+
+/* Custom Toggle Switches */
+.cookie-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.cookie-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.cookie-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #6b7280;
+  transition: .4s;
+  border-radius: 24px;
+  border: 1px solid #d1d5db;
+}
+
+.cookie-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  top: 1px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  border: 1px solid #d1d5db;
+}
+
+input:checked + .cookie-slider {
+  background-color: #2563eb;
+}
+
+input:focus + .cookie-slider {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  outline: none;
+}
+
+input:checked + .cookie-slider:before {
+  transform: translateX(24px);
+  border-color: #10b981;
+}
+
+/* Ensure buttons are clickable and visible */
+.cookie-button {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.cookie-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cookie-button:active {
+  transform: translateY(0);
+}
+
+/* RGPD COLOR SCHEME - Global styles for GDPR compliance */
+
+/* Ensure all "Accept All" buttons are green across the entire RGPD system */
+#cookie-accept-btn,
+#cookie-accept-all-modal,
+.rgpd-accept-button,
+.gdpr-accept-button {
+  background-color: #059669 !important; /* green-600 */
+  border-color: #059669 !important;
+}
+
+#cookie-accept-btn:hover,
+#cookie-accept-all-modal:hover,
+.rgpd-accept-button:hover,
+.gdpr-accept-button:hover {
+  background-color: #047857 !important; /* green-700 */
+  border-color: #047857 !important;
+}
+
+/* Ensure all "Decline" buttons are red */
+#cookie-decline-btn,
+.rgpd-decline-button,
+.gdpr-decline-button {
+  background-color: #dc2626 !important; /* red-600 */
+  border-color: #dc2626 !important;
+}
+
+#cookie-decline-btn:hover,
+.rgpd-decline-button:hover,
+.gdpr-decline-button:hover {
+  background-color: #b91c1c !important; /* red-700 */
+  border-color: #b91c1c !important;
+}
+
+/* Settings/Preferences buttons in neutral blue */
+#cookie-settings-btn,
+#privacy-cookie-settings-btn,
+.rgpd-settings-button,
+.gdpr-settings-button {
+  background-color: #2563eb !important; /* blue-600 */
+  border-color: #2563eb !important;
+}
+
+#cookie-settings-btn:hover,
+#privacy-cookie-settings-btn:hover,
+.rgpd-settings-button:hover,
+.gdpr-settings-button:hover {
+  background-color: #1d4ed8 !important; /* blue-700 */
+  border-color: #1d4ed8 !important;
+}
+
+/* Essential cookies always-on indicator */
+.always-active-toggle {
+  background-color: #059669 !important;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.always-active-toggle:before {
+  transform: translateX(24px) !important;
+}
+
+/* Animation for banner appearance */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-banner-show {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  #cookie-consent-banner .flex-col {
+    gap: 1rem;
+  }
+  
+  #cookie-consent-banner .flex-row {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .cookie-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  #cookie-consent-banner {
+    border-top: 2px solid #3b82f6 !important;
+  }
+  
+  .cookie-slider {
+    border: 1px solid #f59e0b !important;
+  }
+}
+
+/* Focus indicators for accessibility */
+button:focus,
+.cookie-toggle:focus-within {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Ensure text is always readable */
+.cookie-text {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.cookie-subtext {
+  color: #e5e7eb !important;
+}

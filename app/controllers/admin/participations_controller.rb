@@ -15,10 +15,10 @@ class Admin::ParticipationsController < Admin::ApplicationController
       end
 
     # Calculate stats using concern method - FIX: use correct method name
-    @stats = calculate_participation_statistics
-    @insights = participation_insights
-    @filter_options = get_participation_filter_options
-    @revenue_data = calculate_participation_revenue
+    @stats = calculate_participation_statistics || {}
+    @insights = participation_insights || {}
+    @filter_options = get_participation_filter_options || {}
+    @revenue_data = calculate_participation_revenue || {}
 
     # Additional data for dashboard
     @top_events = top_events_by_participation(5)
@@ -93,10 +93,10 @@ class Admin::ParticipationsController < Admin::ApplicationController
 
   # Bulk operations
   def bulk_confirm
-    participation_ids = params[:participation_ids]
+    participation_ids = params[:participation_ids] || []
     return redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' if participation_ids.blank?
 
-    result = bulk_confirm_participations(participation_ids)
+    result = bulk_confirm_participations(participation_ids) || { success: false, message: 'Erreur inconnue' }
 
     respond_to do |format|
       if result[:success]
@@ -110,10 +110,10 @@ class Admin::ParticipationsController < Admin::ApplicationController
   end
 
   def bulk_cancel
-    participation_ids = params[:participation_ids]
+    participation_ids = params[:participation_ids] || []
     return redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' if participation_ids.blank?
 
-    result = bulk_cancel_participations(participation_ids)
+    result = bulk_cancel_participations(participation_ids) || { success: false, message: 'Erreur inconnue' }
 
     respond_to do |format|
       if result[:success]

@@ -9,6 +9,10 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    
+    <%# Conditional analytics and marketing scripts based on cookie consent %>
+    <%= render_analytics_scripts %>
+    <%= render_marketing_scripts %>
 
     <%# Icons %>
     <link rel="icon" href="/icon.png" type="image/png">
@@ -26,8 +30,23 @@
     <%# Font Awesome %>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <%# Leaflet CSS %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+
+
     <%# CSS - Single application.css file %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "cookie_consent", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "minimap", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "button_enhance", "data-turbo-track": "reload" %>
+    
+    <%# Leaflet JS %>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    
     <%= javascript_importmap_tags %>
   </head>
 
@@ -46,5 +65,11 @@
     </main>
 
     <%= render 'shared/footer' %>
+    
+    <!-- Cookie Consent Banner -->
+    <%= render 'shared/cookie_consent' if show_consent_banner? %>
+    
+    <!-- Cookie consent controller -->
+    <div data-controller="cookie-consent"></div>
   </body>
 </html>

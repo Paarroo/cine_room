@@ -108,4 +108,28 @@ class ApplicationController < ActionController::Base
   def set_meta_tags(tags = {})
     @meta_tags = tags
   end
+
+  def default_filter_options(resource_type)
+    case resource_type
+    when :movies
+      {
+        search: true,
+        genres: Movie.distinct.pluck(:genre).compact,
+        years: Movie.distinct.pluck(:release_date).map(&:year).uniq.sort.reverse,
+        directors: Movie.distinct.pluck(:director).compact,
+        venues: [],
+        date_filter: true
+      }
+    when :events
+      {
+        search: true,
+        genres: Movie.distinct.pluck(:genre).compact,
+        venues: Event.distinct.pluck(:venue_name).compact,
+        date_filter: true
+      }
+    else
+      {}
+    end
+  end
+
 end

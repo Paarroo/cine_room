@@ -1,0 +1,74 @@
+/* Minimap styles for CinéRoom */
+
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 0.75rem;
+  z-index: 10;
+  position: relative;
+}
+
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Style for attribution */
+.leaflet-control-attribution {
+  font-size: 10px !important;
+  background: rgba(245, 158, 11, 0.9) !important;
+  color: white !important;
+  border-radius: 0.25rem !important;
+}
+
+.leaflet-control-attribution a {
+  color: white !important;
+}
+
+/* Zoom controls styling */
+.leaflet-control-zoom {
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+}
+
+
+/* Contrôle plein écran intégré aux contrôles Leaflet */
+.leaflet-control-fullscreen {
+  margin-top: 5px !important;
+}
+
+.leaflet-control-fullscreen-button {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-control-fullscreen-button:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+  transform: scale(1.05);
+}
+
+/* Style pour le marqueur plein écran */
+.custom-marker-fullscreen {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Animation fluide pour le redimensionnement */
+[data-controller="map"] {
+  transition: height 0.3s ease-in-out !important;
+}

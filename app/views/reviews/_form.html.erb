@@ -1,42 +1,53 @@
-<%= form_with(model: review, class: "contents") do |form| %>
+<%= form_with(model: [review.event || review.movie, review], local: true, class: "space-y-6") do |form| %>
   <% if review.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</h2>
-
-      <ul class="list-disc ml-6">
-        <% review.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-4 py-3 rounded-md shadow">
+      <h2 class="font-semibold mb-2"><%= pluralize(review.errors.count, "erreur") %> empêchent l’enregistrement :</h2>
+      <ul class="list-disc list-inside text-sm">
+        <% review.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": review.errors[:user_id].none?, "border-red-400 focus:outline-red-600": review.errors[:user_id].any?}] %>
+  <!-- Rating field -->
+  <div data-controller="rating" class="rating">
+    <% 5.times do |i| %>
+      <span 
+        class="star" 
+        data-rating-target="star" 
+        data-action="mouseover->rating#highlight mouseout->rating#reset click->rating#select" 
+        data-value="<%= i + 1 %>">
+        &#9733;
+      </span>
+    <% end %>
+    <%= form.hidden_field :rating, value: review.rating || 0, data: { rating_target: "input" } %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :movie_id %>
-    <%= form.text_field :movie_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": review.errors[:movie_id].none?, "border-red-400 focus:outline-red-600": review.errors[:movie_id].any?}] %>
+  <!-- Comment field -->
+  <div>
+    <%= form.label :comment, "Commentaire", class: "block text-sm font-medium text-white" %>
+    <%= form.text_area :comment,
+      rows: 5,
+      placeholder: "Donnez votre avis...",
+      class: "mt-2 block w-full rounded-md border px-3 py-2 shadow-sm bg-dark-500 text-white placeholder-gray-400 
+      #{review.errors[:comment].any? ? 'border-red-400 focus:outline-red-600' : 'border-gray-400 focus:outline-gold-500'}" %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :event_id %>
-    <%= form.text_field :event_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": review.errors[:event_id].none?, "border-red-400 focus:outline-red-600": review.errors[:event_id].any?}] %>
+  <!-- Submit button -->
+  <div>
+    <%= form.submit review.new_record? ? "Laisser un commentaire" : "Mettre à jour le commentaire",
+      class: "inline-block bg-gold-500 hover:bg-gold-600 text-white font-semibold py-2 px-4 rounded-md transition cursor-pointer" %>
   </div>
+<% end %>
 
-  <div class="my-5">
-    <%= form.label :rating %>
-    <%= form.number_field :rating, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": review.errors[:rating].none?, "border-red-400 focus:outline-red-600": review.errors[:rating].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :comment %>
-    <%= form.textarea :comment, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": review.errors[:comment].none?, "border-red-400 focus:outline-red-600": review.errors[:comment].any?}] %>
-  </div>
-
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+<!-- Delete button (separate form) -->
+<% unless review.new_record? %>
+  <div class="mt-4">
+    <%= button_to "🗑 Supprimer le commentaire",
+        [review.event || review.movie, review],
+        method: :delete,
+        data: { confirm: "Êtes-vous sûr de vouloir supprimer cet avis ?" },
+        class: "inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition cursor-pointer" %>
   </div>
 <% end %>

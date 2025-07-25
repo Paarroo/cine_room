@@ -1,0 +1,128 @@
+<div id="cookie-consent-banner" class="fixed bottom-0 left-0 right-0 bg-black border-t-2 border-white p-4 z-50 transform translate-y-full transition-transform duration-300 ease-in-out shadow-2xl" style="display: none;">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h3 class="text-lg font-semibold cookie-text mb-2">
+        <i class="fas fa-cookie-bite mr-2"></i>
+        Consentement aux Cookies
+      </h3>
+      <p class="cookie-subtext text-sm">
+        Nous utilisons des cookies pour améliorer votre expérience de navigation, vous proposer un contenu personnalisé et analyser notre trafic.
+           En cliquant sur « Tout accepter », vous acceptez notre utilisation des cookies. Vous pouvez gérer vos préférences ou en savoir plus dans notre
+        <%= link_to "politique de confidentialité", privacy_path, class: "text-blue-400 hover:text-blue-300 underline" %>.
+      </p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2 min-w-fit">
+      <button
+        id="cookie-settings-btn"
+        class="cookie-button rgpd-settings-button px-4 py-2 text-sm bg-transparent border border-gray-600 text-white rounded-md hover:bg-gray-800 transition-colors"
+      >
+        <i class="fas fa-cog mr-1"></i>
+        Paramètres
+      </button>
+      <button
+        id="cookie-decline-btn"
+        class="cookie-button rgpd-decline-button px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+      >
+        <i class="fas fa-times mr-1"></i>
+        Refuser
+      </button>
+      <button
+        id="cookie-accept-btn"
+        class="cookie-button rgpd-accept-button px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+      >
+        <i class="fas fa-check mr-1"></i>
+        Tout Accepter
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Settings Modal -->
+<div id="cookie-settings-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" style="display: none;">
+  <div class="bg-black border-2 border-white rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl">
+    <!-- Modal Header (Fixed) -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
+      <h2 class="text-xl font-semibold text-white">
+        <i class="fas fa-cookie-bite mr-2"></i>
+        Paramètres des cookies
+      </h2>
+      <button id="cookie-modal-close" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Modal Content (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <p class="text-gray-300 mb-6">
+        Gérez vos préférences en matière de cookies. Vous pouvez activer ou désactiver différents types de cookies ci-dessous.
+      </p>
+
+      <!-- Essential Cookies -->
+      <div class="mb-6 p-4 border border-gray-700 rounded-lg">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-medium text-white">Cookies essentiels</h3>
+          <div class="flex items-center">
+            <span class="text-sm text-gray-400 mr-2">Toujours actif</span>
+            <div class="w-12 h-6 bg-green-600 rounded-full relative">
+              <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-400">
+          Ces cookies sont nécessaires au fonctionnement du site web et ne peuvent pas être désactivés.
+                    Ils sont généralement définis en réponse à des actions que vous effectuez, telles que la configuration de vos préférences en matière de confidentialité,
+                    la connexion ou le remplissage de formulaires.
+        </p>
+      </div>
+
+      <!-- Analytics Cookies -->
+      <div class="mb-6 p-4 border border-gray-700 rounded-lg">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-medium text-white">Cookies analytiques</h3>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="analytics-cookies" class="sr-only peer" />
+            <div class="w-12 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <p class="text-sm text-gray-400">
+          Ces cookies nous aident à comprendre comment les visiteurs interagissent avec notre site web en collectant et en
+                    communiquant des informations de manière anonyme. Cela nous aide à améliorer les performances de notre site web et l'expérience utilisateur.
+        </p>
+      </div>
+
+      <!-- Marketing Cookies -->
+      <div class="mb-6 p-4 border border-gray-700 rounded-lg">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-medium text-white">Cookies marketing</h3>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="marketing-cookies" class="sr-only peer" />
+            <div class="w-12 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <p class="text-sm text-gray-400">
+          Ces cookies sont utilisés pour vous proposer des publicités plus pertinentes en fonction de vos centres d'intérêt.
+                    Ils peuvent également être utilisés pour limiter le nombre de fois que vous voyez une publicité et mesurer l'efficacité des campagnes publicitaires.
+        </p>
+      </div>
+    </div>
+
+    <!-- Modal Footer (Fixed) -->
+    <div class="flex flex-col sm:flex-row gap-3 p-6 border-t border-gray-700 flex-shrink-0">
+      <button
+        id="cookie-save-preferences"
+        class="rgpd-settings-button flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+      >
+        <i class="fas fa-save mr-2"></i>
+        Enregistrer les préférences
+      </button>
+      <button
+        id="cookie-accept-all-modal"
+        class="rgpd-accept-button flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+      >
+        <i class="fas fa-check mr-2"></i>
+        Tout Accepter
+      </button>
+    </div>
+  </div>
+</div>

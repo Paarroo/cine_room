@@ -128,7 +128,7 @@ class Admin::DashboardController < Admin::ApplicationController
   # Calculate key business metrics for dashboard display
   def calculate_metrics
     {
-      total_revenue: confirmed_participations.sum("events.price_cents * participations.seats") / 100.0,
+      total_revenue: calculate_total_revenue,
       upcoming_events: Event.where(status: :upcoming).count,
       total_users: User.count,
       satisfaction: (Review.average(:rating) || 0).round(1)
@@ -138,15 +138,24 @@ class Admin::DashboardController < Admin::ApplicationController
   # Generate revenue chart data for the last 30 days
   def revenue_chart_data
     (30.days.ago.to_date..Date.current).map do |date|
-      revenue = confirmed_participations
-                .where(created_at: date.beginning_of_day..date.end_of_day)
-                .sum("events.price_cents * participations.seats") / 100.0
+      revenue = calculate_daily_revenue(date)
       {
         date: date.strftime("%d/%m"),
         revenue: revenue,
         formatted_revenue: number_to_currency(revenue)
       }
     end
+  end
+
+  # Calculate revenue for a specific date
+  def calculate_daily_revenue(date)
+    total_cents = Participation.includes(:event)
+                              .where(status: :confirmed)
+                              .where.not(stripe_payment_id: [nil, ''])
+                              .where(created_at: date.beginning_of_day..date.end_of_day)
+                              .sum { |p| (p.event.price_cents || 0) * p.seats }
+    
+    total_cents / 100.0
   end
 
   # Generate events status distribution data for charts
@@ -206,6 +215,17 @@ class Admin::DashboardController < Admin::ApplicationController
       total_users: User.count,
       pending_participations: Participation.where(status: :pending).count
     }
+  end
+
+  # Calculate total revenue from confirmed participations
+  def calculate_total_revenue
+    # Use includes instead of joins for better performance and to avoid potential issues
+    total_cents = Participation.includes(:event)
+                              .where(status: :confirmed)
+                              .where.not(stripe_payment_id: [nil, ''])
+                              .sum { |p| (p.event.price_cents || 0) * p.seats }
+    
+    total_cents / 100.0
   end
 
   # Helper method for confirmed participations with event joins

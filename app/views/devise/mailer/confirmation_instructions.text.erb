@@ -1,0 +1,15 @@
+Bienvenue sur CinéRoom !
+
+Bonjour <%= @resource.email %>,
+
+Merci de vous être inscrit sur CinéRoom, votre plateforme dédiée au cinéma !
+
+Pour finaliser votre inscription, veuillez confirmer votre compte en cliquant sur le lien suivant :
+
+<%= confirmation_url(@resource, confirmation_token: @token) %>
+
+Si vous n'arrivez pas à cliquer sur le lien, copiez-le et collez-le dans votre navigateur.
+
+Merci et à bientôt sur CinéRoom !
+
+— L'équipe CinéRoom

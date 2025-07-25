@@ -87,7 +87,7 @@ Rails.application.configure do
     }
     puts "📧 SMTP Gmail"
   else
-    config.action_mailer.delivery_method = :letter_opener_web
+    config.action_mailer.delivery_method = :letter_opener
     puts "📧 Letter Opener"
   end
 end

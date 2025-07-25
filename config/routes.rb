@@ -82,6 +82,9 @@ Rails.application.routes.draw do
     # Users role
     resources :users do
       resource :role, only: [ :show, :update ]
+      member do
+        patch :reset_password
+      end
     end
 
     # Participations with confirmation
@@ -148,6 +151,11 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resources :events do
+    resources :reviews, only: [:new, :create, :edit, :update, :destroy]
+  end
+
 
   get '/contact', to: 'pages#contact', as: :contact
   get '/legal', to: 'pages#legal', as: :legal

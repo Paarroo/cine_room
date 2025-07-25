@@ -1,4 +1,6 @@
 class Users::DashboardController < ApplicationController
+  require "csv"
+
   before_action :authenticate_user!
   before_action :set_user
 

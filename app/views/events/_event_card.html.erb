@@ -5,10 +5,17 @@
   <div class="relative h-72 bg-gradient-to-br from-red-500/20 to-pink-500/20">
     <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
 
-    <%= image_tag event.image,
-        alt: "#{event.title} poster",
-        class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
-        style: "min-width: 100%; min-height: 100%;" %>
+    <% if event.image.attached? %>
+      <%= image_tag event.image,
+          alt: "#{event.title} poster",
+          class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
+          style: "min-width: 100%; min-height: 100%;" %>
+    <% else %>
+      <!-- Default placeholder image -->
+      <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 opacity-30 flex items-center justify-center">
+        <span class="text-6xl opacity-50">🎬</span>
+      </div>
+    <% end %>
 
 
     <!-- Title + director -->

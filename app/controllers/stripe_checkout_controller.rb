@@ -37,7 +37,7 @@ class StripeCheckoutController < ApplicationController
         status: :confirmed
       )
 
-      ParticipationMailer.confirmation_email(participation).deliver_later
+      TicketMailer.ticket_confirmation(participation).deliver_later
       Rails.logger.info "Participation created via success redirect (webhook missed): #{participation.id}"
     else
       Rails.logger.info "Participation already exists from webhook: #{participation.id}"

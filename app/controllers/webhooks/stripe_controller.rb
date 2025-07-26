@@ -68,8 +68,8 @@ class Webhooks::StripeController < ApplicationController
       status: :confirmed
     )
 
-    # Send confirmation email
-    ParticipationMailer.confirmation_email(participation).deliver_later
+    # Send ticket with QR code
+    TicketMailer.ticket_confirmation(participation).deliver_later
     
     Rails.logger.info "Participation created via webhook: #{participation.id}"
   rescue => e

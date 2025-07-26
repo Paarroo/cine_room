@@ -35,6 +35,8 @@ gem "nokogiri"
 gem "geocoder"
 # gem "leaflet-rails" # Using CDN instead
 gem "valid_email2"
+gem "rqrcode"
+gem "mini_magick"
 gem "sidekiq"
 gem "bootsnap", require: false
 gem "kamal", require: false

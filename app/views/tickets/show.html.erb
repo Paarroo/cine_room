@@ -1,0 +1,215 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Ticket Card -->
+    <div class="relative overflow-hidden rounded-3xl shadow-2xl glass-effect">
+      <!-- Ticket Header -->
+      <div class="px-8 py-6 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600">
+        <div class="flex items-center justify-between text-white">
+          <div>
+            <h1 class="text-3xl font-bold flex items-center">
+              <span class="mr-3">🎫</span>
+              BILLET D'ENTRÉE
+            </h1>
+            <p class="text-xl opacity-90">Événement confirmé</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm opacity-80">Billet N°</p>
+            <p class="text-2xl font-mono font-bold">#<%= @participation.id.to_s.rjust(6, '0') %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Event Details -->
+          <div class="space-y-6">
+            <div>
+              <h2 class="text-3xl font-bold text-white mb-2"><%= @event.title %></h2>
+              <p class="text-xl text-slate-300">Film : <%= @movie.title %></p>
+              <% if @movie.director.present? %>
+                <p class="text-slate-400">Réalisé par <%= @movie.director %></p>
+              <% end %>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl bg-slate-800/50">
+              <span class="text-3xl">📅</span>
+              <div>
+                <p class="font-semibold text-white text-lg">
+                  <%= I18n.l(@event.event_date, format: :long) %>
+                </p>
+                <p class="text-slate-300">
+                  Horaire: <%= @event.start_time.strftime('%H:%M') %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Venue -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl bg-slate-800/50">
+              <span class="text-3xl">📍</span>
+              <div>
+                <p class="font-semibold text-white text-lg"><%= @event.venue_name %></p>
+                <p class="text-slate-300"><%= @event.venue_address %></p>
+              </div>
+            </div>
+
+            <!-- Participant Info -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl bg-slate-800/50">
+              <span class="text-3xl">👤</span>
+              <div>
+                <p class="font-semibold text-white text-lg"><%= @user.full_name %></p>
+                <p class="text-slate-300"><%= @user.email %></p>
+                <p class="text-slate-400">
+                  <%= pluralize(@participation.seats, 'place') %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="p-4 rounded-xl <%= @participation.used? ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/20 border border-green-500/30' %>">
+              <div class="flex items-center space-x-3">
+                <span class="text-2xl"><%= @participation.used? ? '✅' : '🟢' %></span>
+                <div>
+                  <p class="font-semibold <%= @participation.used? ? 'text-red-400' : 'text-green-400' %>">
+                    <%= @participation.used? ? 'Billet utilisé' : 'Billet valide' %>
+                  </p>
+                  <% if @participation.used? %>
+                    <p class="text-red-300 text-sm">
+                      Entrée validée le <%= I18n.l(@participation.used_at, format: :short) %>
+                    </p>
+                  <% else %>
+                    <p class="text-green-300 text-sm">Prêt pour l'entrée</p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Section -->
+          <div class="flex flex-col items-center justify-center space-y-6">
+            <div class="text-center">
+              <h3 class="text-2xl font-bold text-white mb-2">🔍 Code d'Entrée</h3>
+              <p class="text-slate-400 mb-6">Présentez ce QR code à l'entrée</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-xl">
+              <div class="w-64 h-64">
+                <%= image_tag participation_qr_code_path(@participation, format: :png), 
+                    alt: "QR Code pour l'entrée", 
+                    class: "w-full h-full object-contain" %>
+              </div>
+            </div>
+            
+            <div class="text-center">
+              <p class="text-slate-400 text-sm mb-4">
+                Token: <%= @participation.qr_code_token[0..15] %>...
+              </p>
+              
+              <!-- Download Options -->
+              <div class="flex flex-wrap justify-center gap-3">
+                <%= link_to participation_qr_code_path(@participation, format: :png),
+                    class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2",
+                    download: "ticket_qr_#{@participation.id}.png" do %>
+                  <span>📱</span>
+                  <span>Télécharger PNG</span>
+                <% end %>
+                
+                <%= link_to participation_qr_code_path(@participation),
+                    class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2" do %>
+                  <span>🔍</span>
+                  <span>Voir QR Code</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="mt-8 p-6 rounded-xl bg-orange-500/10 border border-orange-500/20">
+          <h4 class="font-semibold mb-4 flex items-center text-orange-400">
+            <span class="mr-2">⚠️</span>
+            Instructions importantes
+          </h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h5 class="font-medium text-white mb-2">À l'arrivée :</h5>
+              <ul class="space-y-1 text-sm text-slate-300">
+                <li>• Arrivez 15 minutes avant le début</li>
+                <li>• Présentez ce QR code sur votre téléphone ou imprimé</li>
+                <li>• Ayez votre pièce d'identité si demandée</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-white mb-2">Conditions :</h5>
+              <ul class="space-y-1 text-sm text-slate-300">
+                <li>• Ce billet est personnel et non transférable</li>
+                <li>• Gardez votre billet jusqu'à la fin de l'événement</li>
+                <li>• Respectez les consignes de sécurité du lieu</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-8 pt-6 border-t border-slate-700 text-center">
+          <p class="text-slate-400 text-sm mb-2">
+            Billet généré le <%= I18n.l(@participation.created_at, format: :long) %>
+          </p>
+          <p class="text-slate-500 text-sm">
+            Pour toute question, contactez-nous à codes.sources.0@gmail.com
+          </p>
+          
+          <div class="mt-4 flex justify-center items-center space-x-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+              <span class="text-xl">🎬</span>
+            </div>
+            <div>
+              <p class="text-lg font-bold gradient-text">CinéRoom</p>
+              <p class="text-xs text-slate-500">Votre expérience cinéma indépendant</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex flex-wrap justify-center gap-4">
+          <%= link_to users_dashboard_path(current_user),
+              class: "bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl transition-colors flex items-center space-x-2" do %>
+            <span>👤</span>
+            <span>Mon tableau de bord</span>
+          <% end %>
+          
+          <button onclick="window.print()" 
+                  class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-colors flex items-center space-x-2">
+            <span>🖨️</span>
+            <span>Imprimer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .max-w-4xl, .max-w-4xl * {
+    visibility: visible;
+  }
+  .max-w-4xl {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .bg-gradient-to-br,
+  .bg-gradient-to-r {
+    background: #f59e0b !important;
+    color: white !important;
+  }
+}
+</style>

@@ -1,0 +1,134 @@
+<div class="min-h-screen flex items-center justify-center py-12 px-4" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); font-family: system-ui, -apple-system, sans-serif;">
+  <div class="max-w-2xl mx-auto">
+    <!-- Header with logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center space-x-3 mb-4">
+        <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
+          <span class="text-3xl">🎬</span>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold" style="background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CinéRoom</h1>
+          <p class="text-sm" style="color: #94a3b8;">Votre plateforme cinéma</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticket Card -->
+    <div class="relative overflow-hidden rounded-3xl shadow-2xl" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1);">
+      <!-- Ticket Header -->
+      <div class="px-8 py-6" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white;">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold">🎫 BILLET D'ENTRÉE</h2>
+            <p class="text-lg opacity-90">Événement confirmé</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm opacity-80">Billet N°</p>
+            <p class="text-lg font-mono font-bold">#<%= @participation.id.to_s.rjust(6, '0') %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Event Details -->
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-2xl font-bold mb-2" style="color: #f8fafc;"><%= @event.title %></h3>
+              <p class="text-lg" style="color: #cbd5e1;">Film : <%= @movie.title %></p>
+              <% if @movie.director.present? %>
+                <p class="text-sm" style="color: #94a3b8;">Réalisé par <%= @movie.director %></p>
+              <% end %>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl" style="background: rgba(20, 25, 40, 0.8);">
+              <span class="text-2xl">📅</span>
+              <div>
+                <p class="font-semibold" style="color: #f8fafc;">
+                  <%= I18n.l(@event.event_date, format: :long) %>
+                </p>
+                <p style="color: #cbd5e1;">
+                  Horaire: <%= @event.start_time.strftime('%H:%M') %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Venue -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl" style="background: rgba(20, 25, 40, 0.8);">
+              <span class="text-2xl">📍</span>
+              <div>
+                <p class="font-semibold" style="color: #f8fafc;"><%= @event.venue_name %></p>
+                <p style="color: #cbd5e1;"><%= @event.venue_address %></p>
+              </div>
+            </div>
+
+            <!-- Participant Info -->
+            <div class="flex items-center space-x-4 p-4 rounded-xl" style="background: rgba(20, 25, 40, 0.8);">
+              <span class="text-2xl">👤</span>
+              <div>
+                <p class="font-semibold" style="color: #f8fafc;"><%= @user.full_name %></p>
+                <p style="color: #cbd5e1;"><%= @user.email %></p>
+                <p style="color: #94a3b8;">
+                  <%= pluralize(@participation.seats, 'place') %>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Section -->
+          <div class="flex flex-col items-center justify-center space-y-4">
+            <div class="p-6 rounded-2xl" style="background: white;">
+              <img src="cid:ticket_qr_code_<%= @participation.id %>.png" 
+                   alt="QR Code pour l'entrée" 
+                   class="w-48 h-48 mx-auto">
+            </div>
+            
+            <div class="text-center">
+              <p class="text-lg font-semibold mb-2" style="color: #f8fafc;">
+                🔍 Code d'entrée
+              </p>
+              <p class="text-sm" style="color: #cbd5e1;">
+                Présentez ce QR code à l'entrée de l'événement
+              </p>
+              <p class="text-xs font-mono mt-2 p-2 rounded" style="color: #64748b; background: rgba(20, 25, 40, 0.8);">
+                Token: <%= @participation.qr_code_token[0..15] %>...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="mt-8 p-6 rounded-xl" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
+          <h4 class="font-semibold mb-3 flex items-center" style="color: #fca5a5;">
+            <span class="mr-2">⚠️</span>
+            Instructions importantes
+          </h4>
+          <ul class="space-y-2 text-sm" style="color: #cbd5e1;">
+            <li>• Arrivez 15 minutes avant le début de la projection</li>
+            <li>• Présentez ce QR code sur votre téléphone ou imprimé</li>
+            <li>• Ce billet est personnel et non transférable</li>
+            <li>• Gardez votre billet jusqu'à la fin de l'événement</li>
+          </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t text-center" style="border-color: rgba(148, 163, 184, 0.1);">
+          <p class="text-sm" style="color: #94a3b8;">
+            Billet généré le <%= I18n.l(@participation.created_at, format: :long) %>
+          </p>
+          <p class="text-sm mt-2" style="color: #64748b;">
+            Pour toute question, contactez-nous à codes.sources.0@gmail.com
+          </p>
+          
+          <div class="mt-4">
+            <p class="text-xs" style="color: #475569;">
+              🎬 CinéRoom - Votre expérience cinéma indépendant
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -201,16 +201,33 @@ export default class extends Controller {
     const url = `maps://?daddr=${lat},${lng}&q=${encodeURIComponent(address)}`
     window.location.href = url
     console.log('🍎 Ouverture Apple Maps')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirections(lat, lng)
+    }, 2000)
   }
 
   openAndroidGps(lat, lng, address) {
     const url = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address)})`
     window.location.href = url
     console.log('🤖 Ouverture GPS Android')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirections(lat, lng)
+    }, 2000)
   }
 
   openDesktopGps(lat, lng, address) {
-    console.log('💻 Desktop détecté - fallback nécessaire')
+    // Sur desktop, ouvrir directement OpenStreetMap
+    this.openOpenStreetMapDirections(lat, lng)
+  }
+
+  openOpenStreetMapDirections(lat, lng) {
+    const url = `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`
+    window.open(url, '_blank')
+    console.log('🗺️ Ouverture OpenStreetMap directions')
   }
 
   isIOS() {

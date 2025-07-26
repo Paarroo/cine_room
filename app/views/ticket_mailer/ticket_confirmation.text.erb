@@ -1,0 +1,51 @@
+🎬 CINÉROOM - BILLET D'ENTRÉE 🎬
+
+════════════════════════════════════════════════════
+
+🎫 BILLET CONFIRMÉ #<%= @participation.id.to_s.rjust(6, '0') %>
+
+Bonjour <%= @user.full_name %>,
+
+Votre réservation est confirmée ! Voici votre billet d'entrée pour :
+
+🎭 ÉVÉNEMENT : <%= @event.title %>
+🎬 FILM : <%= @movie.title %>
+<% if @movie.director.present? %>📽️  RÉALISATEUR : <%= @movie.director %><% end %>
+
+📅 DATE & HORAIRE :
+   <%= I18n.l(@event.event_date, format: :long) %>
+   Début : <%= @event.start_time.strftime('%H:%M') %>
+
+📍 LIEU :
+   <%= @event.venue_name %>
+   <%= @event.venue_address %>
+
+👤 PARTICIPANT :
+   <%= @user.full_name %>
+   <%= @user.email %>
+   <%= pluralize(@participation.seats, 'place') %>
+
+🔍 CODE D'ENTRÉE :
+   Token : <%= @participation.qr_code_token %>
+
+════════════════════════════════════════════════════
+
+⚠️  INSTRUCTIONS IMPORTANTES :
+
+• Arrivez 15 minutes avant le début
+• Présentez le QR code joint à ce mail
+• Ce billet est personnel et non transférable  
+• Gardez votre billet jusqu'à la fin de l'événement
+
+════════════════════════════════════════════════════
+
+📎 PIÈCE JOINTE : QR Code pour l'entrée
+   (Vous pouvez l'afficher sur votre téléphone ou l'imprimer)
+
+Billet généré le <%= I18n.l(@participation.created_at, format: :long) %>
+
+Pour toute question : codes.sources.0@gmail.com
+
+🎪 Excellente séance !
+
+— L'équipe CinéRoom 🎬

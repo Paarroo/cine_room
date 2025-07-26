@@ -70,9 +70,9 @@ Rails.application.configure do
   }
 
 
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
-  # Use main database for SolidQueue instead of separate queue database
+  # Temporary fix: use inline delivery for emails instead of SolidQueue
+  config.active_job.queue_adapter = :inline
+  # config.active_job.queue_adapter = :solid_queue
   # config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to

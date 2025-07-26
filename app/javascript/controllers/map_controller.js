@@ -189,9 +189,13 @@ export default class extends Controller {
       return
     }
 
+    // Afficher l'indicateur de chargement
+    this.showGpsLoading(true)
+
     // Demander la position de l'utilisateur
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        this.showGpsLoading(false)
         const userLat = position.coords.latitude
         const userLng = position.coords.longitude
         console.log(`📍 Position utilisateur: ${userLat}, ${userLng}`)
@@ -205,7 +209,10 @@ export default class extends Controller {
         this.openGpsWithRoute(userLat, userLng, destLat, destLng, address)
       },
       (error) => {
+        this.showGpsLoading(false)
         console.log('❌ Erreur géolocalisation:', error.message)
+        this.handleGeolocationError(error)
+        
         // Fallback: ouvrir sans position utilisateur
         this.openGpsWithoutUserLocation()
       },
@@ -316,6 +323,45 @@ export default class extends Controller {
 
   isAndroid() {
     return /Android/.test(navigator.userAgent)
+  }
+
+  showGpsLoading(show) {
+    const gpsButton = this.element.querySelector('.leaflet-control-gps-button')
+    if (gpsButton) {
+      if (show) {
+        gpsButton.innerHTML = '<span style="font-size: 12px;">⏳</span>'
+        gpsButton.style.opacity = '0.7'
+        gpsButton.title = 'Localisation en cours...'
+      } else {
+        gpsButton.innerHTML = '<span style="font-size: 14px;">🧭</span>'
+        gpsButton.style.opacity = '1'
+        gpsButton.title = 'Ouvrir dans le GPS'
+      }
+    }
+  }
+
+  handleGeolocationError(error) {
+    let message = 'Erreur de géolocalisation'
+    
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        message = 'Permission de géolocalisation refusée'
+        console.log('🚫 Permission GPS refusée')
+        break
+      case error.POSITION_UNAVAILABLE:
+        message = 'Position non disponible'
+        console.log('📍 Position GPS non disponible')
+        break
+      case error.TIMEOUT:
+        message = 'Timeout de géolocalisation'
+        console.log('⏰ Timeout GPS')
+        break
+      default:
+        console.log('❌ Erreur GPS inconnue:', error.message)
+        break
+    }
+    
+    console.log(`ℹ️ ${message} - Ouverture sans position utilisateur`)
   }
 
   addResizeControl() {

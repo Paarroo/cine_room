@@ -51,7 +51,7 @@
               <div class="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-center">
                 
                 <div class="text-4xl font-bold mb-2" data-seats-target="totalPrice">
-                  <%= number_to_currency(@event.price_cents, unit: "€") %>
+                  <%= display_price(@event.price_cents) %>
                 </div>
                 <div class="text-white/90">par personne</div>
                 

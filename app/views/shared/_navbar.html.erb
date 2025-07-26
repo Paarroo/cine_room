@@ -54,7 +54,8 @@
                   class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
             <% end %>
 
-            <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            <%= button_to "Déconnexion", destroy_user_session_path, 
+                method: :delete,
                 class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
           </div>
         <% else %>
@@ -110,7 +111,8 @@
             <% end %>
           <% end %>
 
-          <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+          <%= button_to destroy_user_session_path, 
+              method: :delete,
               class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-red-400 bg-transparent border-0" do %>
             <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
           <% end %>

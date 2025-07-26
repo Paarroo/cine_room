@@ -1,0 +1,188 @@
+<%
+  # Configuration des filtres par contexte
+  filter_config = {
+    movies: {
+      path: admin_movies_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Titre du film..." },
+        { type: :select, name: :status, label: "Statut", options: [['Tous les statuts', ''], ['En attente', 'pending'], ['Validé', 'approved'], ['Rejeté', 'rejected']] },
+        { type: :select, name: :genre, label: "Genre", options: [['Tous les genres', '']] + Movie.distinct.pluck(:genre).compact.map { |g| [g, g] } },
+        { type: :select, name: :year, label: "Année", options: [['Toutes les années', '']] + Movie.distinct.pluck(:year).compact.sort.reverse.map { |y| [y, y] } },
+        { type: :text, name: :director, label: "Réalisateur", placeholder: "Nom du réalisateur..." },
+        { type: :text, name: :creator, label: "Créateur", placeholder: "Nom du créateur..." },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Titre A-Z', 'title_asc'], ['Titre Z-A', 'title_desc'], ['Année récente', 'year_desc'], ['Année ancienne', 'year_asc']] }
+      ],
+      active_params: [:q, :status, :genre, :year, :director, :creator, :sort]
+    },
+    participations: {
+      path: admin_participations_path,
+      fields: [
+        { type: :text, name: :user_search, label: "Recherche utilisateur", placeholder: "Nom, email..." },
+        { type: :select, name: :status, label: "Statut", options: [['Tous les statuts', ''], ['En attente', 'pending'], ['Confirmé', 'confirmed'], ['Annulé', 'cancelled'], ['Présent', 'attended']] },
+        { type: :select, name: :event_id, label: "Événement", options: [['Tous les événements', '']] + (defined?(@filter_options) && @filter_options&.dig(:events) || Event.joins(:participations).distinct.limit(20).pluck(:title, :id)) },
+        { type: :select, name: :date_filter, label: "Période", options: [['Toutes les périodes', ''], ['Aujourd\'hui', 'today'], ['Cette semaine', 'week'], ['Ce mois', 'month']] },
+        { type: :select, name: :payment_filter, label: "Paiement", options: [['Tous', ''], ['Avec paiement', 'with_payment'], ['Sans paiement', 'without_payment']] },
+        { type: :select, name: :venue, label: "Lieu", options: [['Tous les lieux', '']] + (defined?(@filter_options) && @filter_options&.dig(:venues) || Event.joins(:participations).distinct.pluck(:venue_name).compact.uniq.map { |v| [v, v] }) },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Par événement', 'event_date_desc'], ['Par utilisateur', 'user_name_asc'], ['Par montant', 'amount_desc']] }
+      ],
+      active_params: [:user_search, :status, :event_id, :date_filter, :payment_filter, :venue]
+    },
+    reviews: {
+      path: admin_reviews_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Commentaires, films..." },
+        { type: :select, name: :rating, label: "Note", options: [['Toutes les notes', ''], ['⭐ 1 étoile', '1'], ['⭐⭐ 2 étoiles', '2'], ['⭐⭐⭐ 3 étoiles', '3'], ['⭐⭐⭐⭐ 4 étoiles', '4'], ['⭐⭐⭐⭐⭐ 5 étoiles', '5']] },
+        { type: :select, name: :content_type, label: "Type de contenu", options: [['Tous les avis', ''], ['Avec commentaire', 'with_comment'], ['Note uniquement', 'rating_only'], ['Avec note', 'with_rating']] },
+        { type: :select, name: :time_period, label: "Période", options: [['Toutes les périodes', ''], ['Aujourd\'hui', 'today'], ['Cette semaine', 'week'], ['Ce mois', 'month'], ['Récents (30 jours)', 'recent']] },
+        { type: :select, name: :genre, label: "Genre de film", options: [['Tous les genres', '']] + Movie.joins(:reviews).distinct.pluck(:genre).compact.map { |g| [g, g] } },
+        { type: :select, name: :user_role, label: "Rôle utilisateur", options: [['Tous les rôles', ''], ['Utilisateur', 'user'], ['Créateur', 'creator'], ['Administrateur', 'admin']] },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'newest'], ['Plus ancien', 'oldest'], ['Note la plus haute', 'rating_desc'], ['Note la plus basse', 'rating_asc']] }
+      ],
+      active_params: [:q, :rating, :content_type, :time_period, :genre, :user_role, :sort]
+    },
+    users: {
+      path: admin_users_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Nom, email..." },
+        { type: :select, name: :role, label: "Rôle", options: [['Tous les rôles', ''], ['Utilisateur', 'user'], ['Créateur', 'creator'], ['Administrateur', 'admin']] },
+        { type: :select, name: :creator_status, label: "Statut créateur", options: [['Tous', ''], ['Avec films', 'with_movies'], ['Sans films', 'without_movies']] },
+        { type: :select, name: :activity, label: "Activité", options: [['Tous', ''], ['Actifs (avec réservations)', 'active'], ['Inactifs (sans réservations)', 'inactive']] },
+        { type: :date, name: :created_since, label: "Inscrit depuis" },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Nom A-Z', 'name_asc'], ['Nom Z-A', 'name_desc'], ['Email A-Z', 'email_asc']] }
+      ],
+      active_params: [:q, :role, :creator_status, :activity, :created_since]
+    }
+  }
+
+  # Détermination du contexte basé sur le contrôleur ou paramètre
+  context = local_assigns[:context]&.to_sym || 
+           case controller_name
+           when 'movies' then :movies
+           when 'participations' then :participations 
+           when 'reviews' then :reviews
+           when 'users' then :users
+           else :movies
+           end
+  
+  config = filter_config[context]
+%>
+
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-filter text-primary mr-2"></i>
+          Filtres et Recherche
+        </h3>
+
+        <!-- Clear Filters Button -->
+        <%= link_to config[:path],
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
+          <i class="fas fa-times mr-2"></i>Effacer les filtres
+        <% end %>
+      </div>
+
+      <!-- Search and Filter Form -->
+      <%= form_with url: config[:path], method: :get,
+          class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+          data: { turbo_frame: "_top" } do |form| %>
+
+        <% config[:fields].each do |field| %>
+          <div class="form-group <%= 'col-span-full flex justify-start' if field[:name] == :submit %>">
+            <% if field[:type] == :text %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.text_field field[:name],
+                  value: params[field[:name]],
+                  placeholder: field[:placeholder],
+                  class: "form-input" %>
+            <% elsif field[:type] == :select %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.select field[:name],
+                  options_for_select(field[:options], params[field[:name]]),
+                  {},
+                  { class: "form-input" } %>
+            <% elsif field[:type] == :date %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.date_field field[:name],
+                  value: params[field[:name]],
+                  class: "form-input" %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <!-- Submit Button -->
+        <div class="form-group flex items-end">
+          <%= form.submit "Appliquer les filtres",
+              class: "w-full btn-primary" %>
+        </div>
+      <% end %>
+
+      <!-- Active Filters Display -->
+      <% if params.slice(*config[:active_params]).values.any?(&:present?) %>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="text-sm text-gray-400 mr-2">Filtres actifs :</span>
+
+            <% config[:active_params].each do |param_key| %>
+              <% if params[param_key].present? %>
+                <% 
+                  # Détermination de la couleur selon le type de filtre
+                  colors = ['primary', 'blue-500', 'green-500', 'purple-500', 'yellow-500', 'red-500']
+                  color = colors[config[:active_params].index(param_key) % colors.length]
+                  
+                  # Formatage de l'affichage selon le contexte
+                  label = case param_key
+                  when :user_search then "Utilisateur"
+                  when :q then "Recherche"
+                  when :event_id
+                    event = Event.find_by(id: params[:event_id])
+                    event ? "Événement: #{event.title}" : nil
+                  when :date_filter, :time_period then "Période"
+                  when :payment_filter then "Paiement"
+                  when :content_type then "Type"
+                  when :creator_status then "Créateur"
+                  when :user_role then "Rôle utilisateur"
+                  else param_key.to_s.humanize
+                  end
+                  
+                  value = case param_key
+                  when :payment_filter
+                    params[param_key] == 'with_payment' ? 'Avec paiement' : 'Sans paiement'
+                  when :content_type
+                    case params[param_key]
+                    when 'with_comment' then 'Avec commentaire'
+                    when 'rating_only' then 'Note seule'
+                    when 'with_rating' then 'Avec note'
+                    else params[param_key]
+                    end
+                  when :creator_status
+                    params[param_key] == 'with_movies' ? 'Avec films' : 'Sans films'
+                  when :activity
+                    params[param_key] == 'active' ? 'Actifs' : 'Inactifs'
+                  when :rating
+                    "#{params[param_key]} étoile#{'s' if params[param_key].to_i > 1}"
+                  when :event_id
+                    nil # Déjà géré dans label
+                  else
+                    params[param_key].is_a?(String) ? params[param_key] : params[param_key].humanize
+                  end
+                %>
+                
+                <% next if param_key == :event_id && !event %>
+                
+                <span class="px-3 py-1 bg-<%= color %>/20 text-<%= color == 'primary' ? 'primary' : color.gsub('-500', '-400') %> rounded-full text-xs">
+                  <% if param_key == :event_id %>
+                    <%= label %>
+                  <% else %>
+                    <%= label %>: <% if value.is_a?(String) && value.length > 20 %>"<%= truncate(value, length: 20) %>"<% else %><%= value || params[param_key] %><% end %>
+                  <% end %>
+                </span>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

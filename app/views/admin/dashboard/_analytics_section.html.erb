@@ -1,11 +1,13 @@
-<section class="metrics-overview py-8">
+<!-- Analytics Overview Section -->
+<section class="analytics-overview py-8">
   <div class="container-app">
     <h2 class="text-2xl font-bold text-white mb-6">
       <i class="fas fa-chart-line text-primary mr-3"></i>
       Métriques Clés
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" data-admin-dashboard-target="metrics">
+    <!-- Metrics Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8" data-admin-dashboard-target="metrics">
       <!-- Revenue Metric -->
       <div class="metric-card glass-effect rounded-2xl p-6 hover:border-primary/30 transition-all duration-300">
         <div class="flex items-center justify-between mb-4">
@@ -93,6 +95,65 @@
         <div class="text-sm text-gray-400">Satisfaction</div>
         <div class="text-xs text-gray-500 mt-1">
           <%= Review.count %> avis
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Revenue Chart -->
+      <div class="glass-effect rounded-3xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-chart-line text-primary mr-2"></i>
+            Évolution des Revenus
+          </h3>
+          <span class="text-sm text-gray-400">30 derniers jours</span>
+        </div>
+
+        <div
+          class="chart-wrapper h-64"
+          data-controller="admin-chart"
+          data-admin-chart-type-value="line"
+          data-admin-chart-data-value='<%= @revenue_chart_data.to_json %>'
+          data-admin-dashboard-target="revenueChart"
+        >
+          <!-- Chart placeholder -->
+          <div class="h-full flex items-center justify-center text-gray-400">
+            <div class="text-center">
+              <i class="fas fa-chart-line text-4xl mb-4"></i>
+              <p>Graphique des revenus</p>
+              <div class="loading-skeleton w-full h-32 rounded-lg mt-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events Status Chart -->
+      <div class="glass-effect rounded-3xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-chart-pie text-accent mr-2"></i>
+            Statut des Événements
+          </h3>
+          <span class="text-sm text-gray-400">Répartition actuelle</span>
+        </div>
+
+        <div
+          class="chart-wrapper h-64"
+          data-controller="admin-chart"
+          data-admin-chart-type-value="doughnut"
+          data-admin-chart-data-value='<%= @events_chart_data.to_json %>'
+          data-admin-dashboard-target="eventsChart"
+        >
+          <!-- Chart placeholder -->
+          <div class="h-full flex items-center justify-center text-gray-400">
+            <div class="text-center">
+              <i class="fas fa-chart-pie text-4xl mb-4"></i>
+              <p>Répartition des événements</p>
+              <div class="loading-skeleton w-32 h-32 rounded-full mx-auto mt-4"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

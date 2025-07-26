@@ -88,7 +88,7 @@
     </div>
     <div class="text-center p-3 bg-white/5 rounded-lg">
       <div class="text-lg font-bold text-green-400">
-        <%= number_to_currency((participation.event&.price_cents || 0) * participation.seats / 100.0) %>
+        <%= number_to_currency(calculate_participation_total(participation.event, participation.seats)) %>
       </div>
       <div class="text-xs text-gray-400">Total</div>
     </div>

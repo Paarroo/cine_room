@@ -85,7 +85,7 @@
               <div class="glass-subtle rounded-xl p-4">
                 <div class="text-sm text-gray-400 mb-1">Prix</div>
                 <div class="text-lg font-semibold text-white">
-                  <%= number_to_currency(@event.price_cents / 100.0) %>
+                  <%= display_price(@event.price_cents) %>
                 </div>
               </div>
             </div>

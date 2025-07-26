@@ -27,6 +27,13 @@ class Admin::ParticipationsController < Admin::ApplicationController
   end
 
   def show
+    # Format participation data for view
+    @participation_data = format_participation_data(@participation)
+    @user = @participation.user
+    @event = @participation.event
+    @movie = @event&.movie
+    @can_modify = @event&.event_date && @event.event_date >= Date.current
+    
     @participation_revenue = calculate_single_participation_revenue(@participation)
     @related_participations = Participation.joins(:event)
                                           .where(events: { id: @participation.event_id })

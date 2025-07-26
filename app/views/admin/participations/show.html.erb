@@ -20,23 +20,23 @@
   <section class="participation-header py-8">
     <div class="container-app">
       <div class="glass-effect rounded-3xl p-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
           <!-- Status & Actions -->
-          <div class="lg:col-span-1">
+          <div class="lg:col-span-1 min-w-0">
             <!-- Status Badge -->
             <div class="text-center mb-6">
               <% case @participation_data[:status] %>
               <% when 'pending' %>
-                <span class="px-6 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-lg font-medium">
+                <span class="px-4 py-3 bg-yellow-500/20 text-yellow-300 rounded-xl text-sm lg:text-lg font-medium block">
                   <i class="fas fa-clock mr-2"></i>En attente
                 </span>
               <% when 'confirmed' %>
-                <span class="px-6 py-3 bg-green-500/20 text-green-300 rounded-xl text-lg font-medium">
+                <span class="px-4 py-3 bg-green-500/20 text-green-300 rounded-xl text-sm lg:text-lg font-medium block">
                   <i class="fas fa-check mr-2"></i>Confirmée
                 </span>
               <% when 'cancelled' %>
-                <span class="px-6 py-3 bg-red-500/20 text-red-300 rounded-xl text-lg font-medium">
+                <span class="px-4 py-3 bg-red-500/20 text-red-300 rounded-xl text-sm lg:text-lg font-medium block">
                   <i class="fas fa-times mr-2"></i>Annulée
                 </span>
               <% end %>
@@ -45,14 +45,14 @@
             <!-- Payment Status -->
             <div class="text-center mb-6">
               <% if @participation_data[:has_payment] %>
-                <div class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg">
+                <div class="px-3 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm">
                   <i class="fas fa-credit-card mr-2"></i>Paiement effectué
                 </div>
-                <p class="text-xs text-gray-500 mt-2">
+                <p class="text-xs text-gray-500 mt-2 break-all px-2">
                   ID: <%= @participation_data[:stripe_payment_id] %>
                 </p>
               <% else %>
-                <div class="px-4 py-2 bg-gray-500/20 text-gray-400 rounded-lg">
+                <div class="px-3 py-2 bg-gray-500/20 text-gray-400 rounded-lg text-sm">
                   <i class="fas fa-credit-card mr-2"></i>Aucun paiement
                 </div>
               <% end %>
@@ -65,42 +65,42 @@
                   <%= button_to admin_participation_path(@participation),
                       method: :patch,
                       params: { status: 'confirmed' },
-                      class: "w-full btn-primary",
+                      class: "w-full px-4 py-3 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-content rounded-xl transition-colors font-medium text-sm",
                       data: { confirm: "Confirmer cette réservation ?" } do %>
-                    <i class="fas fa-check mr-2"></i>Confirmer la Réservation
+                    <i class="fas fa-check mr-2"></i><span class="truncate">Confirmer</span>
                   <% end %>
 
                   <%= button_to admin_participation_path(@participation),
                       method: :patch,
                       params: { status: 'cancelled' },
-                      class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold",
+                      class: "w-full px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-medium text-sm",
                       data: { confirm: "Annuler cette réservation ?" } do %>
-                    <i class="fas fa-times mr-2"></i>Annuler la Réservation
+                    <i class="fas fa-times mr-2"></i><span class="truncate">Annuler</span>
                   <% end %>
                 <% elsif @participation.confirmed? %>
                   <%= button_to admin_participation_path(@participation),
                       method: :patch,
                       params: { status: 'cancelled' },
-                      class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold",
+                      class: "w-full px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-medium text-sm",
                       data: { confirm: "Annuler cette réservation confirmée ?" } do %>
-                    <i class="fas fa-times mr-2"></i>Annuler la Réservation
+                    <i class="fas fa-times mr-2"></i><span class="truncate">Annuler</span>
                   <% end %>
                 <% elsif @participation.cancelled? %>
                   <%= button_to admin_participation_path(@participation),
                       method: :patch,
                       params: { status: 'pending' },
-                      class: "w-full px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors font-semibold",
+                      class: "w-full px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors font-medium text-sm",
                       data: { confirm: "Remettre en attente cette réservation ?" } do %>
-                    <i class="fas fa-undo mr-2"></i>Remettre en Attente
+                    <i class="fas fa-undo mr-2"></i><span class="truncate">Remettre en Attente</span>
                   <% end %>
                 <% end %>
               </div>
             <% else %>
-              <div class="text-center py-4">
-                <p class="text-gray-500 text-sm">
-                  <i class="fas fa-lock mr-2"></i>
-                  Réservation non modifiable<br>
-                  (événement passé ou annulé)
+              <div class="text-center py-4 px-2">
+                <p class="text-gray-500 text-xs lg:text-sm">
+                  <i class="fas fa-lock mr-1"></i>
+                  <span class="block">Réservation non modifiable</span>
+                  <span class="text-xs">(événement passé ou annulé)</span>
                 </p>
               </div>
             <% end %>
@@ -115,21 +115,21 @@
                   Réservation #<%= @participation.id %>
                 </h1>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div class="glass-subtle rounded-xl p-4">
+                  <div class="glass-subtle rounded-xl p-4 min-w-0">
                     <div class="text-sm text-gray-400 mb-1">Places</div>
                     <div class="text-2xl font-semibold text-white"><%= @participation_data[:seats] %></div>
                   </div>
-                  <div class="glass-subtle rounded-xl p-4">
+                  <div class="glass-subtle rounded-xl p-4 min-w-0">
                     <div class="text-sm text-gray-400 mb-1">Prix Total</div>
-                    <div class="text-2xl font-semibold text-primary"><%= @participation_data[:formatted_total_price] %></div>
+                    <div class="text-2xl font-semibold text-primary truncate"><%= @participation_data[:formatted_total_price] %></div>
                   </div>
-                  <div class="glass-subtle rounded-xl p-4">
+                  <div class="glass-subtle rounded-xl p-4 min-w-0">
                     <div class="text-sm text-gray-400 mb-1">Date Réservation</div>
                     <div class="text-lg font-semibold text-white"><%= @participation_data[:formatted_created_at] %></div>
                   </div>
-                  <div class="glass-subtle rounded-xl p-4">
+                  <div class="glass-subtle rounded-xl p-4 min-w-0">
                     <div class="text-sm text-gray-400 mb-1">Statut</div>
-                    <div class="text-lg font-semibold text-white"><%= @participation_data[:status_humanized] %></div>
+                    <div class="text-lg font-semibold text-white truncate"><%= @participation_data[:status_humanized] %></div>
                   </div>
                 </div>
               </div>
@@ -144,11 +144,11 @@
                     <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold">
                       <%= @user&.full_name&.first(2)&.upcase || 'U' %>
                     </div>
-                    <div>
-                      <div class="text-lg font-semibold text-white">
+                    <div class="flex-1 min-w-0">
+                      <div class="text-lg font-semibold text-white truncate">
                         <%= @participation_data[:user_name] %>
                       </div>
-                      <div class="text-sm text-gray-400">
+                      <div class="text-sm text-gray-400 truncate">
                         <%= @user&.email || 'Email non disponible' %>
                       </div>
                       <div class="text-xs text-gray-500">
@@ -166,7 +166,7 @@
                   <i class="fas fa-calendar-alt text-primary mr-2"></i>Événement
                 </h3>
                 <div class="glass-subtle rounded-xl p-6">
-                  <h4 class="text-lg font-semibold text-white mb-3">
+                  <h4 class="text-lg font-semibold text-white mb-3 truncate">
                     <%= @participation_data[:event_title] %>
                   </h4>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -180,11 +180,11 @@
                     </div>
                     <div>
                       <div class="text-sm text-gray-400 mb-1">Lieu</div>
-                      <div class="text-white"><%= @event&.venue_name %></div>
+                      <div class="text-white truncate"><%= @event&.venue_name %></div>
                     </div>
                     <div>
                       <div class="text-sm text-gray-400 mb-1">Adresse</div>
-                      <div class="text-white"><%= @event&.venue_address %></div>
+                      <div class="text-white truncate" title="<%= @event&.venue_address %>"><%= @event&.venue_address %></div>
                     </div>
                   </div>
                 </div>
@@ -202,13 +202,13 @@
                         <%= @movie.title.first(2).upcase %>
                       </div>
                       <div class="flex-1">
-                        <h4 class="text-lg font-semibold text-white mb-2">
+                        <h4 class="text-lg font-semibold text-white mb-2 truncate">
                           <%= @participation_data[:movie_title] %>
                         </h4>
                         <div class="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <span class="text-gray-400">Réalisateur:</span>
-                            <span class="text-white ml-2"><%= @movie.director %></span>
+                            <span class="text-white ml-2 truncate block sm:inline"><%= @movie.director %></span>
                           </div>
                           <div>
                             <span class="text-gray-400">Année:</span>
@@ -236,25 +236,25 @@
                 </h3>
                 <div class="glass-subtle rounded-xl p-6">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
+                    <div class="min-w-0">
                       <span class="text-gray-400">ID Réservation:</span>
                       <span class="text-white ml-2">#<%= @participation.id %></span>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                       <span class="text-gray-400">ID Stripe:</span>
-                      <span class="text-white ml-2">
+                      <div class="text-white text-xs break-all mt-1" title="<%= @participation_data[:stripe_payment_id] %>">
                         <%= @participation_data[:stripe_payment_id] || 'Non renseigné' %>
-                      </span>
+                      </div>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                       <span class="text-gray-400">Créée le:</span>
-                      <span class="text-white ml-2">
+                      <span class="text-white ml-2 truncate block sm:inline">
                         <%= @participation_data[:created_at]&.strftime("%d/%m/%Y à %H:%M") %>
                       </span>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                       <span class="text-gray-400">Modifiée le:</span>
-                      <span class="text-white ml-2">
+                      <span class="text-white ml-2 truncate block sm:inline">
                         <%= @participation_data[:updated_at]&.strftime("%d/%m/%Y à %H:%M") %>
                       </span>
                     </div>

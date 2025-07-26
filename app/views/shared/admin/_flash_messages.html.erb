@@ -5,7 +5,8 @@
 
 <div
   class="flash-messages fixed top-20 right-6 z-50 space-y-3"
-  data-controller="admin-flash"
+  data-controller="unified-flash"
+  data-unified-flash-is-admin-value="true"
   data-admin-flash-auto-dismiss-value="true"
   data-admin-flash-dismiss-delay-value="5000"
 >
@@ -54,7 +55,7 @@
 
     <div
       class="<%= base_classes %> <%= type_classes %>"
-      data-admin-flash-target="message"
+      data-unified-flash-target="message"
       data-flash-type="<%= mapped_type %>"
       style="animation: slideInRight 0.3s ease-out"
     >
@@ -79,8 +80,8 @@
         <!-- Dismiss Button -->
         <button
           class="flex-shrink-0 ml-3 p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-          data-action="click->admin-flash#dismissMessage"
-          data-admin-flash-target="dismissBtn"
+          data-action="click->unified-flash#dismissMessage"
+          data-unified-flash-target="dismissBtn"
         >
           <i class="fas fa-times text-xs opacity-75 hover:opacity-100"></i>
         </button>
@@ -91,7 +92,7 @@
         <div class="progress-bar mt-3 h-1 bg-white/10 rounded-full overflow-hidden">
           <div
             class="progress-fill h-full bg-current rounded-full transition-all duration-linear"
-            data-admin-flash-target="progressBar"
+            data-unified-flash-target="progressBar"
             style="animation: progressShrink 5s linear"
           ></div>
         </div>

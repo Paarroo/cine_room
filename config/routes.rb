@@ -118,6 +118,11 @@ Rails.application.routes.draw do
 
     # Participations with confirmation
     resources :participations do
+      collection do
+        patch :bulk_confirm
+        patch :bulk_cancel
+      end
+      
       resources :confirmations, only: [ :create ] do
         collection do
           patch :bulk

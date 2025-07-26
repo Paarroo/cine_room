@@ -5,7 +5,8 @@
       type="checkbox"
       class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary participation-checkbox"
       data-participation-id="<%= data[:id] %>"
-      onchange="updateBulkActions()"
+      data-admin-participations-target="participationCheckbox"
+      data-action="change->admin-participations#updateBulkActions"
     >
   </td>
 

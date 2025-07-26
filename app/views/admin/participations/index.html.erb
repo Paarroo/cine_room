@@ -49,7 +49,8 @@
                 type="checkbox"
                 id="select-all-participations"
                 class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-                onchange="toggleAllParticipations(this)"
+                data-admin-participations-target="selectAll"
+                data-action="change->admin-participations#toggleSelectAll"
               >
               <span class="text-sm text-gray-400">Tout sélectionner</span>
             </label>
@@ -135,23 +136,3 @@
   <%= render 'revenue_summary' %>
 </div>
 
-<script>
-function toggleAllParticipations(selectAllCheckbox) {
-  const checkboxes = document.querySelectorAll('.participation-checkbox');
-  checkboxes.forEach(checkbox => {
-    checkbox.checked = selectAllCheckbox.checked;
-  });
-  updateBulkActions();
-}
-
-function updateBulkActions() {
-  const checkboxes = document.querySelectorAll('.participation-checkbox:checked');
-  const bulkActions = document.getElementById('bulk-actions');
-
-  if (checkboxes.length > 0) {
-    bulkActions.classList.remove('hidden');
-  } else {
-    bulkActions.classList.add('hidden');
-  }
-}
-</script>

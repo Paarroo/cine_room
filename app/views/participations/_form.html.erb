@@ -35,7 +35,7 @@
 
   <!-- Dynamic total price -->
   <div class="text-white text-lg font-semibold">
-    Total: <span data-seats-target="price"><%= number_to_currency(@event.price_cents , unit: "€") %></span>
+    Total: <span data-seats-target="price"><%= display_price(@event.price_cents) %></span>
   </div>
 
   <!-- Submit -->

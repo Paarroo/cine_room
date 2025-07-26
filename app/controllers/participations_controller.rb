@@ -34,7 +34,7 @@ class ParticipationsController < ApplicationController
       line_items: [ {
         price_data: {
           currency: 'eur',
-          unit_amount: @event.price_cents*100,
+          unit_amount: @event.price_cents,
           product_data: {
             name: @event.title
           }

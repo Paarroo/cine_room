@@ -69,4 +69,23 @@ module ApplicationHelper
       precision = options[:precision] || 0
       "#{number.round(precision)}%"
     end
+
+    # Convert price from cents to euros and format as currency
+    def display_price(price_cents, options = {})
+      return '0 €' if price_cents.nil? || price_cents.zero?
+      
+      euros = price_cents / 100.0
+      precision = options[:precision] || 2
+      unit = options[:unit] || '€'
+      
+      number_to_currency(euros, unit: unit, precision: precision)
+    end
+
+    # Calculate total price for participation (price_cents * seats converted to euros)
+    def calculate_participation_total(event, seats)
+      return 0 if event.nil? || event.price_cents.nil? || seats.nil?
+      
+      total_cents = event.price_cents * seats.to_i
+      total_cents / 100.0
+    end
 end

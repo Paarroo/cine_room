@@ -192,7 +192,7 @@
             <!-- Booking box -->
             <div class="glass-effect rounded-3xl overflow-hidden">
               <div class="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-center">
-                <div class="text-4xl font-bold mb-2"><%= number_to_currency(@event.price_cents, unit: "€") %></div>
+                <div class="text-4xl font-bold mb-2"><%= display_price(@event.price_cents) %></div>
                 <div class="text-white/90">par personne</div>
               </div>
 

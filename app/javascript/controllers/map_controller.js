@@ -37,7 +37,7 @@ export default class extends Controller {
       
       if (this.retryCount > 50) {
         console.error("❌ Leaflet failed to load after 5 seconds")
-        this.showFallback("Leaflet non chargé")
+        this.showFallback("Leaflet not loaded")
         return
       }
       
@@ -121,7 +121,7 @@ export default class extends Controller {
         </div>
       `)
 
-      // Ajouter les contrôles personnalisés
+      // Add custom controls
       this.addGpsControl()
       this.addResizeControl()
 
@@ -140,7 +140,7 @@ export default class extends Controller {
   }
 
   addGpsControl() {
-    // Créer un contrôle personnalisé pour GPS
+    // Create custom GPS control
     const GpsControl = L.Control.extend({
       options: {
         position: 'topleft'

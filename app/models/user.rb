@@ -99,7 +99,7 @@ class User < ApplicationRecord
       errors.add(:email, "utilise un domaine email non valide")
     end
     
-    # Vérification basique du format du domaine
+    # Basic domain format validation
     unless domain.match?(/\A[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/)
       errors.add(:email, "doit utiliser un domaine valide")
     end

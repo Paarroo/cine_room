@@ -182,7 +182,43 @@ export default class extends Controller {
   openInGps() {
     console.log('🧭 Ouverture dans le GPS par défaut')
     
-    // Coordonnées de destination
+    // Vérifier si la géolocalisation est disponible
+    if (!navigator.geolocation) {
+      console.log('❌ Géolocalisation non disponible')
+      this.openGpsWithoutUserLocation()
+      return
+    }
+
+    // Demander la position de l'utilisateur
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLat = position.coords.latitude
+        const userLng = position.coords.longitude
+        console.log(`📍 Position utilisateur: ${userLat}, ${userLng}`)
+        
+        // Coordonnées de destination
+        const destLat = this.latitudeValue || 48.8566
+        const destLng = this.longitudeValue || 2.3522
+        const address = this.venueAddressValue || this.venueNameValue || 'Destination'
+        
+        // Ouvrir l'app GPS avec itinéraire
+        this.openGpsWithRoute(userLat, userLng, destLat, destLng, address)
+      },
+      (error) => {
+        console.log('❌ Erreur géolocalisation:', error.message)
+        // Fallback: ouvrir sans position utilisateur
+        this.openGpsWithoutUserLocation()
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    )
+  }
+
+  openGpsWithoutUserLocation() {
+    // Coordonnées de destination seulement
     const lat = this.latitudeValue || 48.8566
     const lng = this.longitudeValue || 2.3522
     const address = this.venueAddressValue || this.venueNameValue || 'Destination'
@@ -194,6 +230,17 @@ export default class extends Controller {
       this.openAndroidGps(lat, lng, address)
     } else {
       this.openDesktopGps(lat, lng, address)
+    }
+  }
+
+  openGpsWithRoute(userLat, userLng, destLat, destLng, address) {
+    // Détecter la plateforme et ouvrir l'app GPS avec itinéraire complet
+    if (this.isIOS()) {
+      this.openAppleMapsWithRoute(userLat, userLng, destLat, destLng, address)
+    } else if (this.isAndroid()) {
+      this.openAndroidGpsWithRoute(userLat, userLng, destLat, destLng, address)
+    } else {
+      this.openDesktopGpsWithRoute(userLat, userLng, destLat, destLng)
     }
   }
 
@@ -224,10 +271,43 @@ export default class extends Controller {
     this.openOpenStreetMapDirections(lat, lng)
   }
 
+  openAppleMapsWithRoute(userLat, userLng, destLat, destLng, address) {
+    const url = `maps://?saddr=${userLat},${userLng}&daddr=${destLat},${destLng}&q=${encodeURIComponent(address)}`
+    window.location.href = url
+    console.log('🍎 Ouverture Apple Maps avec itinéraire')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+    }, 2000)
+  }
+
+  openAndroidGpsWithRoute(userLat, userLng, destLat, destLng, address) {
+    const url = `google.navigation:q=${destLat},${destLng}&mode=d`
+    window.location.href = url
+    console.log('🤖 Ouverture navigation Android')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+    }, 2000)
+  }
+
+  openDesktopGpsWithRoute(userLat, userLng, destLat, destLng) {
+    // Sur desktop, ouvrir OpenStreetMap avec itinéraire complet
+    this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+  }
+
   openOpenStreetMapDirections(lat, lng) {
     const url = `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`
     window.open(url, '_blank')
     console.log('🗺️ Ouverture OpenStreetMap directions')
+  }
+
+  openOpenStreetMapDirectionsWithRoute(fromLat, fromLng, toLat, toLng) {
+    const url = `https://www.openstreetmap.org/directions?from=${fromLat}%2C${fromLng}&to=${toLat}%2C${toLng}`
+    window.open(url, '_blank')
+    console.log('🗺️ Ouverture OpenStreetMap avec itinéraire complet')
   }
 
   isIOS() {

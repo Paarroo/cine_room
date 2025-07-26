@@ -180,8 +180,37 @@ export default class extends Controller {
   }
 
   openInGps() {
-    // Méthode vide pour l'instant
-    console.log('🧭 GPS button clicked')
+    console.log('🧭 Ouverture dans le GPS par défaut')
+    
+    // Coordonnées de destination
+    const lat = this.latitudeValue || 48.8566
+    const lng = this.longitudeValue || 2.3522
+    const address = this.venueAddressValue || this.venueNameValue || 'Destination'
+    
+    // Détecter la plateforme et ouvrir l'app GPS appropriée
+    if (this.isIOS()) {
+      this.openAppleMaps(lat, lng, address)
+    } else if (this.isAndroid()) {
+      this.openAndroidGps(lat, lng, address)
+    } else {
+      this.openDesktopGps(lat, lng, address)
+    }
+  }
+
+  openAppleMaps(lat, lng, address) {
+    const url = `maps://?daddr=${lat},${lng}&q=${encodeURIComponent(address)}`
+    window.location.href = url
+    console.log('🍎 Ouverture Apple Maps')
+  }
+
+  openAndroidGps(lat, lng, address) {
+    const url = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address)})`
+    window.location.href = url
+    console.log('🤖 Ouverture GPS Android')
+  }
+
+  openDesktopGps(lat, lng, address) {
+    console.log('💻 Desktop détecté - fallback nécessaire')
   }
 
   isIOS() {

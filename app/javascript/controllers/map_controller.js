@@ -184,6 +184,14 @@ export default class extends Controller {
     console.log('🧭 GPS button clicked')
   }
 
+  isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent)
+  }
+
+  isAndroid() {
+    return /Android/.test(navigator.userAgent)
+  }
+
   addResizeControl() {
     // Créer un contrôle personnalisé pour plein écran
     const FullscreenControl = L.Control.extend({

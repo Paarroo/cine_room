@@ -9,8 +9,6 @@ class Admin::DashboardController < Admin::ApplicationController
   # Main dashboard page with all metrics and data
   def index
     @metrics = calculate_metrics
-    @revenue_chart_data = revenue_chart_data
-    @events_chart_data = events_status_chart_data
     @pending_movies = Movie.where(validation_status: :pending).limit(5)
     @recent_activities = recent_activities
     @quick_stats = quick_stats
@@ -22,10 +20,6 @@ class Admin::DashboardController < Admin::ApplicationController
       format.json do
         render json: {
           metrics: calculate_metrics,
-          charts: {
-            revenue: revenue_chart_data,
-            events: events_status_chart_data
-          },
           activities: recent_activities,
           status: 'success'
         }

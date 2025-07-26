@@ -2,10 +2,21 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["container"]
+  static values = {
+    timeout: { type: Number, default: 8000 },
+    isAdmin: { type: Boolean, default: false }
+  }
 
   connect() {
-    console.log("💬 Admin Flash connected")
-    this.setupGlobalToastListener()
+    if (this.isAdminValue) {
+      console.log("💬 Admin Flash connected")
+      this.setupGlobalToastListener()
+    } else {
+      // Simple flash message with auto-remove
+      setTimeout(() => {
+        this.element.remove()
+      }, this.timeoutValue)
+    }
   }
 
   setupGlobalToastListener() {

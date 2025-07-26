@@ -278,7 +278,7 @@ class Admin::UsersController < Admin::ApplicationController
     Rails.logger.info "Admin User Management: #{current_user.email} #{action} #{target_user&.email || 'multiple users'} - #{details}"
 
 
-    # ok RGPD Obligation
+    # GDPR compliance requirement
     # In production, you might want to store this in an audit log table
     # AuditLog.create(
     #   admin_user: current_user,

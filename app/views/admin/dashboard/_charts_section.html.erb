@@ -11,21 +11,36 @@
           <span class="text-sm text-gray-400">30 derniers jours</span>
         </div>
 
-        <div
-          class="chart-wrapper h-64"
-          data-controller="admin-chart"
-          data-admin-chart-type-value="line"
-          data-admin-chart-data-value='<%= @revenue_chart_data.to_json %>'
-          data-admin-dashboard-target="revenueChart"
-        >
-          <!-- Chart placeholder -->
-          <div class="h-full flex items-center justify-center text-gray-400">
-            <div class="text-center">
-              <i class="fas fa-chart-line text-4xl mb-4"></i>
-              <p>Graphique des revenus</p>
-              <div class="loading-skeleton w-full h-32 rounded-lg mt-4"></div>
-            </div>
-          </div>
+        <div class="chart-wrapper h-64">
+          <canvas id="revenueChart" width="400" height="200"></canvas>
+          <script type="module">
+            import Chart from 'chart.js/auto';
+            
+            console.log("Chart.js loaded:", Chart);
+            
+            const ctx = document.getElementById('revenueChart');
+            if (ctx) {
+              const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                  datasets: [{
+                    label: 'Test Revenue',
+                    data: [12, 19, 3, 5, 2],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false
+                }
+              });
+              console.log("Chart created:", chart);
+            } else {
+              console.error("Canvas not found");
+            }
+          </script>
         </div>
       </div>
 
@@ -46,14 +61,7 @@
           data-admin-chart-data-value='<%= @events_chart_data.to_json %>'
           data-admin-dashboard-target="eventsChart"
         >
-          <!-- Chart placeholder -->
-          <div class="h-full flex items-center justify-center text-gray-400">
-            <div class="text-center">
-              <i class="fas fa-chart-pie text-4xl mb-4"></i>
-              <p>Répartition des événements</p>
-              <div class="loading-skeleton w-32 h-32 rounded-full mx-auto mt-4"></div>
-            </div>
-          </div>
+          <canvas class="w-full h-full"></canvas>
         </div>
       </div>
     </div>

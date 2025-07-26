@@ -1,4 +1,7 @@
 {
   "name": "app",
-  "private": "true"
+  "private": "true",
+  "dependencies": {
+    "chart.js": "^4.5.0"
+  }
 }

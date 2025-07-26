@@ -36,15 +36,14 @@
           <!-- QR Code -->
           <div class="p-8">
             <div class="bg-white p-6 rounded-2xl mb-6 mx-auto shadow-xl">
-              <div class="w-64 h-64 mx-auto">
+              <div class="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto">
                 <% if @participation.qr_code_token.present? %>
                   <% begin %>
-                    <!-- Génération et affichage direct du QR code SVG -->
+                    <!-- Generate and display QR code SVG with full data -->
                     <% 
                       require 'rqrcode'
-                      # Créer un QR code simple avec juste le token pour test
-                      simple_data = "CINEROOM-#{@participation.qr_code_token}"
-                      qrcode = RQRCode::QRCode.new(simple_data, size: 6, level: :l)
+                      # Use the full QR code data from the model
+                      qrcode = RQRCode::QRCode.new(@participation.qr_code_data)
                       qr_svg = qrcode.as_svg(
                         color: '000',
                         shape_rendering: 'crispEdges',

@@ -1,4 +1,4 @@
-<div class="fixed top-20 right-6 flex justify-center">
+<div class="fixed top-20 right-4 left-4 sm:left-auto sm:right-6 flex justify-center sm:justify-end z-[60]">
   <% flash.each do |type, message| %>
     <% next if message.blank? %>
     <% color = {
@@ -11,7 +11,7 @@
     <div
       data-controller="flash"
       data-flash-timeout-value="8000"
-      class="max-w-xl px-4 py-3 rounded-xl border text-sm font-medium flex items-center gap-2 shadow-md <%= color %>"
+      class="w-full max-w-xl px-4 py-3 rounded-xl border text-sm font-medium flex items-center gap-2 shadow-lg <%= color %>"
     >
       <i class="fas fa-info-circle"></i>
       <%= message %>

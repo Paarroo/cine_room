@@ -96,6 +96,33 @@
       <%= link_to about_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
         À propos
       <% end %>
+
+      <!-- Mobile Authentication Section -->
+      <div class="border-t border-white/20 pt-4 mt-4">
+        <% if user_signed_in? %>
+          <% if current_user&.admin? %>
+            <%= link_to admin_root_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+              <i class="fas fa-cog mr-2"></i>Dashboard Admin
+            <% end %>
+          <% else %>
+            <%= link_to users_dashboard_path(current_user), class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+              <i class="fas fa-user mr-2"></i>Mon Dashboard
+            <% end %>
+          <% end %>
+
+          <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+              class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-red-400 bg-transparent border-0" do %>
+            <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+            <i class="fas fa-sign-in-alt mr-2"></i>Connexion
+          <% end %>
+          <%= link_to new_user_registration_path, class: "block w-full text-center py-3 mt-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white rounded-xl font-medium transition-all duration-200" do %>
+            <i class="fas fa-user-plus mr-2"></i>Rejoindre
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </nav>

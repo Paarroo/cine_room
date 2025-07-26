@@ -30,7 +30,7 @@
 
       <!-- Movies section -->
       <div class="mb-12 text-center">
-        <h2 class="text-3xl font-bold mb-6">Films présentés</h2>
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-6">Films présentés</h2>
         <% if @creator.movies.approved.any? %>
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             <% @creator.movies.approved.each do |movie| %>

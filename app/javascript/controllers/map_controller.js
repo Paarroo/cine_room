@@ -149,11 +149,11 @@ export default class extends Controller {
       onAdd: (map) => {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-gps')
         
-        // Bouton GPS
+        // GPS button
         const button = L.DomUtil.create('a', 'leaflet-control-gps-button', container)
         button.innerHTML = '<span style="font-size: 14px;">🧭</span>'
         button.href = '#'
-        button.title = 'Ouvrir dans le GPS'
+        button.title = 'Open in GPS'
         
         // Style du bouton
         button.style.display = 'flex'

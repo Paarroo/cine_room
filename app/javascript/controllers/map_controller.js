@@ -121,7 +121,8 @@ export default class extends Controller {
         </div>
       `)
 
-      // Ajouter le contrôle de resize après les contrôles de zoom
+      // Ajouter les contrôles personnalisés
+      this.addGpsControl()
       this.addResizeControl()
 
       // Force refresh after initialization
@@ -136,6 +137,51 @@ export default class extends Controller {
       console.error("❌ Error creating map:", error)
       this.showFallback(`Erreur: ${error.message}`)
     }
+  }
+
+  addGpsControl() {
+    // Créer un contrôle personnalisé pour GPS
+    const GpsControl = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+
+      onAdd: (map) => {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-gps')
+        
+        // Bouton GPS
+        const button = L.DomUtil.create('a', 'leaflet-control-gps-button', container)
+        button.innerHTML = '<span style="font-size: 14px;">🧭</span>'
+        button.href = '#'
+        button.title = 'Ouvrir dans le GPS'
+        
+        // Style du bouton
+        button.style.display = 'flex'
+        button.style.alignItems = 'center'
+        button.style.justifyContent = 'center'
+        button.style.width = '30px'
+        button.style.height = '30px'
+        button.style.textDecoration = 'none'
+        button.style.fontWeight = 'bold'
+        
+        // Gestionnaire d'événement
+        L.DomEvent.on(button, 'click', (e) => {
+          L.DomEvent.stopPropagation(e)
+          L.DomEvent.preventDefault(e)
+          this.openInGps()
+        })
+        
+        return container
+      }
+    })
+
+    // Ajouter le contrôle à la carte
+    this.map.addControl(new GpsControl())
+  }
+
+  openInGps() {
+    // Méthode vide pour l'instant
+    console.log('🧭 GPS button clicked')
   }
 
   addResizeControl() {

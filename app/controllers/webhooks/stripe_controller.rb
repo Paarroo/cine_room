@@ -1,6 +1,7 @@
 class Webhooks::StripeController < ApplicationController
   # Skip CSRF protection for Stripe webhooks
   skip_before_action :verify_authenticity_token
+  skip_before_action :authenticate_user!
   
   # Webhook endpoint for Stripe events
   def receive

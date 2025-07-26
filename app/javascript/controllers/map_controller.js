@@ -121,7 +121,8 @@ export default class extends Controller {
         </div>
       `)
 
-      // Ajouter le contrôle de resize après les contrôles de zoom
+      // Ajouter les contrôles personnalisés
+      this.addGpsControl()
       this.addResizeControl()
 
       // Force refresh after initialization
@@ -136,6 +137,231 @@ export default class extends Controller {
       console.error("❌ Error creating map:", error)
       this.showFallback(`Erreur: ${error.message}`)
     }
+  }
+
+  addGpsControl() {
+    // Créer un contrôle personnalisé pour GPS
+    const GpsControl = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+
+      onAdd: (map) => {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-gps')
+        
+        // Bouton GPS
+        const button = L.DomUtil.create('a', 'leaflet-control-gps-button', container)
+        button.innerHTML = '<span style="font-size: 14px;">🧭</span>'
+        button.href = '#'
+        button.title = 'Ouvrir dans le GPS'
+        
+        // Style du bouton
+        button.style.display = 'flex'
+        button.style.alignItems = 'center'
+        button.style.justifyContent = 'center'
+        button.style.width = '30px'
+        button.style.height = '30px'
+        button.style.textDecoration = 'none'
+        button.style.fontWeight = 'bold'
+        
+        // Gestionnaire d'événement
+        L.DomEvent.on(button, 'click', (e) => {
+          L.DomEvent.stopPropagation(e)
+          L.DomEvent.preventDefault(e)
+          this.openInGps()
+        })
+        
+        return container
+      }
+    })
+
+    // Ajouter le contrôle à la carte
+    this.map.addControl(new GpsControl())
+  }
+
+  openInGps() {
+    console.log('🧭 Ouverture dans le GPS par défaut')
+    
+    // Vérifier si la géolocalisation est disponible
+    if (!navigator.geolocation) {
+      console.log('❌ Géolocalisation non disponible')
+      this.openGpsWithoutUserLocation()
+      return
+    }
+
+    // Afficher l'indicateur de chargement
+    this.showGpsLoading(true)
+
+    // Demander la position de l'utilisateur
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.showGpsLoading(false)
+        const userLat = position.coords.latitude
+        const userLng = position.coords.longitude
+        console.log(`📍 Position utilisateur: ${userLat}, ${userLng}`)
+        
+        // Coordonnées de destination
+        const destLat = this.latitudeValue || 48.8566
+        const destLng = this.longitudeValue || 2.3522
+        const address = this.venueAddressValue || this.venueNameValue || 'Destination'
+        
+        // Ouvrir l'app GPS avec itinéraire
+        this.openGpsWithRoute(userLat, userLng, destLat, destLng, address)
+      },
+      (error) => {
+        this.showGpsLoading(false)
+        console.log('❌ Erreur géolocalisation:', error.message)
+        this.handleGeolocationError(error)
+        
+        // Fallback: ouvrir sans position utilisateur
+        this.openGpsWithoutUserLocation()
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    )
+  }
+
+  openGpsWithoutUserLocation() {
+    // Coordonnées de destination seulement
+    const lat = this.latitudeValue || 48.8566
+    const lng = this.longitudeValue || 2.3522
+    const address = this.venueAddressValue || this.venueNameValue || 'Destination'
+    
+    // Détecter la plateforme et ouvrir l'app GPS appropriée
+    if (this.isIOS()) {
+      this.openAppleMaps(lat, lng, address)
+    } else if (this.isAndroid()) {
+      this.openAndroidGps(lat, lng, address)
+    } else {
+      this.openDesktopGps(lat, lng, address)
+    }
+  }
+
+  openGpsWithRoute(userLat, userLng, destLat, destLng, address) {
+    // Détecter la plateforme et ouvrir l'app GPS avec itinéraire complet
+    if (this.isIOS()) {
+      this.openAppleMapsWithRoute(userLat, userLng, destLat, destLng, address)
+    } else if (this.isAndroid()) {
+      this.openAndroidGpsWithRoute(userLat, userLng, destLat, destLng, address)
+    } else {
+      this.openDesktopGpsWithRoute(userLat, userLng, destLat, destLng)
+    }
+  }
+
+  openAppleMaps(lat, lng, address) {
+    const url = `maps://?daddr=${lat},${lng}&q=${encodeURIComponent(address)}`
+    window.location.href = url
+    console.log('🍎 Ouverture Apple Maps')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirections(lat, lng)
+    }, 2000)
+  }
+
+  openAndroidGps(lat, lng, address) {
+    const url = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address)})`
+    window.location.href = url
+    console.log('🤖 Ouverture GPS Android')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirections(lat, lng)
+    }, 2000)
+  }
+
+  openDesktopGps(lat, lng, address) {
+    // Sur desktop, ouvrir directement OpenStreetMap
+    this.openOpenStreetMapDirections(lat, lng)
+  }
+
+  openAppleMapsWithRoute(userLat, userLng, destLat, destLng, address) {
+    const url = `maps://?saddr=${userLat},${userLng}&daddr=${destLat},${destLng}&q=${encodeURIComponent(address)}`
+    window.location.href = url
+    console.log('🍎 Ouverture Apple Maps avec itinéraire')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+    }, 2000)
+  }
+
+  openAndroidGpsWithRoute(userLat, userLng, destLat, destLng, address) {
+    const url = `google.navigation:q=${destLat},${destLng}&mode=d`
+    window.location.href = url
+    console.log('🤖 Ouverture navigation Android')
+    
+    // Fallback après 2 secondes si l'app ne s'ouvre pas
+    setTimeout(() => {
+      this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+    }, 2000)
+  }
+
+  openDesktopGpsWithRoute(userLat, userLng, destLat, destLng) {
+    // Sur desktop, ouvrir OpenStreetMap avec itinéraire complet
+    this.openOpenStreetMapDirectionsWithRoute(userLat, userLng, destLat, destLng)
+  }
+
+  openOpenStreetMapDirections(lat, lng) {
+    const url = `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`
+    window.open(url, '_blank')
+    console.log('🗺️ Ouverture OpenStreetMap directions')
+  }
+
+  openOpenStreetMapDirectionsWithRoute(fromLat, fromLng, toLat, toLng) {
+    const url = `https://www.openstreetmap.org/directions?from=${fromLat}%2C${fromLng}&to=${toLat}%2C${toLng}`
+    window.open(url, '_blank')
+    console.log('🗺️ Ouverture OpenStreetMap avec itinéraire complet')
+  }
+
+  isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent)
+  }
+
+  isAndroid() {
+    return /Android/.test(navigator.userAgent)
+  }
+
+  showGpsLoading(show) {
+    const gpsButton = this.element.querySelector('.leaflet-control-gps-button')
+    if (gpsButton) {
+      if (show) {
+        gpsButton.innerHTML = '<span style="font-size: 12px;">⏳</span>'
+        gpsButton.style.opacity = '0.7'
+        gpsButton.title = 'Localisation en cours...'
+      } else {
+        gpsButton.innerHTML = '<span style="font-size: 14px;">🧭</span>'
+        gpsButton.style.opacity = '1'
+        gpsButton.title = 'Ouvrir dans le GPS'
+      }
+    }
+  }
+
+  handleGeolocationError(error) {
+    let message = 'Erreur de géolocalisation'
+    
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        message = 'Permission de géolocalisation refusée'
+        console.log('🚫 Permission GPS refusée')
+        break
+      case error.POSITION_UNAVAILABLE:
+        message = 'Position non disponible'
+        console.log('📍 Position GPS non disponible')
+        break
+      case error.TIMEOUT:
+        message = 'Timeout de géolocalisation'
+        console.log('⏰ Timeout GPS')
+        break
+      default:
+        console.log('❌ Erreur GPS inconnue:', error.message)
+        break
+    }
+    
+    console.log(`ℹ️ ${message} - Ouverture sans position utilisateur`)
   }
 
   addResizeControl() {

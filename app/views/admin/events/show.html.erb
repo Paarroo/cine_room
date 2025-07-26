@@ -22,6 +22,11 @@
   <!-- Event Details Section -->
   <%= render 'event_details' %>
 
+  <!-- QR Scanner Section (for day of event) -->
+  <% if @event.event_date.to_date == Date.current %>
+    <%= render 'qr_scanner' %>
+  <% end %>
+
   <!-- Participations Section -->
   <% if @participations.any? %>
     <%= render 'participations_section' %>

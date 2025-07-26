@@ -41,11 +41,26 @@
         <% upcoming_participations.first(3).each do |p| %>
           <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl mb-4 text-gray-200">
             <div class="flex justify-between items-center">
-              <div>
+              <div class="flex-1">
                 <strong><%= p.event.title %></strong> – <%= l(p.event.event_date, format: :long) %>
                 <p class="text-sm text-gray-400">Lieu : <%= p.event.venue_name %></p>
+                <p class="text-xs text-green-400 mt-1">
+                  <%= pluralize(p.seats, 'place') %> • 
+                  <span class="capitalize"><%= p.status %></span>
+                </p>
               </div>
-              <%= link_to "Détails", reservation_path(p), class: "text-sm text-gold-400 hover:underline" %>
+              <div class="flex space-x-2">
+                <%= link_to participation_ticket_path(p), 
+                    class: "bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-lg text-xs transition-colors flex items-center space-x-1" do %>
+                  <span>🎫</span>
+                  <span>Billet</span>
+                <% end %>
+                <%= link_to participation_qr_code_path(p), 
+                    class: "bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs transition-colors flex items-center space-x-1" do %>
+                  <span>📱</span>
+                  <span>QR</span>
+                <% end %>
+              </div>
             </div>
           </div>
         <% end %>

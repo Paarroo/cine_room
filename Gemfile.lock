@@ -146,6 +146,7 @@ GEM
       logger (~> 1.5)
     choice (0.2.0)
     chronic (0.10.2)
+    chunky_png (1.4.0)
     cloudinary (2.3.1)
       faraday (>= 2.0.1, < 3.0.0)
       faraday-follow_redirects (~> 0.3.0)
@@ -545,6 +546,10 @@ GEM
       railties (>= 5.2)
     rexml (3.4.1)
     rouge (4.6.0)
+    rqrcode (3.1.0)
+      chunky_png (~> 1.0)
+      rqrcode_core (~> 2.0)
+    rqrcode_core (2.0.0)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -793,6 +798,7 @@ DEPENDENCIES
   localhost
   lograge
   meta_request
+  mini_magick
   money-rails
   newrelic_rpm
   nokogiri
@@ -813,6 +819,7 @@ DEPENDENCIES
   rails_panel
   rails_semantic_logger
   rerun
+  rqrcode
   rspec-rails
   rubocop-performance
   rubocop-rails

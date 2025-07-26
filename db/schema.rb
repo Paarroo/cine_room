@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_25_142648) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -93,7 +93,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_25_142648) do
     t.integer "seats", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "qr_code_token"
+    t.datetime "used_at"
     t.index ["event_id"], name: "index_participations_on_event_id"
+    t.index ["qr_code_token"], name: "index_participations_on_qr_code_token", unique: true
     t.index ["status"], name: "index_participations_on_status"
     t.index ["user_id", "event_id"], name: "index_participations_on_user_id_and_event_id", unique: true
     t.index ["user_id"], name: "index_participations_on_user_id"

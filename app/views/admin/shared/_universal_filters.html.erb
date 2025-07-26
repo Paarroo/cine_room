@@ -39,7 +39,7 @@
         { type: :text, name: :q, label: "Recherche", placeholder: "Nom, email..." },
         { type: :select, name: :role, label: "Rôle", options: [['Tous les rôles', ''], ['Utilisateur', 'user'], ['Créateur', 'creator'], ['Administrateur', 'admin']] },
         { type: :select, name: :creator_status, label: "Statut créateur", options: [['Tous', ''], ['Avec films', 'with_movies'], ['Sans films', 'without_movies']] },
-        { type: :select, name: :activity, label: "Activité", options: [['Tous', ''], ['Actifs (avec réservations)', 'active'], ['Inactifs (sans réservations)', 'inactive']] },
+        { type: :select, name: :activity, label: "Activité", options: [['Tous', ''], ['Actifs (avec participations)', 'active'], ['Inactifs (sans participations)', 'inactive']] },
         { type: :date, name: :created_since, label: "Inscrit depuis" },
         { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Nom A-Z', 'name_asc']] }
       ]

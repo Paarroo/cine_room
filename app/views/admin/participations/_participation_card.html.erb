@@ -119,7 +119,7 @@
   <% if participation.event&.event_date %>
     <% days_diff = (participation.event.event_date - participation.created_at.to_date).to_i %>
     <div class="mb-4 p-3 bg-white/5 rounded-lg">
-      <div class="text-sm text-gray-400">Délai de réservation</div>
+      <div class="text-sm text-gray-400">Délai de participation</div>
       <div class="text-sm text-white">
         <%= days_diff %> jour<%= 's' if days_diff.abs > 1 %>
         <%= days_diff >= 0 ? 'avant l\'événement' : 'après l\'événement' %>

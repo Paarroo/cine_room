@@ -1,4 +1,38 @@
-/* ===== NAVBAR GRID LAYOUT - SOLUTION OPTIMALE ===== */
+/* ===== ADMIN CSS VARIABLES ===== */
+:root {
+  --admin-primary: #f59e0b; /* gold-500 */
+  --admin-accent: #2563eb; /* blue-600 */
+  --admin-success: #22c55e; /* green-500 */
+  --admin-warning: #f59e0b; /* amber-500 */
+  --admin-error: #ef4444; /* red-500 */
+  --admin-surface: #0a0a0a; /* dark-400 */
+  --admin-content: #ffffff; /* white text */
+  --admin-muted: #6b7280; /* gray-500 */
+  --admin-transition-fast: 0.15s ease-out;
+  --admin-transition-normal: 0.3s ease-out;
+  --admin-transition-slow: 0.6s ease-out;
+}
+
+/* ===== ADMIN BASE CLASSES ===== */
+.admin-dashboard {
+  background-color: var(--admin-surface);
+  color: var(--admin-content);
+  min-height: 100vh;
+}
+
+.admin-navbar {
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  height: 4rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+/* ===== NAVBAR GRID LAYOUT ===== */
 
 /* Grid container for perfect alignment */
 .navbar-grid {
@@ -445,23 +479,23 @@
     max-width: unset;
     transform: translateY(-100%);
   }
-  
+
   .admin-toast.show {
     transform: translateY(0);
   }
-  
+
   .admin-toast.removing {
     transform: translateY(-100%);
   }
-  
+
   .admin-toast:nth-child(2) {
     top: 100px;
   }
-  
+
   .admin-toast:nth-child(3) {
     top: 180px;
   }
-  
+
   .admin-toast:nth-child(4) {
     top: 260px;
   }

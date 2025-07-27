@@ -26,6 +26,54 @@
   --transition-slow: 0.6s ease-out;
 }
 
+/* ===== FAVORITES STYLES ===== */
+.favorite-btn {
+  @apply relative transition-all duration-300;
+}
+
+.favorite-btn:not(.favorited) {
+  @apply text-white hover:text-gold-400;
+}
+
+.favorite-btn.favorited {
+  @apply text-red-500;
+}
+
+.favorite-btn.favorited i {
+  @apply text-red-500;
+}
+
+.favorite-btn:hover i {
+  @apply scale-110;
+}
+
+.favorites-count {
+  @apply absolute -top-1 -right-1 bg-gold-500 text-white text-xs 
+         rounded-full w-5 h-5 flex items-center justify-center font-bold
+         transition-all duration-300;
+}
+
+.favorites-count:empty {
+  @apply hidden;
+}
+
+/* ===== EMPTY STATE STYLES ===== */
+.favorites-empty-state {
+  @apply text-center py-16;
+}
+
+.favorites-empty-state i {
+  @apply text-6xl text-gray-400 mb-4;
+}
+
+.favorites-empty-state h3 {
+  @apply text-2xl font-bold text-white mb-2;
+}
+
+.favorites-empty-state p {
+  @apply text-gray-400 mb-6;
+}
+
 /* OPTIONAL CLASSES — mirror tailwind.config.js if not building dynamically */
 .text-dark-100 {
   color: #1a1a1a;

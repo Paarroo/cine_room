@@ -20,11 +20,24 @@
     <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent z-5"></div>
 
     <!-- Favorite button -->
-    <div class="absolute top-4 right-4 z-30">
-      <button onclick="event.stopPropagation();" class="w-10 h-10 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-        <i class="far fa-heart text-sm"></i>
-      </button>
-    </div>
+    <% if user_signed_in? %>
+      <% favorite = current_user.favorites.find_by(movie: movie) %>
+      <div class="absolute top-4 right-4 z-30">
+        <button 
+          class="w-10 h-10 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 relative <%= 'favorited' if favorite %>"
+          data-controller="favorites"
+          data-action="click->favorites#toggle"
+          data-favorites-movie-id-value="<%= movie.id %>"
+          data-favorites-favorited-value="<%= favorite.present? %>"
+          data-favorites-favorite-id-value="<%= favorite&.id %>"
+        >
+          <i class="<%= favorite ? 'fas' : 'far' %> fa-heart text-sm transition-transform duration-200"></i>
+          <% if movie.favorites_count > 0 %>
+            <span class="favorites-count absolute -top-1 -right-1 bg-gold-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"><%= movie.favorites_count %></span>
+          <% end %>
+        </button>
+      </div>
+    <% end %>
 
     <!-- Title & Director -->
     <div class="absolute bottom-4 left-4 right-4 z-30">

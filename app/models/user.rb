@@ -13,6 +13,8 @@ class User < ApplicationRecord
   has_many :events, through: :participations
   has_many :movies
   has_many :created_events, through: :movies, source: :events
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_movies, through: :favorites, source: :movie
   has_one_attached :avatar
 
   validate :name_cannot_be_changed_after_publishing, on: :update

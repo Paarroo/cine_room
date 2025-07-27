@@ -8,6 +8,8 @@ class Movie < ApplicationRecord
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_by_users, through: :favorites, source: :user
   has_one_attached :poster
 
   validates :title, :synopsis, :director, :duration, :genre, :year, :poster, presence: true
@@ -56,6 +58,15 @@ class Movie < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[reviews events]
+  end
+
+  def favorited_by?(user)
+    return false unless user
+    favorites.exists?(user: user)
+  end
+
+  def favorites_count
+    favorites.count
   end
 
   private

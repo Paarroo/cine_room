@@ -31,6 +31,15 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
+  def avatar_url
+    if avatar.attached?
+      avatar
+    else
+      # Return default avatar URL from Cloudinary
+      "https://res.cloudinary.com/dhusbkszr/image/upload/v1753621019/ocuvyd737vat2fwwl76t0oyrbds7.png"
+    end
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     [
       "email", "first_name", "last_name", "role", "bio",
@@ -46,24 +55,9 @@ class User < ApplicationRecord
   private
 
   def attach_default_avatar
-    return if avatar.attached?
-    
-    begin
-      # Use Cloudinary default avatar URL instead of local file
-      require 'open-uri'
-      
-      avatar.attach(
-        io: URI.open("https://res.cloudinary.com/dhusbkszr/image/upload/v1753621019/ocuvyd737vat2fwwl76t0oyrbds7.png"),
-        filename: "default-avatar.png",
-        content_type: "image/png"
-      )
-      
-      # Mark as analyzed to skip ActiveStorage analysis job
-      avatar.blob.update!(metadata: { analyzed: true }) if avatar.attached?
-      
-    rescue OpenURI::HTTPError, SocketError, StandardError => e
-      Rails.logger.warn "Default avatar attachment failed: #{e.message}"
-    end
+    # Disable default avatar attachment to avoid registration errors
+    # Users can upload their own avatar after registration
+    return
   end
 
   def name_cannot_be_changed_after_publishing

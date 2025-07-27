@@ -82,7 +82,7 @@ export default class extends Controller {
       return
     }
 
-    // Pour les actions bulk, on traite les films un par un
+    // For bulk actions, process movies one by one
     await this.performBulkValidation(selectedIds)
   }
 
@@ -99,7 +99,7 @@ export default class extends Controller {
       return
     }
 
-    // Pour les actions bulk, on traite les films un par un
+    // For bulk actions, process movies one by one
     await this.performBulkRejection(selectedIds)
   }
 

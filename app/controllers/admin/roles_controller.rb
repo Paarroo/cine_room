@@ -52,8 +52,8 @@ class Admin::RolesController < Admin::ApplicationController
 
   def can_assign_role?(role)
     return true if current_user.admin?
-    return false if role == 'admin' # Seuls les admins peuvent promouvoir en admin
-    return false if @user.admin? # Seuls les admins peuvent modifier un admin
+    return false if role == 'admin' # Only admins can promote to admin
+    return false if @user.admin? # Only admins can modify admin users
     
     current_user.creator? && role != 'admin'
   end

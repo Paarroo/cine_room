@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = ["participationItem"]
 
   connect() {
-    console.log("📅 Admin Events controller connected")
   }
 
   filterParticipations(event) {

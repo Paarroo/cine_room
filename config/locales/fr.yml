@@ -15,6 +15,9 @@ fr:
       long: "%A %d %B %Y à %Hh%M"
 
   activerecord:
+    errors:
+      messages:
+        record_invalid: "Enregistrement non valide"
     models:
       creator: Créateur
       event: Événement

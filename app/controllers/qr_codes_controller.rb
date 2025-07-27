@@ -16,7 +16,7 @@ class QrCodesController < ApplicationController
                     disposition: 'inline'
         rescue => e
           Rails.logger.error "QR PNG generation error: #{e.message}"
-          # Fallback avec image simple
+          # Fallback with simple image
           redirect_to asset_path('qr_placeholder.png')
         end
       end

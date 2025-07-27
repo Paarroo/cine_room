@@ -9,7 +9,6 @@ export default class extends Controller {
   ]
 
   connect() {
-    console.log("🎫 Admin Participations controller connected")
     this.updateBulkActions()
   }
 
@@ -73,7 +72,6 @@ export default class extends Controller {
   async bulkConfirm() {
     const selectedIds = this.getSelectedParticipationIds()
 
-    console.log('🎫 Bulk confirm - Selected IDs:', selectedIds)
 
     if (selectedIds.length === 0) {
       this.showToast('Aucune participation sélectionnée', 'warning')
@@ -88,7 +86,6 @@ export default class extends Controller {
     this.setLoadingState(true, 'confirm')
 
     try {
-      console.log('🎫 Sending bulk confirm request...')
       
       const response = await fetch('/admin/participations/bulk_confirm', {
         method: 'PATCH',
@@ -103,15 +100,12 @@ export default class extends Controller {
         })
       })
 
-      console.log('🎫 Response status:', response.status)
-      console.log('🎫 Response headers:', response.headers.get('content-type'))
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
-      console.log('🎫 Response data:', result)
 
       if (result.status === 'success') {
         this.showToast(result.message || 'Participations confirmées avec succès', 'success')
@@ -135,7 +129,6 @@ export default class extends Controller {
   async bulkCancel() {
     const selectedIds = this.getSelectedParticipationIds()
 
-    console.log('🎫 Bulk cancel - Selected IDs:', selectedIds)
 
     if (selectedIds.length === 0) {
       this.showToast('Aucune participation sélectionnée', 'warning')
@@ -150,7 +143,6 @@ export default class extends Controller {
     this.setLoadingState(true, 'cancel')
 
     try {
-      console.log('🎫 Sending bulk cancel request...')
       
       const response = await fetch('/admin/participations/bulk_cancel', {
         method: 'PATCH',
@@ -165,15 +157,12 @@ export default class extends Controller {
         })
       })
 
-      console.log('🎫 Response status:', response.status)
-      console.log('🎫 Response headers:', response.headers.get('content-type'))
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
-      console.log('🎫 Response data:', result)
 
       if (result.status === 'success') {
         this.showToast(result.message || 'Participations annulées avec succès', 'success')

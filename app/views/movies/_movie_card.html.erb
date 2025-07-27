@@ -1,8 +1,8 @@
-<div class="movie-card rounded-2xl overflow-hidden card-hover group cursor-pointer relative">
+<div class="movie-card rounded-2xl overflow-hidden card-hover card-fade-in group cursor-pointer relative">
   <%= link_to movie_path(movie), class: "absolute inset-0 z-10", data: { turbo: false } do %><% end %>
 
   <!-- Card Image / Background -->
-  <div class="relative h-72 w-full overflow-hidden">
+  <div class="relative h-72 w-full overflow-hidden card-image-zoom">
     <% if movie.poster.attached?%>
       <%= image_tag movie.poster,
         alt: "#{movie.title} poster",
@@ -71,7 +71,7 @@
         <i class="fas fa-calendar-alt mr-2 text-gold-500"></i><%= movie.year %>
       </span>
       <span onclick="event.stopPropagation();" class="z-30">
-        <%= link_to "Voir le film", movie_path(movie), class: "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
+        <%= link_to "Voir le film", movie_path(movie), class: "card-button px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
       </span>
     </div>
   </div>

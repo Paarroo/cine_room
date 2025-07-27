@@ -14,23 +14,26 @@ FactoryBot.define do
 
     trait :approved do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
     trait :rejected do
       validation_status { :rejected }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
     trait :validated do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
-    association :user, factory: [:user, :creator]
+    user { association(:user, :creator) }
 
     after(:build) do |movie|
       movie.authorship_confirmed = "1"
+
+      # Skip poster attachment in production to avoid network dependencies
+      next if Rails.env.production?
 
       urls = [
         "https://source.unsplash.com/300x450/?cinema",
@@ -39,7 +42,7 @@ FactoryBot.define do
         
       ]
 
-      # Génère un poster aléatoire depuis Unsplash
+      # Generates a random poster from Unsplash (dev/test only)
       begin
         file = URI.open(urls.sample)
       rescue OpenURI::HTTPError => e

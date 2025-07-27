@@ -9,7 +9,7 @@ FactoryBot.define do
     start_time { [ '19:00', '20:30', '21:00', '18:30', '22:00' ].sample }
     max_capacity { rand(50..100) }
     price_cents { rand(800..2500) }
-    status { [ :upcoming, :completed, :sold_out ].sample }
+    status { [ :upcoming, :finished, :sold_out ].sample }
     latitude { Faker::Address.latitude.to_f }
     longitude { Faker::Address.longitude.to_f }
 
@@ -19,8 +19,18 @@ FactoryBot.define do
     end
 
     trait :completed do
-      status { :completed }
+      status { :finished }
       event_date { rand(6.months.ago..1.week.ago).to_date }
+    end
+
+    trait :finished do
+      status { :finished }
+      event_date { rand(6.months.ago..1.week.ago).to_date }
+    end
+
+    trait :ongoing do
+      status { :ongoing }
+      event_date { 1.day.ago.to_date }
     end
 
     trait :sold_out do

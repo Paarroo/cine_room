@@ -2,7 +2,7 @@ class Admin::RolesController < Admin::ApplicationController
   before_action :set_user, only: [:show, :update]
 
   def show
-    # Afficher les informations sur le rôle de l'utilisateur
+    # Display user role information
     respond_to do |format|
       format.json do
         render json: {
@@ -52,8 +52,8 @@ class Admin::RolesController < Admin::ApplicationController
 
   def can_assign_role?(role)
     return true if current_user.admin?
-    return false if role == 'admin' # Seuls les admins peuvent promouvoir en admin
-    return false if @user.admin? # Seuls les admins peuvent modifier un admin
+    return false if role == 'admin' # Only admins can promote to admin
+    return false if @user.admin? # Only admins can modify admin users
     
     current_user.creator? && role != 'admin'
   end
@@ -71,7 +71,7 @@ class Admin::RolesController < Admin::ApplicationController
   def can_modify_user?(target_user)
     return true if current_user.admin?
     return false if target_user.admin?
-    return false if target_user == current_user # Pas de modification de son propre rôle
+    return false if target_user == current_user # Cannot modify own role
     
     current_user.creator? && target_user.user?
   end
@@ -79,7 +79,7 @@ class Admin::RolesController < Admin::ApplicationController
   def log_role_change(old_role, new_role)
     Rails.logger.info "Admin Role Change: #{current_user.email} changed #{@user.email} from #{old_role} to #{new_role}"
     
-    # Optionnel: créer un log d'audit
+    # Optional: create audit log
     # AuditLog.create(
     #   admin_user: current_user,
     #   action: 'role_changed',

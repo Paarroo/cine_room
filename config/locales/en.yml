@@ -17,6 +17,9 @@ en:
       movies: Films
       users: Utilisateurs
   activerecord:
+    errors:
+      messages:
+        record_invalid: "Record invalid"
     attributes:
       creator:
         bio: Biographie

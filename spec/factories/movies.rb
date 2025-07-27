@@ -14,20 +14,20 @@ FactoryBot.define do
 
     trait :approved do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { association(:user, :admin) }
     end
 
     trait :rejected do
       validation_status { :rejected }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { association(:user, :admin) }
     end
 
     trait :validated do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { association(:user, :admin) }
     end
 
-    association :user, factory: [:user, :creator]
+    user { association(:user, :creator) }
 
     after(:build) do |movie|
       movie.authorship_confirmed = "1"

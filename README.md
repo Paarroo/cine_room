@@ -144,21 +144,6 @@ rails db:seed
 rails server
 ```
 
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Stripe Configuration
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-
-# Email Configuration (optional for development)
-SMTP_USERNAME=your_smtp_username
-SMTP_PASSWORD=your_smtp_password
-
-# Cloudinary Configuration (for file uploads)
-CLOUDINARY_URL=cloudinary://...
 ```
 
 ### Login Credentials
@@ -166,15 +151,19 @@ CLOUDINARY_URL=cloudinary://...
 **Development (after `rails db:seed`):**
 
 ```
+
 Admin: admin@cineroom.com / password123
 Test User: germaine@kreiger-bailey.example / password123
+
 ```
 
 **Production:**
 
 ```
+
 Admin credentials are configured via environment variables
 Create a new user account through the registration process
+
 ```
 
 ---
@@ -327,3 +316,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 **🎬 Built with ❤️ and Rails 8.0.2 as part of THP Full-Stack Developer Bootcamp**
 
 _"Where independent cinema meets modern web development"_ ✨🍿
+```

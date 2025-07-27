@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Événement Approuvé - CinéRoom</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #f59e0b;">🎬 CinéRoom</h1>
+      </div>
+      
+      <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h2 style="color: #16a34a; margin-top: 0;">✅ Événement Approuvé !</h2>
+        <p>Bonjour <%= @creator.first_name %>,</p>
+        <p>Bonne nouvelle ! Votre événement <strong>"<%= @event.title %>"</strong> a été approuvé par notre équipe.</p>
+      </div>
+      
+      <div style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-top: 0; color: #1f2937;">Détails de l'événement :</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li><strong>Titre :</strong> <%= @event.title %></li>
+          <li><strong>Film :</strong> <%= @event.movie.title %></li>
+          <li><strong>Date :</strong> <%= l(@event.event_date, format: :long) %></li>
+          <li><strong>Lieu :</strong> <%= @event.venue_name %>, <%= @event.venue_address %></li>
+          <li><strong>Capacité :</strong> <%= @event.max_capacity %> places</li>
+          <li><strong>Prix :</strong> <%= number_to_currency(@event.price_cents / 100.0) %></li>
+        </ul>
+      </div>
+      
+      <div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+        <p style="margin: 0;"><strong>🎉 Votre événement est maintenant visible sur la plateforme !</strong></p>
+        <p style="margin: 10px 0 0 0;">Les utilisateurs peuvent dès maintenant découvrir et réserver des places pour votre événement.</p>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="<%= event_url(@event) %>" style="background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Voir mon événement</a>
+      </div>
+      
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 14px;">
+        <p>L'équipe CinéRoom<br>
+        Pour le cinéma indépendant</p>
+      </div>
+    </div>
+  </body>
+</html>

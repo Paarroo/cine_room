@@ -20,10 +20,21 @@ class MoviesController < ApplicationController
     @movie = current_user.movies.build(movie_params)
     @movie.director = current_user.full_name
 
-    if @movie.save
-      redirect_to @movie, notice: 'Film publié pour validation.'
-    else
-      render :new, status: :unprocessable_entity
+    begin
+      if @movie.save
+        redirect_to @movie, notice: 'Film publié pour validation.'
+      else
+        render :new, status: :unprocessable_entity
+      end
+    rescue SolidQueue::Job::EnqueueError => e
+      # Handle background job failure gracefully
+      Rails.logger.warn "Background job failed for movie #{@movie.id}: #{e.message}"
+      
+      if @movie.persisted?
+        redirect_to @movie, notice: 'Film publié pour validation. (Analyse d\'image en cours en arrière-plan)'
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 

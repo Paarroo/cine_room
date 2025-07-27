@@ -3,7 +3,7 @@ class EventsController < ApplicationController
   before_action :ensure_creator_or_admin!, except: [ :index, :show ]
 
   def index
-     @events = Event.filter_by(params).includes(:movie).order(event_date: :asc).page(params[:page])
+     @events = Event.filter_by(params).includes(:movie, :created_by).order(event_date: :asc).page(params[:page])
 
     respond_to do |format|
       format.html
@@ -12,6 +12,12 @@ class EventsController < ApplicationController
   end
 
   def show
+    # Only show approved events to regular users
+    unless @event.approved? || (current_user && (current_user.admin? || @event.created_by == current_user))
+      redirect_to events_path, alert: "Cet événement n'est pas disponible."
+      return
+    end
+    
     @participation = current_user&.participations&.find_by(event: @event)
     @available_spots = @event.available_spots
     @movie = @event.movie
@@ -24,6 +30,16 @@ class EventsController < ApplicationController
 
   def create
     @event = Event.new(event_params)
+    @event.created_by = current_user
+    
+    # Set validation status based on user role
+    if current_user.admin?
+      @event.validation_status = 'approved'
+      @event.validated_by = current_user
+      @event.validated_at = Time.current
+    else
+      @event.validation_status = 'pending'
+    end
     
     # Ensure creators can only create events for their own movies
     unless current_user.admin? || current_user.movies.approved.exists?(id: @event.movie_id)
@@ -34,7 +50,11 @@ class EventsController < ApplicationController
     end
 
     if @event.save
-      redirect_to @event, notice: 'Event was successfully created.'
+      if current_user.admin?
+        redirect_to @event, notice: 'Événement créé et approuvé automatiquement.'
+      else
+        redirect_to events_path, notice: 'Événement proposé avec succès. Il sera visible après validation par un administrateur.'
+      end
     else
       @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
       render :new, status: :unprocessable_entity

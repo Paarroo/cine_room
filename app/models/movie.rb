@@ -8,15 +8,20 @@ class Movie < ApplicationRecord
   belongs_to :validated_by, class_name: 'User', optional: true
   has_many :events, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_by_users, through: :favorites, source: :user
   has_one_attached :poster
 
-  validates :title, :synopsis, :director, :duration, :genre, :year, :poster, presence: true
+  validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
+  validates :poster, presence: true, unless: -> { Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress }
   validates :duration, numericality: { greater_than: 0, less_than: 300 }
   validates :year, numericality: {
     greater_than: 1900,
     less_than_or_equal_to: Date.current.year
   }
   validate :authorship_must_be_confirmed, on: :create
+  validate :trailer_url_must_be_youtube
+
 
   enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
@@ -56,7 +61,59 @@ class Movie < ApplicationRecord
     %w[reviews events]
   end
 
+  # Dashboard metrics methods
+  def self.recent_activities
+    activities = []
+    
+    includes(:user)
+      .order(created_at: :desc)
+      .limit(2)
+      .each do |movie|
+        activities << {
+          type: 'movie',
+          title: 'Nouveau film ajouté',
+          description: "\"#{movie.title}\" par #{movie.user&.full_name}",
+          time_ago: ActionController::Base.helpers.time_ago_in_words(movie.created_at),
+          icon: 'film',
+          color: 'blue-400'
+        }
+      end
+    
+    activities
+  end
+
+  def self.quick_stats
+    {
+      pending_movies: where(validation_status: :pending).count,
+      total_movies: count
+    }
+  end
+
+  def self.export_data
+    includes(:user)
+      .select(:id, :title, :director, :year, :validation_status, :created_at)
+      .limit(1000)
+      .map(&:attributes)
+  end
+
+  def favorited_by?(user)
+    return false unless user
+    favorites.exists?(user: user)
+  end
+
+  def favorites_count
+    favorites.count
+  end
+
   private
+
+  def trailer_url_must_be_youtube
+    return if trailer_url.blank?
+
+    unless trailer_url.match?(/\Ahttps:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+\z/)
+      errors.add(:trailer_url, "doit être un lien YouTube valide (youtube.com/watch?v= ou youtu.be/)")
+    end
+  end
 
   def authorship_must_be_confirmed
     if authorship_confirmed != "1"

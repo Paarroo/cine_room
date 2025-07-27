@@ -16,7 +16,6 @@ export default class extends Controller {
 
   // Lifecycle hooks
   connect() {
-    console.log("📊 Admin Dashboard connected")
     this.initializeDashboard()
     this.setupAutoRefresh()
     this.setupKeyboardShortcuts()
@@ -215,15 +214,13 @@ export default class extends Controller {
     button.disabled = true
 
     try {
-      const response = await fetch('/admin/dashboard/export', {
-        method: 'POST',
+      const response = await fetch(`/admin/exports?type=${dataType}`, {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-Token': this.getCSRFToken()
-        },
-        body: JSON.stringify({ type: dataType })
+        }
       })
 
       if (response.ok) {
@@ -366,7 +363,6 @@ export default class extends Controller {
     // Simulate API call delay
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log(`Exporting ${dataType} data...`)
         resolve()
       }, 2000)
     })
@@ -375,7 +371,6 @@ export default class extends Controller {
   async simulateBackup() {
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log('Database backup completed')
         resolve()
       }, 3000)
     })
@@ -384,7 +379,6 @@ export default class extends Controller {
   async simulateMaintenanceToggle() {
     return new Promise(resolve => {
       setTimeout(() => {
-        console.log('Maintenance mode toggled')
         resolve()
       }, 1000)
     })
@@ -439,7 +433,6 @@ export default class extends Controller {
       end: () => {
         const endTime = performance.now()
         const duration = endTime - startTime
-        console.log(`Dashboard action "${action}" took ${duration.toFixed(2)}ms`)
 
         // Log slow operations
         if (duration > 1000) {

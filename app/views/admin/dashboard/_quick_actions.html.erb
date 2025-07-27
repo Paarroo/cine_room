@@ -68,7 +68,7 @@
               </div>
               <i class="fas fa-arrow-right text-gray-400 group-hover:text-white transition-colors"></i>
             </div>
-            <h4 class="text-lg font-semibold text-white mb-1">Réservations</h4>
+            <h4 class="text-lg font-semibold text-white mb-1">Participations</h4>
             <p class="text-sm text-gray-400">
               <%= @quick_stats[:pending_participations] %> en attente
             </p>
@@ -92,57 +92,46 @@
       <!-- Action Buttons Grid - All uniform size -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Export Movies Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="movies"
-          title="Export movies list to CSV"
-        >
+        <%= link_to admin_movies_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export movies list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
           <span class="truncate">Export Films</span>
-        </button>
+        <% end %>
 
         <!-- Export Events Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="events"
-          title="Export events list to CSV"
-        >
+        <%= link_to admin_events_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export events list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
           <span class="truncate">Export Événements</span>
-        </button>
+        <% end %>
 
         <!-- Export Participations Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#exportData"
-          data-type="participations"
-          title="Export participations list to CSV"
-        >
+        <%= link_to admin_participations_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Export participations list to CSV" do %>
           <i class="fas fa-download mr-2"></i>
-          <span class="truncate">Export Réservations</span>
-        </button>
+          <span class="truncate">Export Participations</span>
+        <% end %>
 
         <!-- Database Backup Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#backupDatabase"
-          title="Create database backup"
-        >
+        <%= link_to admin_backup_exports_path(format: :csv),
+            class: "management-action-btn h-14 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium",
+            title: "Create database backup" do %>
           <i class="fas fa-database mr-2"></i>
           <span class="truncate">Sauvegarde BDD</span>
-        </button>
+        <% end %>
 
         <!-- Maintenance Mode Button -->
-        <button
-          class="management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium"
-          data-action="click->admin-dashboard#toggleMaintenanceMode"
-          title="Toggle maintenance mode"
-        >
+        <%= button_to admin_system_maintenance_modes_path,
+            method: :post,
+            class: "management-action-btn h-14 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center text-sm font-medium border-0",
+            title: "Toggle maintenance mode",
+            data: { confirm: "Activer le mode maintenance ?" } do %>
           <i class="fas fa-tools mr-2"></i>
           <span class="truncate">Mode Maintenance</span>
-        </button>
+        <% end %>
       </div>
 
       <!-- Action Status Indicator -->

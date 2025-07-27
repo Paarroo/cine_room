@@ -26,6 +26,54 @@
   --transition-slow: 0.6s ease-out;
 }
 
+/* ===== FAVORITES STYLES ===== */
+.favorite-btn {
+  @apply relative transition-all duration-300;
+}
+
+.favorite-btn:not(.favorited) {
+  @apply text-white hover:text-gold-400;
+}
+
+.favorite-btn.favorited {
+  @apply text-red-500;
+}
+
+.favorite-btn.favorited i {
+  @apply text-red-500;
+}
+
+.favorite-btn:hover i {
+  @apply scale-110;
+}
+
+.favorites-count {
+  @apply absolute -top-1 -right-1 bg-gold-500 text-white text-xs 
+         rounded-full w-5 h-5 flex items-center justify-center font-bold
+         transition-all duration-300;
+}
+
+.favorites-count:empty {
+  @apply hidden;
+}
+
+/* ===== EMPTY STATE STYLES ===== */
+.favorites-empty-state {
+  @apply text-center py-16;
+}
+
+.favorites-empty-state i {
+  @apply text-6xl text-gray-400 mb-4;
+}
+
+.favorites-empty-state h3 {
+  @apply text-2xl font-bold text-white mb-2;
+}
+
+.favorites-empty-state p {
+  @apply text-gray-400 mb-6;
+}
+
 /* OPTIONAL CLASSES — mirror tailwind.config.js if not building dynamically */
 .text-dark-100 {
   color: #1a1a1a;
@@ -155,6 +203,165 @@ h6 {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* CARDS */
+/* Enhanced card hover animations */
+.card-hover {
+  @apply transition-all duration-500 ease-out transform-gpu;
+  transition-property: transform, box-shadow, filter;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
+              0 0 0 1px rgba(255, 255, 255, 0.1),
+              0 0 30px rgba(245, 158, 11, 0.2);
+  filter: brightness(1.05);
+}
+
+.card-hover:active {
+  transform: translateY(-4px) scale(1.01);
+  transition-duration: 150ms;
+}
+
+/* Card tilt effect */
+.card-tilt {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.card-tilt:hover {
+  transform: rotateY(5deg) rotateX(-2deg) translateZ(20px);
+}
+
+/* Card pulse animation */
+.card-pulse {
+  animation: cardPulse 2s ease-in-out infinite;
+}
+
+@keyframes cardPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  50% { 
+    transform: scale(1.02); 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(245, 158, 11, 0.1);
+  }
+}
+
+/* Entrance animations */
+.card-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: cardFadeIn 0.6s ease-out forwards;
+}
+
+.card-slide-up {
+  opacity: 0;
+  transform: translateY(50px);
+  animation: cardSlideUp 0.8s ease-out forwards;
+}
+
+.card-scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+  animation: cardScaleIn 0.7s ease-out forwards;
+}
+
+@keyframes cardFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardScaleIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Staggered animation delays */
+.card-delay-1 { animation-delay: 0.1s; }
+.card-delay-2 { animation-delay: 0.2s; }
+.card-delay-3 { animation-delay: 0.3s; }
+.card-delay-4 { animation-delay: 0.4s; }
+.card-delay-5 { animation-delay: 0.5s; }
+.card-delay-6 { animation-delay: 0.6s; }
+
+/* Animated orange light around card (existing) */
+.card-glow-wrapper {
+  position: relative;
+  z-index: 0;
+}
+
+.card-glow-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 1.875rem;
+  background: linear-gradient(120deg, #ff9900, #ffcc00, #ff9900);
+  background-size: 300% 300%;
+  animation: borderLight 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  z-index: -1;
+  box-shadow: 0 0 10px 3px rgba(255, 153, 0, 0.5), 0 0 20px 6px rgba(255, 204, 0, 0.4);
+}
+
+.card-glow-wrapper:hover::before {
+  opacity: 1;
+}
+
+@keyframes borderLight {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Image zoom effect for cards */
+.card-image-zoom {
+  overflow: hidden;
+}
+
+.card-image-zoom img {
+  transition: transform 0.7s ease-out;
+}
+
+.card-hover:hover .card-image-zoom img {
+  transform: scale(1.1);
+}
+
+/* Interactive elements */
+.card-button {
+  @apply transition-all duration-300 transform-gpu;
+}
+
+.card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
 /* NAVIGATION */
 .nav-blur {
   backdrop-filter: blur(20px);
@@ -259,12 +466,12 @@ img {
 }
 
 .avatar-circle {
-  width: 96px;             /* Taille fixe : 96px (équivalent à w-24) */
+  width: 96px;             /* Fixed size: 96px (equivalent to w-24) */
   height: 96px;
-  border-radius: 50%;      /* Cercle parfait */
-  object-fit: cover;       /* Remplit sans déformation */
-  border: 2px solid #ffbb00; /* Or — tu peux adapter */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Optionnel */
+  border-radius: 50%;      /* Perfect circle */
+  object-fit: cover;       /* Fill without deformation */
+  border: 2px solid #ffbb00; /* Gold - you can adapt */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Optional */
 }
 
 .poster-preview {

@@ -11,13 +11,13 @@
           <div class="flex-1 min-width-0">
             <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
               <i class="fas fa-ticket-alt mr-4"></i>
-              Gestion des Réservations
+              Gestion des Participations
             </h1>
             <p class="text-xl text-gray-300 mb-2">
               Administration des participations utilisateurs
             </p>
             <p class="text-gray-400 text-base">
-              <%= @stats[:total] %> réservations au total • <%= @stats[:pending] %> en attente
+              <%= @stats[:total] %> participations au total • <%= @stats[:pending] %> en attente
             </p>
           </div>
         </div>
@@ -27,7 +27,7 @@
 
   <%= render 'stats_cards' %>
 
-  <%= render 'filters' %>
+  <%= render 'admin/shared/universal_filters', context: :participations %>
 
   <section class="participations-list py-8">
     <div class="container-app">
@@ -39,7 +39,7 @@
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold text-white">
             <i class="fas fa-list text-primary mr-2"></i>
-            Liste des Réservations
+            Liste des Participations
           </h3>
 
           <!-- Select All Checkbox -->
@@ -49,7 +49,8 @@
                 type="checkbox"
                 id="select-all-participations"
                 class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary"
-                onchange="toggleAllParticipations(this)"
+                data-admin-participations-target="selectAll"
+                data-action="change->admin-participations#toggleSelectAll"
               >
               <span class="text-sm text-gray-400">Tout sélectionner</span>
             </label>
@@ -60,22 +61,27 @@
           </div>
         </div>
 
-        <!-- Bulk Actions -->
-        <div class="bulk-actions hidden" id="bulk-actions">
-          <button
-            class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors"
-            data-action="click->admin-participations#bulkConfirm"
-          >
-            <i class="fas fa-check mr-2"></i>
-            Confirmer sélection
-          </button>
-          <button
-            class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors"
-            data-action="click->admin-participations#bulkCancel"
-          >
-            <i class="fas fa-times mr-2"></i>
-            Annuler sélection
-          </button>
+        <!-- Bulk Actions - Sticky -->
+        <div class="bulk-actions hidden fixed bottom-6 right-6 z-50 bg-dark-500/95 backdrop-blur-sm border border-white/10 rounded-2xl p-4 shadow-2xl" id="bulk-actions">
+          <div class="flex flex-col space-y-3">
+            <div class="text-xs text-gray-400 text-center mb-2">
+              <span id="selected-count">0</span> sélectionnée(s)
+            </div>
+            <button
+              class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors flex items-center justify-center"
+              data-action="click->admin-participations#bulkConfirm"
+            >
+              <i class="fas fa-check mr-2"></i>
+              Confirmer
+            </button>
+            <button
+              class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center justify-center"
+              data-action="click->admin-participations#bulkCancel"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Annuler
+            </button>
+          </div>
         </div>
 
         <!-- Participations Table -->
@@ -107,14 +113,14 @@
           <!-- Empty State -->
           <div class="text-center py-12">
             <i class="fas fa-ticket-alt text-6xl text-gray-600 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucune réservation trouvée</h3>
+            <h3 class="text-xl font-semibold text-gray-400 mb-2">Aucune participation trouvée</h3>
             <p class="text-gray-500">
               <% if params[:scope].present? && params[:scope] != 'all' %>
-                Aucune réservation avec le statut "<%= params[:scope] %>"
+                Aucune participation avec le statut "<%= params[:scope] %>"
               <% elsif params[:user_search].present? || params[:status].present? %>
                 Essayez de modifier vos critères de recherche
               <% else %>
-                Aucune réservation n'a encore été effectuée
+                Aucune participation n'a encore été effectuée
               <% end %>
             </p>
           </div>
@@ -135,23 +141,3 @@
   <%= render 'revenue_summary' %>
 </div>
 
-<script>
-function toggleAllParticipations(selectAllCheckbox) {
-  const checkboxes = document.querySelectorAll('.participation-checkbox');
-  checkboxes.forEach(checkbox => {
-    checkbox.checked = selectAllCheckbox.checked;
-  });
-  updateBulkActions();
-}
-
-function updateBulkActions() {
-  const checkboxes = document.querySelectorAll('.participation-checkbox:checked');
-  const bulkActions = document.getElementById('bulk-actions');
-
-  if (checkboxes.length > 0) {
-    bulkActions.classList.remove('hidden');
-  } else {
-    bulkActions.classList.add('hidden');
-  }
-}
-</script>

@@ -18,20 +18,31 @@ class StripeCheckoutController < ApplicationController
       redirect_to root_path, alert: "Le paiement n'a pas été confirmé." and return
     end
 
-    if current_user.participations.exists?(event: @event)
-      redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
-    end
-
-    participation = current_user.participations.create!(
+    # Check if participation already exists (created by webhook)
+    participation = current_user.participations.find_by(
       event: @event,
-      seats: seats,
-      stripe_payment_id: session_id,
-      status: :confirmed
+      stripe_payment_id: session_id
     )
 
-    ParticipationMailer.confirmation_email(participation).deliver_later
+    # If not created by webhook, create it now (fallback)
+    unless participation
+      if current_user.participations.exists?(event: @event)
+        redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
+      end
 
-    
+      participation = current_user.participations.create!(
+        event: @event,
+        seats: seats,
+        stripe_payment_id: session_id,
+        status: :confirmed
+      )
+
+      TicketMailer.ticket_confirmation(participation).deliver_now
+      Rails.logger.info "Participation created via success redirect (webhook missed): #{participation.id}"
+    else
+      Rails.logger.info "Participation already exists from webhook: #{participation.id}"
+    end
+
     redirect_to reservation_success_path(participation_id: participation.id)
   end
 

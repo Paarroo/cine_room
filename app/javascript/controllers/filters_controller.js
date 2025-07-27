@@ -1,3 +1,5 @@
+//submission form search in real time
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {

@@ -1,16 +1,16 @@
 <!-- Admin Navbar - Combined with positioning fix -->
 <nav data-controller="navigation" class="admin-navbar fixed top-0 w-full z-50 nav-blur border-b border-white/10">
-  <div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="h-16 max-w-7xl px-4 sm:px-6 lg:px-8" style="margin-left: auto; margin-right: auto;" data-responsive-transform>
     <div class="flex justify-between items-center h-full">
 
       <!-- Logo Section - Admin Version -->
       <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0" do %>
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
+        <div class="w-10 h-10 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
           <i class="fas fa-cog text-white text-lg"></i>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col mr-5">
           <span class="text-xl font-bold tracking-tight text-white">CinéRoom</span>
-          <span class="text-xs text-primary uppercase tracking-widest">Administration</span>
+          <span class="text-xs text-gold-400 uppercase tracking-widest mt-0.5 font-semibold">Administration</span>
         </div>
       <% end %>
 
@@ -48,25 +48,26 @@
         <%= link_to admin_participations_path,
             class: "admin-nav-link #{'active' if controller_name == 'participations' && params[:namespace] == 'admin'}" do %>
           <i class="fas fa-ticket-alt mr-2"></i>
-          Réservations
+          Participations
         <% end %>
       </div>
 
       <!-- Admin Actions Section -->
-      <div class="hidden lg:flex items-center space-x-4">
+      <div class="hidden lg:flex items-center space-x-8 ml-8">
         <!-- User Profile Admin -->
         <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+          <div class="w-8 h-8 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-lg flex items-center justify-center shadow-md transition-all duration-300">
             <i class="fas fa-user-shield text-white text-sm"></i>
           </div>
           <div class="hidden xl:block">
             <div class="text-sm font-medium text-white"><%= current_user.full_name %></div>
-            <div class="text-xs text-primary">Administrateur</div>
+            <div class="text-xs text-gold-400 font-semibold">Administrateur</div>
           </div>
         </div>
         <!-- Back to Site -->
-        <%= button_to "Retour au site", public_site_path, method: :get,
-            class: "px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-xl transition-colors duration-200 font-medium" %>
+        <%= form_with url: public_site_path, method: :get, local: true, class: "inline" do %>
+          <%= submit_tag "Retour au site", class: "px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-xl transition-colors duration-200 font-medium" %>
+        <% end %>
         <!-- Logout -->
         <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
             class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-xl transition-colors duration-200 font-medium" %>
@@ -111,7 +112,7 @@
       <%= link_to admin_participations_path,
           class: "admin-mobile-nav-link" do %>
         <i class="fas fa-ticket-alt mr-3"></i>
-        Réservations
+        Participations
       <% end %>
 
       <!-- Mobile Admin Actions -->

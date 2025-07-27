@@ -3,7 +3,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :trackable, :confirmable
 
 
-  after_create :send_welcome_email
+  before_create :skip_confirmation_for_admin
+  after_create :send_welcome_email, unless: -> { Rails.env.production? }
   after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
   has_many :participations, dependent: :destroy
@@ -11,9 +12,13 @@ class User < ApplicationRecord
   has_many :events, through: :participations
   has_many :movies
   has_many :created_events, through: :movies, source: :events
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_movies, through: :favorites, source: :movie
   has_one_attached :avatar
 
   validate :name_cannot_be_changed_after_publishing, on: :update
+  validates :email, format: { with: /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/, message: "doit être une adresse email valide" }
+  validate :validate_email_domain, on: [:create, :update]
 
   enum :role, { user: 0, creator: 1, admin: 2 }, default: :user
   scope :admin_users, -> { where(role: :admin) }
@@ -23,6 +28,15 @@ class User < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def avatar_url
+    if avatar.attached?
+      avatar
+    else
+      # Return default avatar URL from Cloudinary
+      "https://res.cloudinary.com/dhusbkszr/image/upload/v1753621019/ocuvyd737vat2fwwl76t0oyrbds7.png"
+    end
   end
 
   def self.ransackable_attributes(auth_object = nil)
@@ -37,7 +51,29 @@ class User < ApplicationRecord
     [ "participations", "reviews", "events", "movies", "created_events" ]
   end
 
+  # Dashboard metrics methods
+  def self.export_data
+    select(:id, :email, :first_name, :last_name, :role, :created_at)
+      .limit(1000)
+      .map(&:attributes)
+  end
+
+  def self.quick_stats
+    {
+      total_users: count,
+      admin_count: where(role: :admin).count,
+      creator_count: where(role: :creator).count,
+      user_count: where(role: :user).count
+    }
+  end
+
   private
+
+  def attach_default_avatar
+    # Disable default avatar attachment to avoid registration errors
+    # Users can upload their own avatar after registration
+    return
+  end
 
   def name_cannot_be_changed_after_publishing
     return unless movies.exists?
@@ -48,7 +84,7 @@ class User < ApplicationRecord
   end
 
   def send_welcome_email
-    UserMailer.welcome_email(self).deliver_later
+    UserMailer.welcome_email(self).deliver_now
   end
 
   def saved_change_to_name?
@@ -57,5 +93,36 @@ class User < ApplicationRecord
 
   def sync_director_name_to_movies
     movies.update_all(director: full_name)
+  end
+
+  def skip_confirmation_for_admin
+    if admin?
+      skip_confirmation!
+    end
+  end
+
+  def validate_email_domain
+    return unless email.present? && email.include?('@')
+    
+    domain = email.split('@').last
+    blocked_domains = %w[fake.com example.org invalid.email nonexistent.domain]
+    
+    # Allow .test domains in development/test environments
+    blocked_domains << 'test.com' unless Rails.env.development? || Rails.env.test?
+    
+    if blocked_domains.include?(domain.downcase)
+      errors.add(:email, "utilise un domaine email non valide")
+    end
+    
+    # Basic domain format validation - allow .test in dev/test
+    domain_pattern = if Rails.env.development? || Rails.env.test?
+      /\A[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
+    else
+      /\A[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
+    end
+    
+    unless domain.match?(domain_pattern)
+      errors.add(:email, "doit utiliser un domaine valide")
+    end
   end
 end

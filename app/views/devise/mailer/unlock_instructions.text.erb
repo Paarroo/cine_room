@@ -1,0 +1,25 @@
+🔒 COMPTE VERROUILLÉ - CINÉROOM 🔒
+
+════════════════════════════════════════════════════
+
+Bonjour <%= @resource.email %>,
+
+⚠️ Votre compte CinéRoom a été temporairement verrouillé pour des raisons de sécurité suite à plusieurs tentatives de connexion incorrectes.
+
+🔓 Ne vous inquiétez pas, vous pouvez le déverrouiller facilement :
+
+🔗 <%= unlock_url(@resource, unlock_token: @token) %>
+
+📱 Si vous n'arrivez pas à cliquer sur le lien, copiez-le et collez-le dans votre navigateur.
+
+────────────────────────────────────────────────────
+
+🛡️  SÉCURITÉ RECOMMANDÉE
+
+Si vous n'avez pas tenté de vous connecter récemment, nous vous conseillons de changer votre mot de passe après déverrouillage.
+
+════════════════════════════════════════════════════
+
+🔐 Votre sécurité nous tient à cœur,
+
+— L'équipe CinéRoom 🎬

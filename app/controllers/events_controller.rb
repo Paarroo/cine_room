@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_action :set_event, only: [ :show, :edit, :update, :destroy ]
-  before_action :ensure_admin!, except: [ :index, :show ]
+  before_action :ensure_creator_or_admin!, except: [ :index, :show ]
 
   def index
      @events = Event.filter_by(params).includes(:movie).order(event_date: :asc).page(params[:page])
@@ -19,29 +19,37 @@ class EventsController < ApplicationController
 
   def new
     @event = Event.new
-    @movies = Movie.approved
+    @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
   end
 
   def create
     @event = Event.new(event_params)
+    
+    # Ensure creators can only create events for their own movies
+    unless current_user.admin? || current_user.movies.approved.exists?(id: @event.movie_id)
+      flash[:alert] = "Vous ne pouvez créer des événements que pour vos propres films approuvés."
+      @movies = current_user.movies.approved
+      render :new, status: :unprocessable_entity
+      return
+    end
 
     if @event.save
       redirect_to @event, notice: 'Event was successfully created.'
     else
-      @movies = Movie.approved
+      @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
-    @movies = Movie.approved
+    @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
   end
 
   def update
     if @event.update(event_params)
       redirect_to @event, notice: 'Event was successfully updated.'
     else
-      @movies = Movie.approved
+      @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
       render :edit, status: :unprocessable_entity
     end
   end

@@ -77,6 +77,11 @@
                     <span>
                       <i class="fas fa-map-marker-alt mr-1"></i>
                       <%= event.venue_name %>
+                      <% if event.latitude == 48.8566 && event.longitude == 2.3522 %>
+                        <span class="ml-2 px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs" title="Coordonnées par défaut (Paris) - Géocodage échoué">
+                          ⚠️ GPS
+                        </span>
+                      <% end %>
                     </span>
                     <span>
                       <i class="fas fa-calendar mr-1"></i>
@@ -86,6 +91,11 @@
                       <i class="fas fa-users mr-1"></i>
                       <%= event.participations.where(status: :confirmed).sum(:seats) %>/<%= event.max_capacity %>
                     </span>
+                    <% if event.geocoding_status.present? && event.geocoding_status != 'success' %>
+                      <span class="px-2 py-1 bg-red-500/20 text-red-300 rounded text-xs" title="Statut géocodage: <%= event.geocoding_status %>">
+                        🗺️ <%= event.geocoding_status %>
+                      </span>
+                    <% end %>
                   </div>
                 </div>
 

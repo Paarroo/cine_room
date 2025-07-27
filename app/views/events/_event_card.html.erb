@@ -1,28 +1,27 @@
 <!-- Event Card -->
-<div class="event-card rounded-2xl overflow-hidden card-hover group cursor-pointer relative">
+<div class="event-card rounded-2xl overflow-hidden card-hover card-slide-up group cursor-pointer relative">
   <%= link_to event_path(event), class: "absolute inset-0 z-10", data: { turbo: false } do %><% end %>
 
-  <div class="relative h-72 bg-gradient-to-br from-red-500/20 to-pink-500/20">
+  <div class="relative h-72 bg-gradient-to-br from-red-500/20 to-pink-500/20 card-image-zoom">
     <div class="absolute inset-0 bg-gradient-to-t from-dark-300 via-transparent to-transparent"></div>
 
-    <!-- "Popular" badge -->
-    <div class="absolute top-4 left-4">
-      <span class="bg-red-500/20 border border-red-500/30 px-3 py-1 rounded-full text-xs font-medium text-red-300">
-        <i class="fas fa-fire mr-1"></i>Populaire
-      </span>
-    </div>
+    <% if event.image.attached? %>
+      <%= image_tag event.image,
+          alt: "#{event.title} poster",
+          class: "absolute inset-0 w-full h-full object-cover z-0 opacity-30",
+          style: "min-width: 100%; min-height: 100%;" %>
+    <% else %>
+      <!-- Default placeholder image -->
+      <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 opacity-30 flex items-center justify-center">
+        <span class="text-6xl opacity-50">🎬</span>
+      </div>
+    <% end %>
 
-    <!-- Favorite button -->
-    <div class="absolute top-4 right-4 z-20">
-      <button onclick="event.stopPropagation();" class="w-10 h-10 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-        <i class="far fa-heart text-sm"></i>
-      </button>
-    </div>
 
     <!-- Title + director -->
-    <div class="absolute bottom-4 left-4">
-      <h3 class="text-2xl font-bold mb-1"><%= event.title %></h3>
-      <p class="text-gray-300"><%= event.movie.director %></p>
+    <div class="absolute bottom-4 left-4 right-20">
+      <h3 class="text-lg sm:text-xl md:text-2xl font-bold mb-1 truncate"><%= event.title %></h3>
+      <p class="text-sm sm:text-base text-gray-300 truncate"><%= event.movie.director %></p>
     </div>
 
     <!-- Seats remaining -->
@@ -54,22 +53,22 @@
     <div class="space-y-2 mb-6 text-gray-300">
       <div class="flex items-center">
         <i class="fas fa-calendar-alt mr-3 text-gold-500 w-4"></i>
-        <span class="font-medium">
+        <span class="font-medium text-sm sm:text-base truncate">
           <%= l(event.event_date, format: "%d %B %Y") %> à <%= event.start_time.strftime("%Hh%M") %>
         </span>
       </div>
       <div class="flex items-center">
-        <i class="fas fa-map-marker-alt mr-3 text-gold-500 w-4"></i>
-        <span><%= event.venue_name %>, <%= event.venue_address %></span>
+        <i class="fas fa-map-marker-alt mr-3 text-gold-500 w-4 flex-shrink-0"></i>
+        <span class="truncate"><%= event.venue_name %>, <%= event.venue_address %></span>
       </div>
     </div>
 
     <!-- Price + CTA -->
     <div class="flex items-center justify-between relative z-20">
-      <div class="text-3xl font-bold gradient-text"><%= event.price_cents %>€</div>
+      <div class="text-3xl font-bold gradient-text"><%= display_price(event.price_cents) %></div>
       <% if places_left > 0 %>
         <span onclick="event.stopPropagation();">
-          <%= link_to "Voir détails", event_path(event), data: { turbo: false }, class: "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
+          <%= link_to "Voir détails", event_path(event), data: { turbo: false }, class: "card-button px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors duration-300 font-medium" %>
         </span>
       <% else %>
         <button onclick="event.stopPropagation();" disabled class="px-6 py-3 bg-gray-600 text-gray-400 rounded-xl font-medium cursor-not-allowed">

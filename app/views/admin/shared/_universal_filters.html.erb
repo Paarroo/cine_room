@@ -1,0 +1,116 @@
+<%
+  # Universal admin filters configuration
+  filter_config = {
+    movies: {
+      path: admin_movies_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Titre du film..." },
+        { type: :select, name: :status, label: "Statut", options: [['Tous les statuts', ''], ['En attente', 'pending'], ['Validé', 'approved'], ['Rejeté', 'rejected']] },
+        { type: :select, name: :genre, label: "Genre", options: [['Tous les genres', '']] + (Movie.distinct.pluck(:genre).compact.map { |g| [g, g] } rescue []) },
+        { type: :select, name: :year, label: "Année", options: [['Toutes les années', '']] + (Movie.distinct.pluck(:year).compact.sort.reverse.map { |y| [y, y] } rescue []) },
+        { type: :text, name: :director, label: "Réalisateur", placeholder: "Nom du réalisateur..." },
+        { type: :text, name: :creator, label: "Créateur", placeholder: "Nom du créateur..." },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Titre A-Z', 'title_asc'], ['Titre Z-A', 'title_desc']] }
+      ]
+    },
+    participations: {
+      path: admin_participations_path,
+      fields: [
+        { type: :text, name: :user_search, label: "Recherche utilisateur", placeholder: "Nom, email..." },
+        { type: :select, name: :status, label: "Statut", options: [['Tous les statuts', ''], ['En attente', 'pending'], ['Confirmé', 'confirmed'], ['Annulé', 'cancelled'], ['Présent', 'attended']] },
+        { type: :select, name: :date_filter, label: "Période", options: [['Toutes les périodes', ''], ['Aujourd\'hui', 'today'], ['Cette semaine', 'week'], ['Ce mois', 'month']] },
+        { type: :select, name: :payment_filter, label: "Paiement", options: [['Tous', ''], ['Avec paiement', 'with_payment'], ['Sans paiement', 'without_payment']] },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Par événement', 'event_date_desc']] }
+      ]
+    },
+    reviews: {
+      path: admin_reviews_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Commentaires, films..." },
+        { type: :select, name: :rating, label: "Note", options: [['Toutes les notes', ''], ['⭐ 1 étoile', '1'], ['⭐⭐ 2 étoiles', '2'], ['⭐⭐⭐ 3 étoiles', '3'], ['⭐⭐⭐⭐ 4 étoiles', '4'], ['⭐⭐⭐⭐⭐ 5 étoiles', '5']] },
+        { type: :select, name: :content_type, label: "Type de contenu", options: [['Tous les avis', ''], ['Avec commentaire', 'with_comment'], ['Note uniquement', 'rating_only']] },
+        { type: :select, name: :time_period, label: "Période", options: [['Toutes les périodes', ''], ['Aujourd\'hui', 'today'], ['Cette semaine', 'week'], ['Ce mois', 'month']] },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'newest'], ['Plus ancien', 'oldest'], ['Note la plus haute', 'rating_desc'], ['Note la plus basse', 'rating_asc']] }
+      ]
+    },
+    users: {
+      path: admin_users_path,
+      fields: [
+        { type: :text, name: :q, label: "Recherche", placeholder: "Nom, email..." },
+        { type: :select, name: :role, label: "Rôle", options: [['Tous les rôles', ''], ['Utilisateur', 'user'], ['Créateur', 'creator'], ['Administrateur', 'admin']] },
+        { type: :select, name: :creator_status, label: "Statut créateur", options: [['Tous', ''], ['Avec films', 'with_movies'], ['Sans films', 'without_movies']] },
+        { type: :select, name: :activity, label: "Activité", options: [['Tous', ''], ['Actifs (avec participations)', 'active'], ['Inactifs (sans participations)', 'inactive']] },
+        { type: :date, name: :created_since, label: "Inscrit depuis" },
+        { type: :select, name: :sort, label: "Trier par", options: [['Plus récent', 'created_at_desc'], ['Plus ancien', 'created_at_asc'], ['Nom A-Z', 'name_asc']] }
+      ]
+    }
+  }
+
+  # Determine context from controller or parameter
+  context = local_assigns[:context]&.to_sym || 
+           case controller_name
+           when 'movies' then :movies
+           when 'participations' then :participations 
+           when 'reviews' then :reviews
+           when 'users' then :users
+           else :movies
+           end
+  
+  config = filter_config[context]
+%>
+
+<!-- Filters Section for Admin <%= context.to_s.humanize %> -->
+<section class="filters-section py-6">
+  <div class="container-app">
+    <div class="glass-effect rounded-3xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-filter text-primary mr-2"></i>
+          Filtres et Recherche
+        </h3>
+
+        <!-- Clear Filters Button -->
+        <%= link_to config[:path],
+            class: "px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
+          <i class="fas fa-times mr-2"></i>Effacer les filtres
+        <% end %>
+      </div>
+
+      <!-- Search and Filter Form -->
+      <%= form_with url: config[:path], method: :get,
+          class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+          data: { turbo_frame: "_top" } do |form| %>
+
+        <% config[:fields].each do |field| %>
+          <div class="form-group">
+            <% if field[:type] == :text %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.text_field field[:name],
+                  value: params[field[:name]],
+                  placeholder: field[:placeholder],
+                  class: "form-input" %>
+            <% elsif field[:type] == :select %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.select field[:name],
+                  options_for_select(field[:options], params[field[:name]]),
+                  {},
+                  { class: "form-input" } %>
+            <% elsif field[:type] == :date %>
+              <%= form.label field[:name], field[:label], class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.date_field field[:name],
+                  value: params[field[:name]],
+                  class: "form-input" %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <!-- Submit Button -->
+        <div class="form-group flex items-end">
+          <%= form.submit "Appliquer les filtres",
+              class: "w-full btn-primary" %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</section>

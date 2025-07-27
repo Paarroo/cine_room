@@ -312,38 +312,62 @@
   <section class="actions-section py-8">
     <div class="container-app">
       <div class="glass-effect rounded-3xl p-6">
-        <div class="flex flex-wrap gap-4 justify-center">
+        <div class="flex flex-wrap gap-4 justify-center" data-controller="admin-actions">
           <!-- Approve -->
-          <%= button_to approve_admin_review_path(@review),
-              method: :patch,
-              class: "px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center",
-              data: { confirm: "Approuver cet avis ?" } do %>
+          <button
+            type="button"
+            class="px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= approve_admin_review_path(@review) %>"
+            data-method="PATCH"
+            data-confirm="Approuver cet avis ?"
+            data-success-message="Avis approuvé"
+            data-action-type="approval"
+          >
             <i class="fas fa-check mr-2"></i>Approuver l'avis
-          <% end %>
+          </button>
 
           <!-- Flag -->
-          <%= button_to flag_admin_review_path(@review),
-              method: :patch,
-              class: "px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center",
-              data: { confirm: "Signaler cet avis ?" } do %>
+          <button
+            type="button"
+            class="px-6 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-xl transition-colors font-semibold flex items-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= flag_admin_review_path(@review) %>"
+            data-method="PATCH"
+            data-confirm="Signaler cet avis ?"
+            data-success-message="Avis signalé"
+            data-action-type="status-update"
+          >
             <i class="fas fa-flag mr-2"></i>Signaler
-          <% end %>
+          </button>
 
           <!-- Reject -->
-          <%= button_to reject_admin_review_path(@review),
-              method: :patch,
-              class: "px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center",
-              data: { confirm: "Rejeter cet avis ?" } do %>
+          <button
+            type="button"
+            class="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= reject_admin_review_path(@review) %>"
+            data-method="PATCH"
+            data-confirm="Rejeter cet avis ?"
+            data-success-message="Avis rejeté"
+            data-action-type="approval"
+          >
             <i class="fas fa-times mr-2"></i>Rejeter l'avis
-          <% end %>
+          </button>
 
           <!-- Delete -->
-          <%= button_to admin_review_path(@review),
-              method: :delete,
-              class: "px-6 py-3 bg-gray-700/50 hover:bg-gray-700/70 text-gray-400 rounded-xl transition-colors font-semibold flex items-center",
-              data: { confirm: "Supprimer définitivement cet avis ?" } do %>
+          <button
+            type="button"
+            class="px-6 py-3 bg-gray-700/50 hover:bg-gray-700/70 text-gray-400 rounded-xl transition-colors font-semibold flex items-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_review_path(@review) %>"
+            data-method="DELETE"
+            data-confirm="Supprimer définitivement cet avis ?"
+            data-success-message="Avis supprimé"
+            data-action-type="deletion"
+          >
             <i class="fas fa-trash mr-2"></i>Supprimer
-          <% end %>
+          </button>
         </div>
       </div>
     </div>

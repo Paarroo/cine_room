@@ -14,44 +14,26 @@ FactoryBot.define do
 
     trait :approved do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
     trait :rejected do
       validation_status { :rejected }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
     trait :validated do
       validation_status { :approved }
-      association :validated_by, factory: [:user, :admin]
+      validated_by { User.find_by(role: :admin) || association(:user, :admin) }
     end
 
-    association :user, factory: [:user, :creator]
+    user { association(:user, :creator) }
 
     after(:build) do |movie|
       movie.authorship_confirmed = "1"
 
-      urls = [
-        "https://source.unsplash.com/300x450/?cinema",
-        "https://source.unsplash.com/300x450/?movie-poster",
-        "https://source.unsplash.com/300x450/?film",
-        
-      ]
-
-      # Génère un poster aléatoire depuis Unsplash
-      begin
-        file = URI.open(urls.sample)
-      rescue OpenURI::HTTPError => e
-        puts "⚠️ Poster download failed: #{e.message}"
-        file = File.open(Rails.root.join("spec/fixtures/files/test-poster.jpg")) # fallback
-      end
-
-      movie.poster.attach(
-        io: file,
-        filename: "poster.jpg",
-        content_type: "image/jpeg"
-      )
+      # Skip poster attachment to avoid network dependencies and missing fixtures
+      # Poster can be added manually through the UI when needed
     end
   end
 end

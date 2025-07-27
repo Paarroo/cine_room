@@ -2,13 +2,13 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
-      <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer" do %>
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
+      <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer hover:transform hover:scale-105 transition-all duration-300" do %>
+        <div class="w-10 h-10 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
           <i class="fas fa-film text-white text-lg"></i>
         </div>
         <div class="flex flex-col">
-          <span class="text-xl font-bold tracking-tight">CinéRoom</span>
-          <span class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</span>
+          <span class="text-xl font-bold tracking-tight text-white">CinéRoom</span>
+          <span class="text-xs text-gold-400 uppercase tracking-widest font-semibold">Cinéma Indépendant</span>
         </div>
       <% end %>
 
@@ -54,7 +54,8 @@
                   class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
             <% end %>
 
-            <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
+            <%= button_to "Déconnexion", destroy_user_session_path, 
+                method: :delete,
                 class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
           </div>
         <% else %>
@@ -96,6 +97,34 @@
       <%= link_to about_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-accent" do %>
         À propos
       <% end %>
+
+      <!-- Mobile Authentication Section -->
+      <div class="border-t border-white/20 pt-4 mt-4">
+        <% if user_signed_in? %>
+          <% if current_user&.admin? %>
+            <%= link_to admin_root_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+              <i class="fas fa-cog mr-2"></i>Dashboard Admin
+            <% end %>
+          <% else %>
+            <%= link_to users_dashboard_path(current_user), class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+              <i class="fas fa-user mr-2"></i>Mon Dashboard
+            <% end %>
+          <% end %>
+
+          <%= button_to destroy_user_session_path, 
+              method: :delete,
+              class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-red-400 bg-transparent border-0" do %>
+            <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path, class: "block w-full text-left py-3 text-muted font-medium transition duration-300 hover:text-primary" do %>
+            <i class="fas fa-sign-in-alt mr-2"></i>Connexion
+          <% end %>
+          <%= link_to new_user_registration_path, class: "block w-full text-center py-3 mt-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white rounded-xl font-medium transition-all duration-200" do %>
+            <i class="fas fa-user-plus mr-2"></i>Rejoindre
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </nav>

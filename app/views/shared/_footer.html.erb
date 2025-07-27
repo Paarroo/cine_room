@@ -7,12 +7,12 @@
         <%= link_to public_site_path,
             class: "flex items-center space-x-3 mb-8 group",
             data: { turbo: false } do %>
-          <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+          <div class="w-12 h-12 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-xl flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-lg">
             <i class="fas fa-film text-white text-xl"></i>
           </div>
           <div class="flex flex-col">
             <span class="text-2xl font-bold tracking-tight text-white font-display">CinéRoom</span>
-            <span class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</span>
+            <span class="text-xs text-gold-400 uppercase tracking-widest font-semibold">Cinéma Indépendant</span>
           </div>
         <% end %>
 
@@ -26,25 +26,25 @@
         <h4 class="font-semibold text-white mb-8 font-display text-lg">Navigation</h4>
         <div class="space-y-4">
           <%= link_to "Accueil", public_site_path,
-              class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+              class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
               data: { turbo: false } %>
 
           <% if defined?(creators_path) %>
             <%= link_to "Créateurs", creators_path,
-                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                 data: { turbo: false } %>
           <% else %>
             <%= link_to "Créateurs", "#",
-                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10" %>
+                class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10" %>
           <% end %>
 
           <% if defined?(events_path) %>
             <%= link_to "Événements", events_path,
-                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                 data: { turbo: false } %>
           <% else %>
             <%= link_to "Événements", "#",
-                class: "block text-muted hover:text-primary transition-colors font-medium relative z-10" %>
+                class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10" %>
           <% end %>
         </div>
       </div>
@@ -56,15 +56,15 @@
           <!-- Contact info -->
           <div class="space-y-4">
             <div class="flex items-center text-muted">
-              <i class="fas fa-envelope mr-4 text-primary w-4"></i>
+              <i class="fas fa-envelope mr-4 text-gold-400 w-4"></i>
               <span>contact@cineroom.com</span>
             </div>
             <div class="flex items-center text-muted">
-              <i class="fas fa-phone mr-4 text-primary w-4"></i>
-              <span>01 23 45 67 89</span>
+              <i class="fas fa-phone mr-4 text-gold-400 w-4"></i>
+              <span>07 44 42 10 60</span>
             </div>
             <div class="flex items-center text-muted">
-              <i class="fas fa-map-marker-alt mr-4 text-primary w-4"></i>
+              <i class="fas fa-map-marker-alt mr-4 text-gold-400 w-4"></i>
               <span>Paris, France</span>
             </div>
           </div>
@@ -73,34 +73,34 @@
           <div class="space-y-3">
             <% if defined?(contact_path) %>
               <%= link_to "Contact", contact_path,
-                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                   data: { turbo: false } %>
             <% else %>
-              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Contact</a>
+              <a href="#" class="block text-muted hover:text-gold-400 transition-colors font-medium relative z-10">Contact</a>
             <% end %>
 
             <% if defined?(legal_path) %>
               <%= link_to "Mentions légales", legal_path,
-                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                   data: { turbo: false } %>
             <% else %>
-              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Mentions légales</a>
+              <a href="#" class="block text-muted hover:text-gold-400 transition-colors font-medium relative z-10">Mentions légales</a>
             <% end %>
 
             <% if defined?(privacy_path) %>
               <%= link_to "Politique de confidentialité", privacy_path,
-                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                   data: { turbo: false } %>
             <% else %>
-              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">Politique de confidentialité</a>
+              <a href="#" class="block text-muted hover:text-gold-400 transition-colors font-medium relative z-10">Politique de confidentialité</a>
             <% end %>
 
             <% if defined?(terms_path) %>
               <%= link_to "CGV", terms_path,
-                  class: "block text-muted hover:text-primary transition-colors font-medium relative z-10",
+                  class: "block text-muted hover:text-gold-400 transition-colors font-medium relative z-10",
                   data: { turbo: false } %>
             <% else %>
-              <a href="#" class="block text-muted hover:text-primary transition-colors font-medium relative z-10">CGV</a>
+              <a href="#" class="block text-muted hover:text-gold-400 transition-colors font-medium relative z-10">CGV</a>
             <% end %>
           </div>
         </div>

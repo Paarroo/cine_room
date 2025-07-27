@@ -6,7 +6,7 @@
           <i class="fas fa-euro-sign text-primary mr-2"></i>
           Résumé des Revenus
         </h3>
-        <span class="text-sm text-gray-400">Réservations confirmées uniquement</span>
+        <span class="text-sm text-gray-400">Participations confirmées uniquement</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -28,7 +28,7 @@
 
           <div class="text-sm text-gray-400">Toutes périodes confondues</div>
           <div class="text-xs text-gray-500 mt-1">
-            Moyenne par réservation: <%= number_to_currency(@revenue_data[:average_participation_value]) %>
+            Moyenne par participation: <%= number_to_currency(@revenue_data[:average_participation_value]) %>
           </div>
         </div>
 
@@ -49,7 +49,7 @@
 
           <div class="text-sm text-gray-400">Revenus de <%= Date.current.strftime('%B %Y') %></div>
           <div class="text-xs text-gray-500 mt-1">
-            <%= @stats[:this_month] || 0 %> réservations ce mois
+            <%= @stats[:this_month] || 0 %> participations ce mois
           </div>
         </div>
 
@@ -70,7 +70,7 @@
 
           <div class="text-sm text-gray-400">7 derniers jours</div>
           <div class="text-xs text-gray-500 mt-1">
-            <%= @stats[:this_week] || 0 %> réservations cette semaine
+            <%= @stats[:this_week] || 0 %> participations cette semaine
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@
       <!-- Quick Actions -->
       <div class="mt-6 pt-6 border-t border-white/10">
         <div class="flex flex-wrap gap-3">
-          <%= link_to admin_participations_path(format: :csv),
+          <%= link_to admin_participations_exports_path(format: :csv),
               class: "px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors inline-flex items-center" do %>
             <i class="fas fa-download mr-2"></i>Exporter en CSV
           <% end %>

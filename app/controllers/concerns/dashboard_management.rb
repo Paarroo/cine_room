@@ -128,7 +128,7 @@ module DashboardManagement
                    .each do |participation|
         activities << {
           type: 'participation',
-          title: 'Nouvelle réservation',
+          title: 'Nouvelle participation',
           description: "#{participation.user&.full_name} • #{participation.event&.title}",
           time_ago: time_ago_in_words(participation.created_at),
           icon: 'ticket-alt',

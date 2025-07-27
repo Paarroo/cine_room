@@ -78,6 +78,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def ensure_creator_or_admin!
+    unless current_user&.creator? || current_user&.admin?
+      flash[:alert] = "Accès créateur requis."
+      redirect_to root_path
+    end
+  end
+
   def ensure_owner_or_admin!(resource)
     unless resource.user == current_user || current_user&.admin?
       flash[:alert] = "Vous ne pouvez accéder qu'à vos propres ressources."

@@ -9,8 +9,6 @@ class Admin::DashboardController < Admin::ApplicationController
   # Main dashboard page with all metrics and data
   def index
     @metrics = calculate_metrics
-    @revenue_chart_data = revenue_chart_data
-    @events_chart_data = events_status_chart_data
     @pending_movies = Movie.where(validation_status: :pending).limit(5)
     @recent_activities = recent_activities
     @quick_stats = quick_stats
@@ -22,10 +20,6 @@ class Admin::DashboardController < Admin::ApplicationController
       format.json do
         render json: {
           metrics: calculate_metrics,
-          charts: {
-            revenue: revenue_chart_data,
-            events: events_status_chart_data
-          },
           activities: recent_activities,
           status: 'success'
         }
@@ -40,37 +34,6 @@ class Admin::DashboardController < Admin::ApplicationController
     end
   end
 
-  # Export data functionality for various entity types
-  def export_data
-    data_type = params[:type] || 'users'
-
-    respond_to do |format|
-      format.json do
-        case data_type
-        when 'users'
-          data = export_users_data
-        when 'events'
-          data = export_events_data
-        when 'movies'
-          data = export_movies_data
-        when 'participations'
-          data = export_participations_data
-        else
-          data = { error: 'Type non supporté' }
-        end
-
-        render json: {
-          success: true,
-          data: data,
-          filename: "#{data_type}_export_#{Date.current.strftime('%Y%m%d')}.csv"
-        }
-      end
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { error: e.message }, status: 500 }
-    end
-  end
 
   # Real database backup functionality with pg_dump
   def backup_database
@@ -128,7 +91,7 @@ class Admin::DashboardController < Admin::ApplicationController
   # Calculate key business metrics for dashboard display
   def calculate_metrics
     {
-      total_revenue: calculate_total_revenue,
+      total_revenue: Participation.calculate_total_revenue,
       upcoming_events: Event.where(status: :upcoming).count,
       total_users: User.count,
       satisfaction: (Review.average(:rating) || 0).round(1)
@@ -137,73 +100,19 @@ class Admin::DashboardController < Admin::ApplicationController
 
   # Generate revenue chart data for the last 30 days
   def revenue_chart_data
-    (30.days.ago.to_date..Date.current).map do |date|
-      revenue = calculate_daily_revenue(date)
-      {
-        date: date.strftime("%d/%m"),
-        revenue: revenue,
-        formatted_revenue: number_to_currency(revenue)
-      }
-    end
-  end
-
-  # Calculate revenue for a specific date
-  def calculate_daily_revenue(date)
-    total_cents = Participation.includes(:event)
-                              .where(status: :confirmed)
-                              .where.not(stripe_payment_id: [nil, ''])
-                              .where(created_at: date.beginning_of_day..date.end_of_day)
-                              .sum { |p| (p.event.price_cents || 0) * p.seats }
-    
-    total_cents / 100.0
+    Participation.revenue_chart_data
   end
 
   # Generate events status distribution data for charts
   def events_status_chart_data
-    Event.group(:status).count.map do |status, count|
-      total = Event.count
-      {
-        status: status.humanize,
-        count: count,
-        percentage: total.zero? ? 0 : ((count.to_f / total) * 100).round(1)
-      }
-    end
+    Event.events_status_chart_data
   end
 
   # Aggregate recent activities from participations and movies
   def recent_activities
     activities = []
-
-    # Recent participations
-    Participation.includes(:user, :event)
-                 .order(created_at: :desc)
-                 .limit(3)
-                 .each do |participation|
-      activities << {
-        type: 'participation',
-        title: 'Nouvelle réservation',
-        description: "#{participation.user&.full_name} • #{participation.event&.title}",
-        time_ago: time_ago_in_words(participation.created_at),
-        icon: 'ticket-alt',
-        color: 'primary'
-      }
-    end
-
-    # Recent movies
-    Movie.includes(:user)
-         .order(created_at: :desc)
-         .limit(2)
-         .each do |movie|
-      activities << {
-        type: 'movie',
-        title: 'Nouveau film ajouté',
-        description: "\"#{movie.title}\" par #{movie.user&.full_name}",
-        time_ago: time_ago_in_words(movie.created_at),
-        icon: 'film',
-        color: 'blue-400'
-      }
-    end
-
+    activities += Participation.recent_activities
+    activities += Movie.recent_activities
     activities.sort_by { |a| a[:time_ago] }.first(5)
   end
 
@@ -217,30 +126,11 @@ class Admin::DashboardController < Admin::ApplicationController
     }
   end
 
-  # Calculate total revenue from confirmed participations
-  def calculate_total_revenue
-    # Use includes instead of joins for better performance and to avoid potential issues
-    total_cents = Participation.includes(:event)
-                              .where(status: :confirmed)
-                              .where.not(stripe_payment_id: [nil, ''])
-                              .sum { |p| (p.event.price_cents || 0) * p.seats }
-    
-    total_cents / 100.0
-  end
-
-  # Helper method for confirmed participations with event joins
-  def confirmed_participations
-    Participation.where(status: :confirmed).joins(:event)
-  end
-
-  # Export users data to CSV format
+  # Export data methods using model methods
   def export_users_data
-    User.select(:id, :email, :first_name, :last_name, :role, :created_at)
-        .limit(1000)
-        .map(&:attributes)
+    User.export_data
   end
 
-  # Export events data to CSV format
   def export_events_data
     Event.includes(:movie)
          .select(:id, :title, :venue_name, :event_date, :max_capacity, :status)
@@ -248,15 +138,10 @@ class Admin::DashboardController < Admin::ApplicationController
          .map(&:attributes)
   end
 
-  # Export movies data to CSV format
   def export_movies_data
-    Movie.includes(:user)
-         .select(:id, :title, :director, :year, :validation_status, :created_at)
-         .limit(1000)
-         .map(&:attributes)
+    Movie.export_data
   end
 
-  # Export participations data to CSV format
   def export_participations_data
     Participation.includes(:user, :event)
                  .select(:id, :user_id, :event_id, :seats, :status, :created_at)
@@ -436,4 +321,5 @@ class Admin::DashboardController < Admin::ApplicationController
   def maintenance_mode_active?
     File.exist?(MAINTENANCE_FILE)
   end
+
 end

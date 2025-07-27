@@ -44,6 +44,24 @@
 }
 
 
+/* Contrôle GPS intégré aux contrôles Leaflet */
+.leaflet-control-gps {
+  margin-bottom: 5px !important;
+}
+
+.leaflet-control-gps-button {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1f2937 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-control-gps-button:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  color: white !important;
+  transform: scale(1.05);
+}
+
 /* Contrôle plein écran intégré aux contrôles Leaflet */
 .leaflet-control-fullscreen {
   margin-top: 5px !important;

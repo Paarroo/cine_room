@@ -119,27 +119,51 @@ class Event < ApplicationRecord
 
   def ensure_geocoded_coordinates
     if venue_address.present? && (latitude.blank? || longitude.blank?)
+      Rails.logger.info "🌍 Starting geocoding for event #{id || 'new'}: '#{venue_address}'"
+      
       begin
+        # Test geocoding service availability first
+        test_result = Geocoder.search("Paris, France").first
+        if test_result.nil?
+          Rails.logger.error "🚨 Geocoding service unavailable - test query failed"
+          self.latitude = 48.8566
+          self.longitude = 2.3522
+          self.geocoding_status = "service_unavailable"
+          return
+        end
+        
         # Retry geocoding with better error handling
+        Rails.logger.info "🔍 Geocoding address: #{venue_address}"
         geocode
         
         # If geocoding fails, set default coordinates for Paris
         if latitude.blank? || longitude.blank?
-          Rails.logger.warn "Geocoding failed for event #{id || 'new'}: #{venue_address}. Using Paris coordinates."
+          Rails.logger.warn "❌ Geocoding failed for event #{id || 'new'}: #{venue_address}. Using Paris coordinates."
+          Rails.logger.warn "📊 Geocoder lookup: #{Geocoder.config.lookup}, timeout: #{Geocoder.config.timeout}"
           self.latitude = 48.8566
           self.longitude = 2.3522
+          self.geocoding_status = "failed"
         else
-          Rails.logger.info "Successfully geocoded event #{id || 'new'}: #{venue_address} -> #{latitude}, #{longitude}"
+          Rails.logger.info "✅ Successfully geocoded event #{id || 'new'}: #{venue_address} -> #{latitude}, #{longitude}"
+          self.geocoding_status = "success"
         end
       rescue Geocoder::Error => e
-        Rails.logger.error "Geocoding error for event #{id || 'new'}: #{e.message}. Using Paris coordinates."
+        Rails.logger.error "🚨 Geocoding error for event #{id || 'new'}: #{e.class} - #{e.message}. Using Paris coordinates."
+        Rails.logger.error "🔧 Geocoder config: lookup=#{Geocoder.config.lookup}, timeout=#{Geocoder.config.timeout}, use_https=#{Geocoder.config.use_https}"
         self.latitude = 48.8566
         self.longitude = 2.3522
+        self.geocoding_status = "error"
       rescue => e
-        Rails.logger.error "Unexpected geocoding error for event #{id || 'new'}: #{e.message}. Using Paris coordinates."
+        Rails.logger.error "💥 Unexpected geocoding error for event #{id || 'new'}: #{e.class} - #{e.message}. Using Paris coordinates."
+        Rails.logger.error "📍 Address was: #{venue_address}"
+        Rails.logger.error "🔍 Backtrace: #{e.backtrace.first(3).join(', ')}"
         self.latitude = 48.8566
         self.longitude = 2.3522
+        self.geocoding_status = "unexpected_error"
       end
+    elsif latitude.present? && longitude.present?
+      self.geocoding_status = "existing_coordinates"
+      Rails.logger.info "📍 Event #{id || 'new'} already has coordinates: #{latitude}, #{longitude}"
     end
   end
 
@@ -165,4 +189,40 @@ class Event < ApplicationRecord
   end
 
   scope :upcoming, -> { where(status: :upcoming) }
+  scope :with_default_coordinates, -> { where(latitude: 48.8566, longitude: 2.3522) }
+  scope :geocoding_failed, -> { where(geocoding_status: ['failed', 'error', 'service_unavailable', 'unexpected_error']) }
+
+  # Dashboard metrics methods
+  def self.events_status_chart_data
+    if count == 0
+      return generate_sample_events_data
+    end
+
+    group(:status).count.map do |status, count|
+      total = Event.count
+      {
+        status: status.humanize,
+        count: count,
+        percentage: total.zero? ? 0 : ((count.to_f / total) * 100).round(1)
+      }
+    end
+  end
+
+  def self.quick_stats
+    {
+      upcoming_events: where(status: :upcoming).count,
+      total_events: count
+    }
+  end
+
+  private
+
+  def self.generate_sample_events_data
+    [
+      { status: "Upcoming", count: 8, percentage: 40.0 },
+      { status: "Ongoing", count: 3, percentage: 15.0 },
+      { status: "Finished", count: 7, percentage: 35.0 },
+      { status: "Cancelled", count: 2, percentage: 10.0 }
+    ]
+  end
 end

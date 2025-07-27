@@ -91,7 +91,7 @@ class Admin::DashboardController < Admin::ApplicationController
   # Calculate key business metrics for dashboard display
   def calculate_metrics
     {
-      total_revenue: calculate_total_revenue,
+      total_revenue: Participation.calculate_total_revenue,
       upcoming_events: Event.where(status: :upcoming).count,
       total_users: User.count,
       satisfaction: (Review.average(:rating) || 0).round(1)
@@ -100,83 +100,19 @@ class Admin::DashboardController < Admin::ApplicationController
 
   # Generate revenue chart data for the last 30 days
   def revenue_chart_data
-    # If no real data, generate sample data for testing
-    if Participation.where(status: :confirmed).count == 0
-      return generate_sample_revenue_data
-    end
-
-    (30.days.ago.to_date..Date.current).map do |date|
-      revenue = calculate_daily_revenue(date)
-      {
-        date: date.strftime("%d/%m"),
-        revenue: revenue,
-        formatted_revenue: number_to_currency(revenue)
-      }
-    end
-  end
-
-  # Calculate revenue for a specific date
-  def calculate_daily_revenue(date)
-    total_cents = Participation.includes(:event)
-                              .where(status: :confirmed)
-                              .where.not(stripe_payment_id: [nil, ''])
-                              .where(created_at: date.beginning_of_day..date.end_of_day)
-                              .sum { |p| (p.event.price_cents || 0) * p.seats }
-    
-    total_cents / 100.0
+    Participation.revenue_chart_data
   end
 
   # Generate events status distribution data for charts
   def events_status_chart_data
-    # If no events, generate sample data for testing
-    if Event.count == 0
-      return generate_sample_events_data
-    end
-
-    Event.group(:status).count.map do |status, count|
-      total = Event.count
-      {
-        status: status.humanize,
-        count: count,
-        percentage: total.zero? ? 0 : ((count.to_f / total) * 100).round(1)
-      }
-    end
+    Event.events_status_chart_data
   end
 
   # Aggregate recent activities from participations and movies
   def recent_activities
     activities = []
-
-    # Recent participations
-    Participation.includes(:user, :event)
-                 .order(created_at: :desc)
-                 .limit(3)
-                 .each do |participation|
-      activities << {
-        type: 'participation',
-        title: 'Nouvelle participation',
-        description: "#{participation.user&.full_name} • #{participation.event&.title}",
-        time_ago: time_ago_in_words(participation.created_at),
-        icon: 'ticket-alt',
-        color: 'primary'
-      }
-    end
-
-    # Recent movies
-    Movie.includes(:user)
-         .order(created_at: :desc)
-         .limit(2)
-         .each do |movie|
-      activities << {
-        type: 'movie',
-        title: 'Nouveau film ajouté',
-        description: "\"#{movie.title}\" par #{movie.user&.full_name}",
-        time_ago: time_ago_in_words(movie.created_at),
-        icon: 'film',
-        color: 'blue-400'
-      }
-    end
-
+    activities += Participation.recent_activities
+    activities += Movie.recent_activities
     activities.sort_by { |a| a[:time_ago] }.first(5)
   end
 
@@ -190,30 +126,11 @@ class Admin::DashboardController < Admin::ApplicationController
     }
   end
 
-  # Calculate total revenue from confirmed participations
-  def calculate_total_revenue
-    # Use includes instead of joins for better performance and to avoid potential issues
-    total_cents = Participation.includes(:event)
-                              .where(status: :confirmed)
-                              .where.not(stripe_payment_id: [nil, ''])
-                              .sum { |p| (p.event.price_cents || 0) * p.seats }
-    
-    total_cents / 100.0
-  end
-
-  # Helper method for confirmed participations with event joins
-  def confirmed_participations
-    Participation.where(status: :confirmed).joins(:event)
-  end
-
-  # Export users data to CSV format
+  # Export data methods using model methods
   def export_users_data
-    User.select(:id, :email, :first_name, :last_name, :role, :created_at)
-        .limit(1000)
-        .map(&:attributes)
+    User.export_data
   end
 
-  # Export events data to CSV format
   def export_events_data
     Event.includes(:movie)
          .select(:id, :title, :venue_name, :event_date, :max_capacity, :status)
@@ -221,15 +138,10 @@ class Admin::DashboardController < Admin::ApplicationController
          .map(&:attributes)
   end
 
-  # Export movies data to CSV format
   def export_movies_data
-    Movie.includes(:user)
-         .select(:id, :title, :director, :year, :validation_status, :created_at)
-         .limit(1000)
-         .map(&:attributes)
+    Movie.export_data
   end
 
-  # Export participations data to CSV format
   def export_participations_data
     Participation.includes(:user, :event)
                  .select(:id, :user_id, :event_id, :seats, :status, :created_at)
@@ -410,29 +322,4 @@ class Admin::DashboardController < Admin::ApplicationController
     File.exist?(MAINTENANCE_FILE)
   end
 
-  # Generate sample revenue data for testing when no real data exists
-  def generate_sample_revenue_data
-    (30.days.ago.to_date..Date.current).map do |date|
-      # Generate realistic sample revenue data
-      base_revenue = [0, 150, 250, 400, 350, 500, 300, 200].sample
-      daily_variation = rand(-50..100)
-      revenue = [0, base_revenue + daily_variation].max
-
-      {
-        date: date.strftime("%d/%m"),
-        revenue: revenue,
-        formatted_revenue: number_to_currency(revenue)
-      }
-    end
-  end
-
-  # Generate sample events data for testing when no real data exists
-  def generate_sample_events_data
-    [
-      { status: "Upcoming", count: 8, percentage: 40.0 },
-      { status: "Ongoing", count: 3, percentage: 15.0 },
-      { status: "Finished", count: 7, percentage: 35.0 },
-      { status: "Cancelled", count: 2, percentage: 10.0 }
-    ]
-  end
 end

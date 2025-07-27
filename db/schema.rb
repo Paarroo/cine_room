@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_27_072852) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_27_210324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,10 +57,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_072852) do
     t.decimal "longitude", precision: 10, scale: 6
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "validation_status", default: 0, null: false
+    t.bigint "created_by_id"
+    t.bigint "validated_by_id"
+    t.datetime "validated_at"
+    t.string "geocoding_status", default: "pending"
+    t.index ["created_by_id"], name: "index_events_on_created_by_id"
     t.index ["event_date"], name: "index_events_on_event_date"
+    t.index ["geocoding_status"], name: "index_events_on_geocoding_status"
     t.index ["latitude", "longitude"], name: "index_events_on_latitude_and_longitude"
     t.index ["movie_id"], name: "index_events_on_movie_id"
     t.index ["status"], name: "index_events_on_status"
+    t.index ["validated_by_id"], name: "index_events_on_validated_by_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -278,6 +286,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_072852) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "events", "movies"
+  add_foreign_key "events", "users", column: "created_by_id"
+  add_foreign_key "events", "users", column: "validated_by_id"
   add_foreign_key "favorites", "movies"
   add_foreign_key "favorites", "users"
   add_foreign_key "movies", "users"

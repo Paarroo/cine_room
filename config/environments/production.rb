@@ -70,12 +70,11 @@ Rails.application.configure do
   }
 
 
-  # Use SolidQueue for background jobs (fallback to inline if SolidQueue fails)
-  config.active_job.queue_adapter = ENV.fetch('ACTIVE_JOB_QUEUE_ADAPTER', 'solid_queue').to_sym
+  # Force SolidQueue for background jobs in production
+  config.active_job.queue_adapter = :solid_queue
   
-  if config.active_job.queue_adapter == :solid_queue
-    config.solid_queue.connects_to = { database: { writing: :queue } }
-  end
+  # Configure SolidQueue database connection
+  config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

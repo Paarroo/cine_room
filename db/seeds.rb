@@ -10,8 +10,12 @@ if Rails.env.production?
   # Enable seed mode to skip poster validation
   Rails.application.config.seed_in_progress = true
   
-  # Disable movie validations for seeding
-  Movie.skip_callback(:validate, :before, :authorship_must_be_confirmed)
+  # Temporarily disable authorship validation for seeding
+  Movie.class_eval do
+    def authorship_must_be_confirmed
+      # Skip validation during seeding
+    end
+  end
   
   # Disable welcome email during seeding
   User.skip_callback(:create, :after, :send_welcome_email)
@@ -353,8 +357,14 @@ if Rails.env.production?
   # Disable seed mode
   Rails.application.config.seed_in_progress = false
   
-  # Re-enable movie validations for live app
-  Movie.set_callback(:validate, :before, :authorship_must_be_confirmed)
+  # Restore authorship validation for live app
+  Movie.class_eval do
+    def authorship_must_be_confirmed
+      if authorship_confirmed != "1"
+        errors.add(:base, "Tu dois confirmer être l'auteur ou l'autrice de cette vidéo pour pouvoir la publier.")
+      end
+    end
+  end
   
   # Re-enable welcome email callback
   User.set_callback(:create, :after, :send_welcome_email)

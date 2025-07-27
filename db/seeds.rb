@@ -7,6 +7,9 @@ puts "🎬 Seeding CinéRoom database with FactoryBot & Faker..."
 if Rails.env.production?
   puts "🔧 Production mode - optimizing seed process..."
   
+  # Enable seed mode to skip poster validation
+  Rails.application.config.seed_in_progress = true
+  
   # Disable welcome email during seeding
   User.skip_callback(:create, :after, :send_welcome_email)
   
@@ -219,6 +222,9 @@ end
 # Re-enable production settings
 if Rails.env.production?
   puts "🔄 Re-enabling production settings..."
+  
+  # Disable seed mode
+  Rails.application.config.seed_in_progress = false
   
   # Re-enable welcome email callback
   User.set_callback(:create, :after, :send_welcome_email)

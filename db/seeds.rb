@@ -10,6 +10,9 @@ if Rails.env.production?
   # Enable seed mode to skip poster validation
   Rails.application.config.seed_in_progress = true
   
+  # Disable movie validations for seeding
+  Movie.skip_callback(:validate, :before, :authorship_must_be_confirmed)
+  
   # Disable welcome email during seeding
   User.skip_callback(:create, :after, :send_welcome_email)
   
@@ -54,7 +57,7 @@ creators = FactoryBot.create_list(:user, 8, :creator)
 puts "🎥 Creating approved movies..."
 approved_movies = []
 creators.each do |creator|
-  movies = FactoryBot.create_list(:movie, rand(2..5), :approved, user: creator, validated_by: admin)
+  movies = FactoryBot.create_list(:movie, rand(2..5), :approved, user: creator)
   approved_movies.concat(movies)
 end
 
@@ -225,6 +228,9 @@ if Rails.env.production?
   
   # Disable seed mode
   Rails.application.config.seed_in_progress = false
+  
+  # Re-enable movie validations for live app
+  Movie.set_callback(:validate, :before, :authorship_must_be_confirmed)
   
   # Re-enable welcome email callback
   User.set_callback(:create, :after, :send_welcome_email)

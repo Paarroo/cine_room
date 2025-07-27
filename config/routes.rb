@@ -271,7 +271,7 @@ Rails.application.routes.draw do
   end
 
   resources :reviews, only: [ :index, :show ] do
-    # Actions d'interaction comme ressources nested
+    # Interaction actions as nested resources
     resources :likes, only: [ :create, :destroy ]
     resources :reports, only: [ :create ]
 

@@ -42,7 +42,7 @@ FactoryBot.define do
         
       ]
 
-      # Génère un poster aléatoire depuis Unsplash (dev/test only)
+      # Generates a random poster from Unsplash (dev/test only)
       begin
         file = URI.open(urls.sample)
       rescue OpenURI::HTTPError => e

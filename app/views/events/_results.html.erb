@@ -3,10 +3,6 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
       <%= render partial: "event_card", collection: @events, as: :event %>
     </div>
-
-    <div class="flex justify-center mt-16">
-      <%#= paginate @events, theme: "tailwind" if @events.respond_to?(:total_pages) %>
-    </div>
   <% else %>
     <div class="text-center text-gray-400 py-16">Aucun événement trouvé</div>
   <% end %>

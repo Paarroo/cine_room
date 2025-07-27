@@ -55,12 +55,17 @@ class User < ApplicationRecord
     return if Rails.env.production? && Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress
     
     begin
+      # Skip analysis job to avoid ActiveJob issues
       avatar.attach(
         io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
         filename: "default-avatar.jpg",
         content_type: "image/jpeg"
       )
-    rescue Errno::ENOENT, StandardError => e
+      
+      # Skip ActiveStorage analysis to avoid job queue issues
+      avatar.blob.update!(metadata: { analyzed: true }) if avatar.attached?
+      
+    rescue Errno::ENOENT, ActiveStorage::IntegrityError, StandardError => e
       Rails.logger.warn "Avatar attachment failed: #{e.message}"
     end
   end

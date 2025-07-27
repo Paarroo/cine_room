@@ -73,8 +73,8 @@ Rails.application.configure do
   # Force SolidQueue for background jobs in production
   config.active_job.queue_adapter = :solid_queue
   
-  # Configure SolidQueue database connection
-  # config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Configure SolidQueue to use main database in production
+  # This avoids socket connection issues on Heroku
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

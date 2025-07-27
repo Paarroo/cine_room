@@ -70,7 +70,7 @@ class Webhooks::StripeController < ApplicationController
     )
 
     # Send ticket with QR code
-    TicketMailer.ticket_confirmation(participation).deliver_later
+    TicketMailer.ticket_confirmation(participation).deliver_now
     
     Rails.logger.info "Participation created via webhook: #{participation.id}"
   rescue => e

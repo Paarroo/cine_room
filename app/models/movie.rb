@@ -3,6 +3,7 @@ class Movie < ApplicationRecord
 
   before_update :prevent_update_if_approved
   after_update :promote_user_to_creator_if_approved
+  after_create :skip_analysis_in_production
 
   belongs_to :user
   belongs_to :validated_by, class_name: 'User', optional: true
@@ -10,7 +11,9 @@ class Movie < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_by_users, through: :favorites, source: :user
-  has_one_attached :poster
+  has_one_attached :poster do |attachable|
+    attachable.variant :thumb, resize_to_limit: [200, 300]
+  end
 
   validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
   validates :poster, presence: true, unless: -> { Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress }
@@ -90,6 +93,13 @@ class Movie < ApplicationRecord
   def promote_user_to_creator_if_approved
     if saved_change_to_validation_status? && validation_status == "approved"
       user.update(role: "creator") unless user.creator?
+    end
+  end
+
+  # Skip ActiveStorage analysis in production to prevent SolidQueue issues
+  def skip_analysis_in_production
+    if Rails.env.production? && poster.attached?
+      poster.blob.update(metadata: poster.blob.metadata.merge(analyzed: true))
     end
   end
 

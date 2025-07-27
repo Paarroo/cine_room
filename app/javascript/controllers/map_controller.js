@@ -28,9 +28,9 @@ export default class extends Controller {
       if (!this.retryCount) this.retryCount = 0
       this.retryCount++
       
-      if (this.retryCount > 50) {
-        console.error("❌ Leaflet failed to load after 5 seconds")
-        this.showFallback("Leaflet not loaded")
+      if (this.retryCount > 100) {
+        console.error("❌ Leaflet failed to load after 10 seconds")
+        this.showFallback("Carte non disponible - Leaflet non chargé")
         return
       }
       
@@ -49,6 +49,12 @@ export default class extends Controller {
     const lat = this.latitudeValue || 48.8566
     const lng = this.longitudeValue || 2.3522
 
+    // Validate coordinates
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      console.warn("❌ Invalid coordinates:", lat, lng, "- using Paris default")
+      this.showFallback("Coordonnées invalides - position par défaut")
+      return
+    }
 
     try {
       // Create the map
@@ -63,10 +69,15 @@ export default class extends Controller {
         attributionControl: true
       })
 
-      // Add tile layer
+      // Add tile layer with error handling
       const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
+        maxZoom: 19,
+        errorTileUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZGlhZ29uYWwiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxwYXRoIGQ9Ik0wLDBMNCw0TTQsMEwwLDQiIHN0cm9rZT0iI2NjYyIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2RpYWdvbmFsKSIvPjwvc3ZnPg=='
+      })
+      
+      tileLayer.on('tileerror', (e) => {
+        console.warn('Map tile failed to load:', e.tile.src)
       })
       
       tileLayer.addTo(this.map)
@@ -123,7 +134,16 @@ export default class extends Controller {
 
     } catch (error) {
       console.error("❌ Error creating map:", error)
-      this.showFallback(`Erreur: ${error.message}`)
+      // Different error messages based on error type
+      let errorMessage = "Erreur de chargement de la carte"
+      if (error.message.includes('map container')) {
+        errorMessage = "Conteneur de carte invalide"
+      } else if (error.message.includes('network')) {
+        errorMessage = "Erreur réseau - carte non disponible"
+      } else if (error.message.includes('tiles')) {
+        errorMessage = "Erreur de chargement des tuiles"
+      }
+      this.showFallback(errorMessage)
     }
   }
 

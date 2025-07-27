@@ -10,6 +10,8 @@ CinéRoom is a modern Ruby on Rails 8.0 platform that transforms independent fil
 
 **🌐 Live Demo**: [cineroom-95309b4cb0ca.herokuapp.com](https://cineroom-95309b4cb0ca.herokuapp.com/)
 
+**🌐 Trello**: [cineroom-Trello](https://trello.com/invite/b/68651832a1ddaea497e9ffaa/ATTI2bdb69d4748f0e5cbaf6b5f7b78dc7de413EA373/cineroom)
+
 ---
 
 ## 🎯 Key Features & User Journeys
@@ -43,6 +45,40 @@ CinéRoom is a modern Ruby on Rails 8.0 platform that transforms independent fil
 - **Analytics** dashboard for revenue and attendance tracking
 - **GDPR-compliant** user data management with cookie consent
 - **Comprehensive** movie approval workflow management
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Homepage
+
+![Homepage](docs/screenshots/homepage.png)
+_Discover upcoming exclusive cinema events with elegant filtering and search capabilities_
+
+### 🎬 Event Details
+
+![Event Detail Page](docs/screenshots/event-detail.png)
+_Complete event information with venue details, pricing, and secure booking functionality_
+
+### 👤 User Dashboard
+
+![User Dashboard](docs/screenshots/dashboard.png)
+_Personal space for managing bookings, reviews, and favorite movies_
+
+### ⚡ Admin Interface
+
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+_Comprehensive admin panel for managing events, users, and analytics_
+
+### 💳 Payment Flow
+
+![Payment Process](docs/screenshots/payment.png)
+_Secure Stripe integration for seamless booking experience_
+
+### 📱 Mobile Responsive
+
+![Mobile View](docs/screenshots/mobile.png)
+_Optimized mobile experience for on-the-go booking_
 
 ---
 

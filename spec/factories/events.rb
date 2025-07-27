@@ -23,6 +23,16 @@ FactoryBot.define do
       event_date { rand(6.months.ago..1.week.ago).to_date }
     end
 
+    trait :finished do
+      status { :completed }
+      event_date { rand(6.months.ago..1.week.ago).to_date }
+    end
+
+    trait :ongoing do
+      status { :upcoming }
+      event_date { 1.day.ago.to_date }
+    end
+
     trait :sold_out do
       status { :sold_out }
       event_date { rand(1.week.from_now..1.month.from_now).to_date }

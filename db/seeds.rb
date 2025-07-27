@@ -3,26 +3,25 @@ require 'factory_bot_rails'
 
 puts "Seeding CinéRoom database with FactoryBot & Faker..."
 
+# Enable seed mode to skip poster validation in all environments
+Rails.application.config.seed_in_progress = true
+
+# Temporarily disable validations for seeding in all environments
+Movie.class_eval do
+  def authorship_must_be_confirmed
+    # Skip validation during seeding
+  end
+end
+
+Event.class_eval do
+  def event_date_must_be_at_least_one_week_from_now
+    # Skip validation during seeding
+  end
+end
+
 # Production optimizations
 if Rails.env.production?
   puts "Production mode - optimizing seed process..."
-  
-  # Enable seed mode to skip poster validation
-  Rails.application.config.seed_in_progress = true
-  
-  # Temporarily disable authorship validation for seeding
-  Movie.class_eval do
-    def authorship_must_be_confirmed
-      # Skip validation during seeding
-    end
-  end
-  
-  # Temporarily disable event date validation for seeding
-  Event.class_eval do
-    def event_date_must_be_at_least_one_week_from_now
-      # Skip validation during seeding
-    end
-  end
   
   # Disable welcome email during seeding
   User.skip_callback(:create, :after, :send_welcome_email)

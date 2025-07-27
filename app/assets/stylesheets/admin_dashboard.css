@@ -262,16 +262,66 @@
   color: rgb(251, 146, 60);
 }
 
-/* ===== RESPONSIVE NAVBAR CENTERING ===== */
-@media (min-width: 1024px) {
+/* ===== RESPONSIVE NAVBAR COMPLETE ===== */
+
+/* Desktop - Large screens */
+@media (min-width: 1280px) {
   [data-responsive-transform] {
     transform: translateX(-80px);
+    max-width: 80rem; /* 7xl */
   }
 }
 
-@media (max-width: 1023px) {
+/* Desktop - Medium screens */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  [data-responsive-transform] {
+    transform: translateX(-40px);
+    max-width: 72rem; /* 6xl */
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
   [data-responsive-transform] {
     transform: translateX(0px);
+    max-width: 64rem; /* 5xl */
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .admin-nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  [data-responsive-transform] {
+    transform: translateX(0px);
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .admin-navbar .flex.justify-between.items-center {
+    align-items: center;
+    height: 4rem; /* Force height consistency */
+  }
+  
+  .admin-navbar .flex.flex-col span:first-child {
+    font-size: 1.125rem; /* text-lg */
+  }
+  
+  .admin-navbar .flex.flex-col span:last-child {
+    display: none;
+  }
+  
+  /* Fix burger menu alignment */
+  .admin-navbar button.lg\:hidden {
+    margin-top: 0;
+    margin-bottom: 0;
+    align-self: center;
   }
 }
 

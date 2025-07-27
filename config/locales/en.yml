@@ -1,79 +1,97 @@
 ---
 en:
-  active_admin:
-    actions:
-      confirm: Êtes-vous sûr ?
-      destroy: Supprimer
-      edit: Modifier %{resource}
-      new: Nouveau %{resource}
-    dashboard:
-      welcome: Bienvenue sur le tableau de bord d'administration
-    headers:
-      filters: Filtres
-    menu:
-      creators: Créateurs
-      dashboard: Tableau de bord
-      events: Événements
-      movies: Films
-      users: Utilisateurs
+  hello: Hello
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d %b"
+      long: "%d %B %Y"
+      weekday: "%A %d %B %Y"
+
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d %b %H:%M"
+      long: "%A %d %B %Y at %H:%M"
+
   activerecord:
     errors:
       messages:
         record_invalid: "Record invalid"
+    models:
+      creator: Creator
+      event: Event
+      movie: Movie
+      user: User
     attributes:
       creator:
-        bio: Biographie
+        bio: Biography
       event:
         event_date: Date
-        start_time: Heure de début
+        start_time: Start time
+        title: Title
+        venue_name: Venue
+        venue_address: Venue address
+        max_capacity: Max capacity
+        price_cents: Price
       movie:
-        director: Réalisateur
-        duration: Durée
+        director: Director
+        duration: Duration
         genre: Genre
-        title: Titre
-        year: Année
+        title: Title
+        year: Year
+        trailer_url: Trailer
       user:
-        current_password: Mot de passe actuel
-        email: E‑mail
-        first_name: Prénom
-        last_name: Nom
-        password: Mot de passe
+        current_password: Current password
+        email: Email
+        first_name: First name
+        last_name: Last name
+        password: Password
         password_confirmation: Confirmation
-        remember_me: Se souvenir de moi
-    models:
-      creator: Créateur
-      event: Événement
-      movie: Film
-      user: Utilisateur
-  date:
-    formats:
-      default: "%d/%m/%Y"
-      long: "%d %B %Y"
-  devise:
-    shared:
-      links:
-        didn_t_receive_confirmation_instructions: Instructions de confirmation non
-          reçues ?
-        didn_t_receive_unlock_instructions: Instructions de déblocage non reçues ?
-        forgot_your_password: Mot de passe oublié ?
-        sign_in: Se connecter
-        sign_in_with: Se connecter avec %{provider}
-        sign_up: S'inscrire
+        remember_me: Remember me
+
   errors:
     format: "%{attribute} %{message}"
     messages:
-      blank: ne peut pas être vide
-      invalid: n’est pas valide
-      not_found: introuvable
-      not_saved: Not saved
-      too_long: est trop long (maximum %{count} caractères)
-      too_short: est trop court (minimum %{count} caractères)
-  hello: Hello world
-  time:
-    formats:
-      default: "%d/%m/%Y %H:%M"
+      blank: can't be blank
+      invalid: is not valid
+      not_found: not found
+      not_saved: not saved
+      too_long: is too long (maximum %{count} characters)
+      too_short: is too short (minimum %{count} characters)
+      taken: has already been taken
+      confirmation: doesn't match confirmation
+
   views:
     actions:
-      cancel: Annuler
-      save: Enregistrer
-      submit: Soumettre
+      cancel: Cancel
+      save: Save
+      submit: Submit
+
+  active_admin:
+    dashboard:
+      welcome: Welcome to the administration dashboard
+    actions:
+      confirm: Are you sure?
+      destroy: Delete
+      edit: Edit %{resource}
+      new: New %{resource}
+    headers:
+      filters: Filters
+    menu:
+      creators: Creators
+      dashboard: Dashboard
+      events: Events
+      movies: Movies
+      users: Users
+
+  devise:
+    shared:
+      links:
+        didn_t_receive_confirmation_instructions: Didn't receive confirmation instructions?
+        didn_t_receive_unlock_instructions: Didn't receive unlock instructions?
+        forgot_your_password: Forgot your password?
+        sign_in: Sign in
+        sign_in_with: Sign in with %{provider}
+        sign_up: Sign up

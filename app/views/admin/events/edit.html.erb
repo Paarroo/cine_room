@@ -361,12 +361,20 @@
           <% end %>
 
           <!-- Delete Event -->
-          <%= button_to admin_event_path(@event),
-              method: :delete,
-              class: "flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full",
-              data: { confirm: "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible." } do %>
+          <button
+            type="button"
+            class="flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full"
+            data-controller="admin-actions"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_event_path(@event) %>"
+            data-method="DELETE"
+            data-confirm="Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible."
+            data-success-message="Événement supprimé"
+            data-action-type="deletion"
+          >
             <i class="fas fa-trash mr-2"></i>
             Supprimer l'événement
+          </button>
           <% end %>
         </div>
       </div>

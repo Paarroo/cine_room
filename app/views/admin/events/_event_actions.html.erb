@@ -8,38 +8,56 @@
         </h3>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-controller="admin-actions">
         <!-- Complete Event -->
         <% if @event.upcoming? %>
-          <%= button_to admin_event_path(@event),
-              method: :patch,
-              params: { status: 'completed' },
-              class: "w-full px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-              data: { confirm: "Marquer cet événement comme terminé ?" } do %>
+          <button
+            type="button"
+            class="w-full px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_event_path(@event) %>"
+            data-method="PATCH"
+            data-params='{"status": "completed"}'
+            data-confirm="Marquer cet événement comme terminé ?"
+            data-success-message="Événement marqué comme terminé"
+            data-action-type="status-update"
+          >
             <i class="fas fa-check-circle mr-2"></i>Marquer terminé
-          <% end %>
+          </button>
         <% end %>
 
         <!-- Cancel Event -->
         <% if @event.upcoming? || @event.sold_out? %>
-          <%= button_to admin_event_path(@event),
-              method: :patch,
-              params: { status: 'cancelled' },
-              class: "w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-              data: { confirm: "Annuler cet événement ?" } do %>
+          <button
+            type="button"
+            class="w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_event_path(@event) %>"
+            data-method="PATCH"
+            data-params='{"status": "cancelled"}'
+            data-confirm="Annuler cet événement ?"
+            data-success-message="Événement annulé"
+            data-action-type="status-update"
+          >
             <i class="fas fa-times-circle mr-2"></i>Annuler événement
-          <% end %>
+          </button>
         <% end %>
 
         <!-- Reopen Event -->
         <% if @event.cancelled? %>
-          <%= button_to admin_event_path(@event),
-              method: :patch,
-              params: { status: 'upcoming' },
-              class: "w-full px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-              data: { confirm: "Rouvrir cet événement ?" } do %>
+          <button
+            type="button"
+            class="w-full px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_event_path(@event) %>"
+            data-method="PATCH"
+            data-params='{"status": "upcoming"}'
+            data-confirm="Rouvrir cet événement ?"
+            data-success-message="Événement rouvert"
+            data-action-type="status-update"
+          >
             <i class="fas fa-undo mr-2"></i>Rouvrir événement
-          <% end %>
+          </button>
         <% end %>
 
         <!-- Export Participations -->
@@ -71,12 +89,18 @@
         <% end %>
 
         <!-- Delete Event -->
-        <%= button_to admin_event_path(@event),
-            method: :delete,
-            class: "w-full px-6 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-            data: { confirm: "Supprimer définitivement cet événement ? Cette action est irréversible." } do %>
+        <button
+          type="button"
+          class="w-full px-6 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+          data-action="click->admin-actions#executeAction"
+          data-url="<%= admin_event_path(@event) %>"
+          data-method="DELETE"
+          data-confirm="Supprimer définitivement cet événement ? Cette action est irréversible."
+          data-success-message="Événement supprimé"
+          data-action-type="deletion"
+        >
           <i class="fas fa-trash mr-2"></i>Supprimer
-        <% end %>
+        </button>
       </div>
 
       <!-- Technical Information -->

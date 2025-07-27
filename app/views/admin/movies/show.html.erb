@@ -86,22 +86,34 @@
 
             <!-- Action Buttons -->
             <% if @movie.pending? %>
-              <div class="flex space-x-3 justify-center">
+              <div class="flex space-x-3 justify-center" data-controller="admin-actions">
                 <!-- Validate Button -->
-                <%= button_to validate_admin_movie_path(@movie),
-                    method: :patch,
-                    class: "flex-1 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-                    data: { confirm: "Valider ce film ?" } do %>
+                <button
+                  type="button"
+                  class="flex-1 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+                  data-action="click->admin-actions#executeAction"
+                  data-url="<%= validate_admin_movie_path(@movie) %>"
+                  data-method="PATCH"
+                  data-confirm="Valider ce film ?"
+                  data-success-message="Film validé avec succès"
+                  data-action-type="validation"
+                >
                   <i class="fas fa-check mr-2"></i>Valider
-                <% end %>
+                </button>
 
                 <!-- Reject Button -->
-                <%= button_to reject_admin_movie_path(@movie),
-                    method: :patch,
-                    class: "flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center",
-                    data: { confirm: "Rejeter ce film ?" } do %>
+                <button
+                  type="button"
+                  class="flex-1 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors font-semibold flex items-center justify-center"
+                  data-action="click->admin-actions#executeAction"
+                  data-url="<%= reject_admin_movie_path(@movie) %>"
+                  data-method="PATCH"
+                  data-confirm="Rejeter ce film ?"
+                  data-success-message="Film rejeté"
+                  data-action-type="validation"
+                >
                   <i class="fas fa-times mr-2"></i>Rejeter
-                <% end %>
+                </button>
               </div>
             <% end %>
           </div>

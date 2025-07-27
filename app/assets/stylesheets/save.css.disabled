@@ -1,0 +1,168 @@
+/* ===== DASHBOARD HEADER STYLES ===== */
+
+/* Dashboard Header Container */
+.dashboard-header {
+  position: relative;
+  z-index: 10;
+  padding-top: 0 !important;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Welcome Section Styling */
+.welcome-section {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--admin-primary), transparent);
+  opacity: 0.6;
+}
+
+/* Status Indicators */
+.status-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.online {
+  background: var(--admin-success);
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+
+/* Notification Badges */
+.notification-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--admin-primary);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--admin-transition-normal);
+}
+
+.notification-badge:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.notification-badge--blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--admin-accent);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.notification-badge--blue:hover {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+/* Gradient Text Animation */
+.gradient-text {
+  background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite alternate;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes gradientShift {
+  0% {
+    background: linear-gradient(135deg, #fbbf24, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  100% {
+    background: linear-gradient(135deg, #8b5cf6, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@keyframes adminNavActivate {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+  .admin-nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .admin-nav-link i {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  div[class*="admin-dashboard"] {
+    padding-top: 7rem !important;
+  }
+
+  .dashboard-header {
+    padding: 0 1rem !important;
+  }
+
+  .welcome-section {
+    padding: 1.5rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  div[class*="admin-dashboard"] {
+    padding-top: 6.5rem !important;
+  }
+}
+
+/* ===== HOVER EFFECTS ===== */
+
+/* Animation for active nav links */
+.admin-nav-link.active {
+  animation: adminNavActivate 0.4s ease-out;
+}
+
+/* Hover effects for desktop only */
+@media (hover: hover) {
+  .admin-nav-link:hover {
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+  }
+}

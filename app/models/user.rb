@@ -48,22 +48,21 @@ class User < ApplicationRecord
   def attach_default_avatar
     return if avatar.attached?
     
-    # Skip avatar attachment completely in production to avoid file access issues
-    return if Rails.env.production?
-    
     begin
-      # Only attach default avatar in development/test environments
+      # Use Cloudinary default avatar URL instead of local file
+      require 'open-uri'
+      
       avatar.attach(
-        io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
-        filename: "default-avatar.jpg",
-        content_type: "image/jpeg"
+        io: URI.open("https://res.cloudinary.com/dhusbkszr/image/upload/v1753621019/ocuvyd737vat2fwwl76t0oyrbds7.png"),
+        filename: "default-avatar.png",
+        content_type: "image/png"
       )
       
-      # Skip ActiveStorage analysis to avoid job queue issues
+      # Mark as analyzed to skip ActiveStorage analysis job
       avatar.blob.update!(metadata: { analyzed: true }) if avatar.attached?
       
-    rescue Errno::ENOENT, ActiveStorage::IntegrityError, StandardError => e
-      Rails.logger.warn "Avatar attachment failed: #{e.message}"
+    rescue OpenURI::HTTPError, SocketError, StandardError => e
+      Rails.logger.warn "Default avatar attachment failed: #{e.message}"
     end
   end
 

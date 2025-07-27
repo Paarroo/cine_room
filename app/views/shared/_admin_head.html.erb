@@ -1,0 +1,4 @@
+<%# Partial pour les ressources CSS/JS spécifiques à l'admin %>
+<% if controller_path.start_with?('admin/') %>
+  <%= stylesheet_link_tag "admin_dashboard", "data-turbo-track": "reload" %>
+<% end %>

@@ -272,7 +272,7 @@
                 <div class="text-2xl font-bold text-blue-400 mb-1">
                   <%= @event.participations.count %>
                 </div>
-                <div class="text-sm text-gray-400">Réservations</div>
+                <div class="text-sm text-gray-400">Participations</div>
               </div>
 
               <div class="glass-subtle rounded-xl p-4 text-center">
@@ -361,12 +361,20 @@
           <% end %>
 
           <!-- Delete Event -->
-          <%= button_to admin_event_path(@event),
-              method: :delete,
-              class: "flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full",
-              data: { confirm: "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible." } do %>
+          <button
+            type="button"
+            class="flex items-center justify-center px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors w-full"
+            data-controller="admin-actions"
+            data-action="click->admin-actions#executeAction"
+            data-url="<%= admin_event_path(@event) %>"
+            data-method="DELETE"
+            data-confirm="Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible."
+            data-success-message="Événement supprimé"
+            data-action-type="deletion"
+          >
             <i class="fas fa-trash mr-2"></i>
             Supprimer l'événement
+          </button>
           <% end %>
         </div>
       </div>

@@ -9,8 +9,6 @@ class Admin::DashboardController < Admin::ApplicationController
   # Main dashboard page with all metrics and data
   def index
     @metrics = calculate_metrics
-    @revenue_chart_data = revenue_chart_data
-    @events_chart_data = events_status_chart_data
     @pending_movies = Movie.where(validation_status: :pending).limit(5)
     @recent_activities = recent_activities
     @quick_stats = quick_stats
@@ -22,10 +20,6 @@ class Admin::DashboardController < Admin::ApplicationController
       format.json do
         render json: {
           metrics: calculate_metrics,
-          charts: {
-            revenue: revenue_chart_data,
-            events: events_status_chart_data
-          },
           activities: recent_activities,
           status: 'success'
         }
@@ -106,6 +100,11 @@ class Admin::DashboardController < Admin::ApplicationController
 
   # Generate revenue chart data for the last 30 days
   def revenue_chart_data
+    # If no real data, generate sample data for testing
+    if Participation.where(status: :confirmed).count == 0
+      return generate_sample_revenue_data
+    end
+
     (30.days.ago.to_date..Date.current).map do |date|
       revenue = calculate_daily_revenue(date)
       {
@@ -129,6 +128,11 @@ class Admin::DashboardController < Admin::ApplicationController
 
   # Generate events status distribution data for charts
   def events_status_chart_data
+    # If no events, generate sample data for testing
+    if Event.count == 0
+      return generate_sample_events_data
+    end
+
     Event.group(:status).count.map do |status, count|
       total = Event.count
       {
@@ -150,7 +154,7 @@ class Admin::DashboardController < Admin::ApplicationController
                  .each do |participation|
       activities << {
         type: 'participation',
-        title: 'Nouvelle réservation',
+        title: 'Nouvelle participation',
         description: "#{participation.user&.full_name} • #{participation.event&.title}",
         time_ago: time_ago_in_words(participation.created_at),
         icon: 'ticket-alt',
@@ -404,5 +408,31 @@ class Admin::DashboardController < Admin::ApplicationController
   # Check if maintenance mode is currently active
   def maintenance_mode_active?
     File.exist?(MAINTENANCE_FILE)
+  end
+
+  # Generate sample revenue data for testing when no real data exists
+  def generate_sample_revenue_data
+    (30.days.ago.to_date..Date.current).map do |date|
+      # Generate realistic sample revenue data
+      base_revenue = [0, 150, 250, 400, 350, 500, 300, 200].sample
+      daily_variation = rand(-50..100)
+      revenue = [0, base_revenue + daily_variation].max
+
+      {
+        date: date.strftime("%d/%m"),
+        revenue: revenue,
+        formatted_revenue: number_to_currency(revenue)
+      }
+    end
+  end
+
+  # Generate sample events data for testing when no real data exists
+  def generate_sample_events_data
+    [
+      { status: "Upcoming", count: 8, percentage: 40.0 },
+      { status: "Ongoing", count: 3, percentage: 15.0 },
+      { status: "Finished", count: 7, percentage: 35.0 },
+      { status: "Cancelled", count: 2, percentage: 10.0 }
+    ]
   end
 end

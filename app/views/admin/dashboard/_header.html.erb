@@ -83,7 +83,7 @@
         <% if @quick_stats[:pending_participations] > 0 %>
           <div class="notification-badge notification-badge--blue  ml-3">
             <i class="fas fa-clock mr-2 text-accent"></i>
-            <span><%= @quick_stats[:pending_participations] %> réservation<%= @quick_stats[:pending_participations] > 1 ? 's' : '' %> en attente</span>
+            <span><%= @quick_stats[:pending_participations] %> participation<%= @quick_stats[:pending_participations] > 1 ? 's' : '' %> en attente</span>
           </div>
         <% end %>
       </div>

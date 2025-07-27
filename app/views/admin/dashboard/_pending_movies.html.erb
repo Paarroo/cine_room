@@ -36,16 +36,19 @@
               <i class="fas fa-eye mr-1"></i>Voir
             <% end %>
 
-            <%= button_to validate_admin_movie_path(movie),
-                method: :patch,
-                class: "px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors",
-                data: {
-                  confirm: "Valider ce film ?",
-                  turbo_method: :patch,
-                  turbo_frame: "_top"
-                } do %>
+            <button
+              type="button"
+              class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors"
+              data-controller="admin-actions"
+              data-action="click->admin-actions#executeAction"
+              data-url="<%= validate_admin_movie_path(movie) %>"
+              data-method="PATCH"
+              data-confirm="Valider ce film ?"
+              data-success-message="Film validé avec succès"
+              data-action-type="validation"
+            >
               <i class="fas fa-check mr-1"></i>Valider
-            <% end %>
+            </button>
           </div>
         </div>
       <% end %>

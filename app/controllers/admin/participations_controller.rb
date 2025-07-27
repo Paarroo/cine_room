@@ -101,35 +101,67 @@ class Admin::ParticipationsController < Admin::ApplicationController
   # Bulk operations
   def bulk_confirm
     participation_ids = params[:participation_ids] || []
-    return redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' if participation_ids.blank?
+    
+    Rails.logger.info "🎫 Bulk confirm called with IDs: #{participation_ids.inspect}"
+    
+    if participation_ids.blank?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'Aucune participation sélectionnée' }, status: 422 }
+        format.html { redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' }
+      end
+      return
+    end
 
-    result = bulk_confirm_participations(participation_ids) || { success: false, message: 'Erreur inconnue' }
+    result = bulk_confirm_participations(participation_ids) || { success: false, error: 'Erreur inconnue' }
+    Rails.logger.info "🎫 Bulk confirm result: #{result.inspect}"
 
     respond_to do |format|
       if result[:success]
         format.json { render json: { status: 'success', message: result[:message] } }
         format.html { redirect_to admin_participations_path, notice: result[:message] }
       else
-        format.json { render json: { status: 'error', message: result[:error] } }
-        format.html { redirect_to admin_participations_path, alert: result[:error] }
+        format.json { render json: { status: 'error', message: result[:error] || result[:message] }, status: 422 }
+        format.html { redirect_to admin_participations_path, alert: result[:error] || result[:message] }
       end
+    end
+  rescue => e
+    Rails.logger.error "🎫 Bulk confirm error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message }, status: 500 }
+      format.html { redirect_to admin_participations_path, alert: e.message }
     end
   end
 
   def bulk_cancel
     participation_ids = params[:participation_ids] || []
-    return redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' if participation_ids.blank?
+    
+    Rails.logger.info "🎫 Bulk cancel called with IDs: #{participation_ids.inspect}"
+    
+    if participation_ids.blank?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'Aucune participation sélectionnée' }, status: 422 }
+        format.html { redirect_to admin_participations_path, alert: 'Aucune participation sélectionnée' }
+      end
+      return
+    end
 
-    result = bulk_cancel_participations(participation_ids) || { success: false, message: 'Erreur inconnue' }
+    result = bulk_cancel_participations(participation_ids) || { success: false, error: 'Erreur inconnue' }
+    Rails.logger.info "🎫 Bulk cancel result: #{result.inspect}"
 
     respond_to do |format|
       if result[:success]
         format.json { render json: { status: 'success', message: result[:message] } }
         format.html { redirect_to admin_participations_path, notice: result[:message] }
       else
-        format.json { render json: { status: 'error', message: result[:error] } }
-        format.html { redirect_to admin_participations_path, alert: result[:error] }
+        format.json { render json: { status: 'error', message: result[:error] || result[:message] }, status: 422 }
+        format.html { redirect_to admin_participations_path, alert: result[:error] || result[:message] }
       end
+    end
+  rescue => e
+    Rails.logger.error "🎫 Bulk cancel error: #{e.message}"
+    respond_to do |format|
+      format.json { render json: { status: 'error', message: e.message }, status: 500 }
+      format.html { redirect_to admin_participations_path, alert: e.message }
     end
   end
 

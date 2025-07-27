@@ -2,13 +2,13 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
-      <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer" do %>
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
+      <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer hover:transform hover:scale-105 transition-all duration-300" do %>
+        <div class="w-10 h-10 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
           <i class="fas fa-film text-white text-lg"></i>
         </div>
         <div class="flex flex-col">
-          <span class="text-xl font-bold tracking-tight">CinéRoom</span>
-          <span class="text-xs text-muted uppercase tracking-widest">Cinéma Indépendant</span>
+          <span class="text-xl font-bold tracking-tight text-white">CinéRoom</span>
+          <span class="text-xs text-gold-400 uppercase tracking-widest font-semibold">Cinéma Indépendant</span>
         </div>
       <% end %>
 

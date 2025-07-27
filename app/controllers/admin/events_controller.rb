@@ -226,7 +226,7 @@ class Admin::EventsController < Admin::ApplicationController
          .each do |participation|
       activities << {
         type: 'participation',
-        title: 'Nouvelle réservation',
+        title: 'Nouvelle participation',
         description: "#{participation.user&.full_name} - #{participation.seats} place(s)",
         status: participation.status,
         created_at: participation.created_at

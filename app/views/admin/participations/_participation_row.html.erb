@@ -5,7 +5,8 @@
       type="checkbox"
       class="w-4 h-4 text-primary bg-transparent border-gray-300 rounded focus:ring-primary participation-checkbox"
       data-participation-id="<%= data[:id] %>"
-      onchange="updateBulkActions()"
+      data-admin-participations-target="participationCheckbox"
+      data-action="change->admin-participations#updateBulkActions"
     >
   </td>
 
@@ -24,27 +25,27 @@
   </td>
 
   <!-- Event -->
-  <td class="py-3 px-1 min-w-0 max-w-36">
+  <td class="py-3 px-1 min-w-0 max-w-48">
     <div class="text-white font-medium text-xs truncate">
-      <%= link_to truncate(data[:event_title], length: 15), admin_participation_path(data[:id]),
+      <%= link_to truncate(data[:event_title], length: 30), admin_participation_path(data[:id]),
           class: "hover:text-primary transition-colors" %>
     </div>
     <% if data[:event_link]&.venue_name %>
       <div class="text-gray-400 text-xs truncate">
-        <%= truncate(data[:event_link].venue_name, length: 12) %>
+        <%= truncate(data[:event_link].venue_name, length: 25) %>
       </div>
     <% end %>
   </td>
 
   <!-- Movie -->
-  <td class="py-3 px-1 min-w-0 max-w-28">
+  <td class="py-3 px-1 min-w-0 max-w-40">
     <% if data[:movie_title].present? %>
       <div class="flex items-center space-x-1">
         <div class="w-4 h-6 bg-gradient-to-br from-red-500 to-pink-600 rounded flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
           <%= data[:movie_title].first(1) %>
         </div>
         <div class="text-white text-xs truncate">
-          <%= truncate(data[:movie_title], length: 8) %>
+          <%= truncate(data[:movie_title], length: 20) %>
         </div>
       </div>
     <% else %>
@@ -118,32 +119,41 @@
       <!-- Action selon statut -->
       <% case data[:status] %>
       <% when 'pending' %>
-        <%= button_to admin_participation_path(data[:id]),
-            method: :patch,
-            params: { status: 'confirmed' },
-            class: "p-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors",
-            data: { confirm: "Confirmer ?" },
-            title: "Confirmer" do %>
+        <button
+          type="button"
+          class="p-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded text-xs transition-colors"
+          data-action="click->admin-participations#updateSingleStatus"
+          data-participation-id="<%= data[:id] %>"
+          data-new-status="confirmed"
+          data-confirm-message="Confirmer ?"
+          title="Confirmer"
+        >
           <i class="fas fa-check"></i>
-        <% end %>
+        </button>
       <% when 'confirmed' %>
-        <%= button_to admin_participation_path(data[:id]),
-            method: :patch,
-            params: { status: 'cancelled' },
-            class: "p-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors",
-            data: { confirm: "Annuler ?" },
-            title: "Annuler" do %>
+        <button
+          type="button"
+          class="p-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded text-xs transition-colors"
+          data-action="click->admin-participations#updateSingleStatus"
+          data-participation-id="<%= data[:id] %>"
+          data-new-status="cancelled"
+          data-confirm-message="Annuler ?"
+          title="Annuler"
+        >
           <i class="fas fa-times"></i>
-        <% end %>
+        </button>
       <% when 'cancelled' %>
-        <%= button_to admin_participation_path(data[:id]),
-            method: :patch,
-            params: { status: 'pending' },
-            class: "p-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors",
-            data: { confirm: "Restaurer ?" },
-            title: "Restaurer" do %>
+        <button
+          type="button"
+          class="p-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-xs transition-colors"
+          data-action="click->admin-participations#updateSingleStatus"
+          data-participation-id="<%= data[:id] %>"
+          data-new-status="pending"
+          data-confirm-message="Restaurer ?"
+          title="Restaurer"
+        >
           <i class="fas fa-undo"></i>
-        <% end %>
+        </button>
       <% end %>
     </div>
   </td>

@@ -7,7 +7,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("✅ seats_controller connected")
   }
 
   updatePrice(event) {

@@ -14,7 +14,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("🎬 Admin Movies controller connected")
     this.updateBulkActions()
   }
 

@@ -9,7 +9,6 @@ export default class extends Controller {
 
   connect() {
     if (this.isAdminValue) {
-      console.log("💬 Admin Flash connected")
       this.setupGlobalToastListener()
     } else {
       // Simple flash message with auto-remove

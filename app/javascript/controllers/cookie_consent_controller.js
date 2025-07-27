@@ -60,11 +60,9 @@ export default class extends Controller {
     
     // Switch change events for immediate visual feedback
     document.getElementById('analytics-cookies')?.addEventListener('change', (e) => {
-      console.log('Analytics cookies toggle:', e.target.checked)
     })
     
     document.getElementById('marketing-cookies')?.addEventListener('change', (e) => {
-      console.log('Marketing cookies toggle:', e.target.checked)
     })
     
     // Close modal when clicking outside
@@ -235,7 +233,6 @@ export default class extends Controller {
       this.setCookie('analytics_consent', validatedData.analytics ? 'true' : 'false', 365)
       this.setCookie('marketing_consent', validatedData.marketing ? 'true' : 'false', 365)
       
-      console.log('Cookie consent saved successfully:', validatedData)
       
     } catch (error) {
       console.error('Error saving cookie consent:', error)
@@ -299,7 +296,6 @@ export default class extends Controller {
     }
 
     // Log current consent state for debugging
-    console.log('Applied cookie settings:', {
       analytics: consentData.analytics,
       marketing: consentData.marketing,
       timestamp: consentData.timestamp
@@ -315,7 +311,6 @@ export default class extends Controller {
     }
     
     // Add your analytics initialization code here
-    console.log('Analytics cookies enabled')
   }
 
   disableAnalyticsCookies() {
@@ -328,7 +323,6 @@ export default class extends Controller {
     
     // Remove analytics cookies
     this.removeAnalyticsCookies()
-    console.log('Analytics cookies disabled')
   }
 
   enableMarketingCookies() {
@@ -339,7 +333,6 @@ export default class extends Controller {
       })
     }
     
-    console.log('Marketing cookies enabled')
   }
 
   disableMarketingCookies() {
@@ -352,7 +345,6 @@ export default class extends Controller {
     
     // Remove marketing cookies
     this.removeMarketingCookies()
-    console.log('Marketing cookies disabled')
   }
 
   removeAnalyticsCookies() {
@@ -558,34 +550,23 @@ window.CookieConsentController = {
     
     // Check localStorage
     const localStorage_data = localStorage.getItem('cookieConsent')
-    console.log('LocalStorage data:', localStorage_data)
     if (localStorage_data) {
       try {
-        console.log('Parsed localStorage:', JSON.parse(localStorage_data))
       } catch (e) {
         console.error('LocalStorage parsing error:', e)
       }
     }
     
     // Check HTTP cookies
-    console.log('HTTP Cookies:')
-    console.log('- cookie_consent:', document.cookie.match(/cookie_consent=([^;]*)/)?.[1] || 'not set')
-    console.log('- analytics_consent:', document.cookie.match(/analytics_consent=([^;]*)/)?.[1] || 'not set')
-    console.log('- marketing_consent:', document.cookie.match(/marketing_consent=([^;]*)/)?.[1] || 'not set')
     
     // Check banner state
     const banner = document.getElementById('cookie-consent-banner')
-    console.log('Banner element:', banner ? 'exists' : 'missing')
     if (banner) {
-      console.log('Banner display:', banner.style.display)
-      console.log('Banner classes:', banner.className)
     }
     
     // Check modal state
     const modal = document.getElementById('cookie-settings-modal')
-    console.log('Modal element:', modal ? 'exists' : 'missing')
     if (modal) {
-      console.log('Modal display:', modal.style.display)
     }
     
     console.groupEnd()

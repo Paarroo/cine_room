@@ -9,12 +9,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("🗺️ Map controller connected")
-    console.log("📍 Latitude:", this.latitudeValue)
-    console.log("📍 Longitude:", this.longitudeValue)
-    console.log("📏 Element dimensions:", this.element.offsetWidth, "x", this.element.offsetHeight)
-    console.log("🏢 Venue:", this.venueNameValue)
-    console.log("📮 Address:", this.venueAddressValue)
     
     // Hide placeholder immediately
     const placeholder = this.element.querySelector('.map-placeholder')
@@ -29,7 +23,6 @@ export default class extends Controller {
   initializeMap() {
     // Check if Leaflet is loaded
     if (typeof L === 'undefined') {
-      console.log("⏳ Leaflet not ready, retrying...")
       
       // Stop retrying after 10 seconds
       if (!this.retryCount) this.retryCount = 0
@@ -47,18 +40,15 @@ export default class extends Controller {
 
     // Check if element has dimensions
     if (this.element.offsetWidth === 0 || this.element.offsetHeight === 0) {
-      console.log("Element not ready, retrying...", this.element.offsetWidth, "x", this.element.offsetHeight)
       setTimeout(() => this.initializeMap(), 100)
       return
     }
 
-    console.log("Leaflet is ready, creating map...")
 
     // Use provided coordinates or default to Paris
     const lat = this.latitudeValue || 48.8566
     const lng = this.longitudeValue || 2.3522
 
-    console.log(`Creating map at: ${lat}, ${lng}`)
 
     try {
       // Create the map
@@ -128,10 +118,8 @@ export default class extends Controller {
       // Force refresh after initialization
       setTimeout(() => {
         this.map.invalidateSize()
-        console.log("Map size invalidated and refreshed")
       }, 300)
 
-      console.log("Map created successfully!")
 
     } catch (error) {
       console.error("❌ Error creating map:", error)
@@ -180,11 +168,9 @@ export default class extends Controller {
   }
 
   openInGps() {
-    console.log('🧭 Ouverture dans le GPS par défaut')
     
     // Vérifier si la géolocalisation est disponible
     if (!navigator.geolocation) {
-      console.log('❌ Géolocalisation non disponible')
       this.openGpsWithoutUserLocation()
       return
     }
@@ -198,7 +184,6 @@ export default class extends Controller {
         this.showGpsLoading(false)
         const userLat = position.coords.latitude
         const userLng = position.coords.longitude
-        console.log(`📍 Position utilisateur: ${userLat}, ${userLng}`)
         
         // Coordonnées de destination
         const destLat = this.latitudeValue || 48.8566
@@ -210,7 +195,6 @@ export default class extends Controller {
       },
       (error) => {
         this.showGpsLoading(false)
-        console.log('❌ Erreur géolocalisation:', error.message)
         this.handleGeolocationError(error)
         
         // Fallback: ouvrir sans position utilisateur
@@ -254,7 +238,6 @@ export default class extends Controller {
   openAppleMaps(lat, lng, address) {
     const url = `maps://?daddr=${lat},${lng}&q=${encodeURIComponent(address)}`
     window.location.href = url
-    console.log('🍎 Ouverture Apple Maps')
     
     // Fallback après 2 secondes si l'app ne s'ouvre pas
     setTimeout(() => {
@@ -265,7 +248,6 @@ export default class extends Controller {
   openAndroidGps(lat, lng, address) {
     const url = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address)})`
     window.location.href = url
-    console.log('🤖 Ouverture GPS Android')
     
     // Fallback après 2 secondes si l'app ne s'ouvre pas
     setTimeout(() => {
@@ -281,7 +263,6 @@ export default class extends Controller {
   openAppleMapsWithRoute(userLat, userLng, destLat, destLng, address) {
     const url = `maps://?saddr=${userLat},${userLng}&daddr=${destLat},${destLng}&q=${encodeURIComponent(address)}`
     window.location.href = url
-    console.log('🍎 Ouverture Apple Maps avec itinéraire')
     
     // Fallback après 2 secondes si l'app ne s'ouvre pas
     setTimeout(() => {
@@ -292,7 +273,6 @@ export default class extends Controller {
   openAndroidGpsWithRoute(userLat, userLng, destLat, destLng, address) {
     const url = `google.navigation:q=${destLat},${destLng}&mode=d`
     window.location.href = url
-    console.log('🤖 Ouverture navigation Android')
     
     // Fallback après 2 secondes si l'app ne s'ouvre pas
     setTimeout(() => {
@@ -308,13 +288,11 @@ export default class extends Controller {
   openOpenStreetMapDirections(lat, lng) {
     const url = `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`
     window.open(url, '_blank')
-    console.log('🗺️ Ouverture OpenStreetMap directions')
   }
 
   openOpenStreetMapDirectionsWithRoute(fromLat, fromLng, toLat, toLng) {
     const url = `https://www.openstreetmap.org/directions?from=${fromLat}%2C${fromLng}&to=${toLat}%2C${toLng}`
     window.open(url, '_blank')
-    console.log('🗺️ Ouverture OpenStreetMap avec itinéraire complet')
   }
 
   isIOS() {
@@ -346,22 +324,17 @@ export default class extends Controller {
     switch(error.code) {
       case error.PERMISSION_DENIED:
         message = 'Permission de géolocalisation refusée'
-        console.log('🚫 Permission GPS refusée')
         break
       case error.POSITION_UNAVAILABLE:
         message = 'Position non disponible'
-        console.log('📍 Position GPS non disponible')
         break
       case error.TIMEOUT:
         message = 'Timeout de géolocalisation'
-        console.log('⏰ Timeout GPS')
         break
       default:
-        console.log('❌ Erreur GPS inconnue:', error.message)
         break
     }
     
-    console.log(`ℹ️ ${message} - Ouverture sans position utilisateur`)
   }
 
   addResizeControl() {
@@ -405,7 +378,6 @@ export default class extends Controller {
   }
 
   openFullscreen() {
-    console.log('🖼️ Ouverture carte plein écran')
     
     // Créer le modal plein écran
     const modal = this.createModal()
@@ -470,7 +442,6 @@ export default class extends Controller {
 
   initializeFullscreenMap() {
     if (typeof L === 'undefined') {
-      console.log('⏳ Leaflet pas prêt pour la carte plein écran')
       return
     }
 
@@ -541,7 +512,6 @@ export default class extends Controller {
       // Forcer le redimensionnement
       setTimeout(() => {
         this.fullscreenMap.invalidateSize()
-        console.log('🗺️ Carte plein écran initialisée')
       }, 300)
 
     } catch (error) {
@@ -564,12 +534,10 @@ export default class extends Controller {
       // Restaurer le scroll du body
       document.body.style.overflow = ''
       
-      console.log('🖼️ Carte plein écran fermée')
     }
   }
 
   showFallback(reason) {
-    console.log("🎭 Showing fallback for:", reason)
     this.element.innerHTML = `
       <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #9ca3af; flex-direction: column; padding: 20px; text-align: center;">
         <div style="font-size: 32px; margin-bottom: 12px;">📍</div>

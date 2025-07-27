@@ -8,8 +8,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("💖 Favorites controller connected")
-    console.log(`Movie ID: ${this.movieIdValue}, Favorited: ${this.favoritedValue}`)
   }
 
   async toggle() {

@@ -12,7 +12,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("🔧 Admin Actions controller connected")
   }
 
   // Universal action handler for all admin operations

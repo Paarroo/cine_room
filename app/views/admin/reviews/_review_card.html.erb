@@ -135,30 +135,48 @@
     <% end %>
 
     <!-- Action Buttons based on status -->
-    <div class="flex space-x-2">
+    <div class="flex space-x-2" data-controller="admin-actions">
       <!-- Approve Button -->
-      <%= button_to approve_admin_review_path(review),
-          method: :patch,
-          class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors",
-          data: { confirm: "Approuver cet avis ?" } do %>
+      <button
+        type="button"
+        class="px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors"
+        data-action="click->admin-actions#executeAction"
+        data-url="<%= approve_admin_review_path(review) %>"
+        data-method="PATCH"
+        data-confirm="Approuver cet avis ?"
+        data-success-message="Avis approuvé"
+        data-action-type="approval"
+      >
         <i class="fas fa-check mr-1"></i>Approuver
-      <% end %>
+      </button>
 
       <!-- Flag Button -->
-      <%= button_to flag_admin_review_path(review),
-          method: :patch,
-          class: "px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-lg text-sm transition-colors",
-          data: { confirm: "Signaler cet avis ?" } do %>
+      <button
+        type="button"
+        class="px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 rounded-lg text-sm transition-colors"
+        data-action="click->admin-actions#executeAction"
+        data-url="<%= flag_admin_review_path(review) %>"
+        data-method="PATCH"
+        data-confirm="Signaler cet avis ?"
+        data-success-message="Avis signalé"
+        data-action-type="status-update"
+      >
         <i class="fas fa-flag mr-1"></i>Signaler
-      <% end %>
+      </button>
 
       <!-- Reject Button -->
-      <%= button_to reject_admin_review_path(review),
-          method: :patch,
-          class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors",
-          data: { confirm: "Rejeter cet avis ?" } do %>
+      <button
+        type="button"
+        class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors"
+        data-action="click->admin-actions#executeAction"
+        data-url="<%= reject_admin_review_path(review) %>"
+        data-method="PATCH"
+        data-confirm="Rejeter cet avis ?"
+        data-success-message="Avis rejeté"
+        data-action-type="approval"
+      >
         <i class="fas fa-times mr-1"></i>Rejeter
-      <% end %>
+      </button>
     </div>
   </div>
 </div>

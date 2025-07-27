@@ -1,13 +1,12 @@
 class Admin::EventsController < Admin::ApplicationController
   include EventManagement
-  before_action :set_event, only: [ :show, :update, :export_participations, :send_notification, :approve, :reject ]
+  before_action :set_event, only: [ :show, :update, :export_participations, :send_notification ]
 
   def index
-    @events_query = Event.includes(:movie, :participations, :users, :created_by)
+    @events_query = Event.includes(:movie, :participations, :users)
 
     # Apply filters
     @events_query = @events_query.where(status: params[:status]) if params[:status].present?
-    @events_query = @events_query.where(validation_status: params[:validation_status]) if params[:validation_status].present?
     @events_query = @events_query.where(venue_name: params[:venue]) if params[:venue].present?
     @events_query = @events_query.joins(:movie).where(movies: { genre: params[:genre] }) if params[:genre].present?
 
@@ -24,10 +23,7 @@ class Admin::EventsController < Admin::ApplicationController
       upcoming: Event.where(status: :upcoming).count,
       completed: Event.where(status: :completed).count,
       sold_out: Event.where(status: :sold_out).count,
-      cancelled: Event.where(status: :cancelled).count,
-      pending_validation: Event.where(validation_status: :pending).count,
-      approved: Event.where(validation_status: :approved).count,
-      rejected: Event.where(validation_status: :rejected).count
+      cancelled: Event.where(status: :cancelled).count
     }
 
     # Get filter options for dropdowns
@@ -88,60 +84,6 @@ class Admin::EventsController < Admin::ApplicationController
     respond_to do |format|
       format.json { render json: { success: false, error: e.message } }
       format.html { redirect_to admin_event_path(@event), alert: 'Erreur lors de l\'export' }
-    end
-  end
-
-  # Approve event
-  def approve
-    @event.update!(
-      validation_status: 'approved',
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-
-    # Send approval notification to creator if it's not an admin-created event
-    if @event.created_by && @event.created_by != current_user
-      EventMailer.event_approved(@event).deliver_now
-    end
-
-    log_event_action('approved', @event)
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Événement approuvé avec succès' } }
-      format.html { redirect_to admin_events_path, notice: 'Événement approuvé avec succès' }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_events_path, alert: 'Erreur lors de l\'approbation' }
-    end
-  end
-
-  # Reject event
-  def reject
-    rejection_reason = params[:reason] || 'Aucune raison spécifiée'
-    
-    @event.update!(
-      validation_status: 'rejected',
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-
-    # Send rejection notification to creator if it's not an admin-created event
-    if @event.created_by && @event.created_by != current_user
-      EventMailer.event_rejected(@event, rejection_reason).deliver_now
-    end
-
-    log_event_action('rejected', @event, { reason: rejection_reason })
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Événement rejeté' } }
-      format.html { redirect_to admin_events_path, notice: 'Événement rejeté' }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_events_path, alert: 'Erreur lors du rejet' }
     end
   end
 

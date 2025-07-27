@@ -73,12 +73,6 @@ Rails.application.configure do
   # Force SolidQueue for background jobs in production
   config.active_job.queue_adapter = :solid_queue
   
-  # Configure SolidQueue to be more resilient
-  config.active_job.retry_jitter = 0.15
-  
-  # Don't require analysis for image uploads in production
-  config.active_storage.variant_processor = :mini_magick
-  
   # Configure SolidQueue database connection
   config.solid_queue.connects_to = { database: { writing: :queue } }
 

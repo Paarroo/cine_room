@@ -34,10 +34,10 @@ class Users::SessionsController < Devise::SessionsController
 
   private
 
-  # Méthode appelée par ApplicationController
-  # Même si pas utilisée ici, elle doit exister pour éviter l'erreur
+  # Method called by ApplicationController
+  # Even if not used here, it must exist to avoid error
   def configure_permitted_parameters
-    # Optionnel : personnaliser les paramètres autorisés pour les sessions
-    # Généralement pas nécessaire pour les sessions, mais requis par l'héritage
+    # Optional: customize permitted parameters for sessions
+    # Generally not needed for sessions, but required by inheritance
   end
 end

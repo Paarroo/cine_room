@@ -12,7 +12,8 @@ class Movie < ApplicationRecord
   has_many :favorited_by_users, through: :favorites, source: :user
   has_one_attached :poster
 
-  validates :title, :synopsis, :director, :duration, :genre, :year, :poster, presence: true
+  validates :title, :synopsis, :director, :duration, :genre, :year, presence: true
+  validates :poster, presence: true, unless: -> { Rails.env.production? && defined?(Rails.application.config.seed_in_progress) && Rails.application.config.seed_in_progress }
   validates :duration, numericality: { greater_than: 0, less_than: 300 }
   validates :year, numericality: {
     greater_than: 1900,

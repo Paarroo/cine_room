@@ -32,6 +32,9 @@ FactoryBot.define do
     after(:build) do |movie|
       movie.authorship_confirmed = "1"
 
+      # Skip poster attachment in production to avoid network dependencies
+      next if Rails.env.production?
+
       urls = [
         "https://source.unsplash.com/300x450/?cinema",
         "https://source.unsplash.com/300x450/?movie-poster",
@@ -39,7 +42,7 @@ FactoryBot.define do
         
       ]
 
-      # Génère un poster aléatoire depuis Unsplash
+      # Génère un poster aléatoire depuis Unsplash (dev/test only)
       begin
         file = URI.open(urls.sample)
       rescue OpenURI::HTTPError => e

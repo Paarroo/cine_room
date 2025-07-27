@@ -18,7 +18,11 @@ class Event < ApplicationRecord
   validates :title, :venue_name, :venue_address, :event_date, :start_time, :max_capacity, :price_cents, presence: true
   validates :max_capacity, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :price_cents, numericality: { greater_than: 0 }
+  validates :latitude, :longitude, presence: true, numericality: true
+  validates :latitude, numericality: { in: -90..90 }
+  validates :longitude, numericality: { in: -180..180 }
   validate :event_date_must_be_at_least_one_week_from_now
+  validate :coordinates_are_reasonable
 
   
   enum :status, { upcoming: 0, sold_out: 1, ongoing: 2, finished: 3, cancelled: 4 }, default: :upcoming
@@ -115,14 +119,38 @@ class Event < ApplicationRecord
 
   def ensure_geocoded_coordinates
     if venue_address.present? && (latitude.blank? || longitude.blank?)
-      geocode
-      
-      # If geocoding fails, set default coordinates for Paris
-      if latitude.blank? || longitude.blank?
-        Rails.logger.warn "Geocoding failed for event #{id}: #{venue_address}. Using Paris coordinates."
+      begin
+        # Retry geocoding with better error handling
+        geocode
+        
+        # If geocoding fails, set default coordinates for Paris
+        if latitude.blank? || longitude.blank?
+          Rails.logger.warn "Geocoding failed for event #{id || 'new'}: #{venue_address}. Using Paris coordinates."
+          self.latitude = 48.8566
+          self.longitude = 2.3522
+        else
+          Rails.logger.info "Successfully geocoded event #{id || 'new'}: #{venue_address} -> #{latitude}, #{longitude}"
+        end
+      rescue Geocoder::Error => e
+        Rails.logger.error "Geocoding error for event #{id || 'new'}: #{e.message}. Using Paris coordinates."
+        self.latitude = 48.8566
+        self.longitude = 2.3522
+      rescue => e
+        Rails.logger.error "Unexpected geocoding error for event #{id || 'new'}: #{e.message}. Using Paris coordinates."
         self.latitude = 48.8566
         self.longitude = 2.3522
       end
+    end
+  end
+
+  def coordinates_are_reasonable
+    return unless latitude.present? && longitude.present?
+    
+    # Check if coordinates are in France (roughly)
+    # France bounds: lat 41-51, lng -5 to 10
+    unless latitude.between?(40, 52) && longitude.between?(-6, 11)
+      Rails.logger.warn "Event #{id || 'new'} has suspicious coordinates: #{latitude}, #{longitude} for address: #{venue_address}"
+      # Don't fail validation, just log warning - coordinates might be valid for international events
     end
   end
 

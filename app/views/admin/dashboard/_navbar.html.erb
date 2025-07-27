@@ -4,13 +4,13 @@
     <div class="flex justify-between items-center h-full">
 
       <!-- Logo Section - Admin Version -->
-      <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0 hover:transform hover:scale-105 transition-all duration-300" do %>
-        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+      <%= link_to admin_root_path, class: "flex items-center space-x-3 cursor-pointer flex-shrink-0" do %>
+        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary/90 rounded-xl flex items-center justify-center">
           <i class="fas fa-cog text-white text-lg"></i>
         </div>
         <div class="flex flex-col mr-5">
           <span class="text-xl font-bold tracking-tight text-white">CinéRoom</span>
-          <span class="text-xs text-orange-400 uppercase tracking-widest mt-0.5 font-semibold">Administration</span>
+          <span class="text-xs text-primary uppercase tracking-widest mt-0.5">Administration</span>
         </div>
       <% end %>
 
@@ -53,15 +53,15 @@
       </div>
 
       <!-- Admin Actions Section -->
-      <div class="hidden lg:flex items-center space-x-4">
+      <div class="hidden lg:flex items-center space-x-8 ml-8">
         <!-- User Profile Admin -->
         <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-            <i class="fas fa-user-shield text-white text-sm ml-5"</i>
+          <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
+            <i class="fas fa-user-shield text-white text-sm"></i>
           </div>
           <div class="hidden xl:block">
             <div class="text-sm font-medium text-white"><%= current_user.full_name %></div>
-            <div class="text-xs text-primary">Administrateur</div>
+            <div class="text-xs text-orange-400 font-semibold">Administrateur</div>
           </div>
         </div>
         <!-- Back to Site -->

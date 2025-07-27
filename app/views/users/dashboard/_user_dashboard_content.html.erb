@@ -19,6 +19,7 @@
       <p class="text-gray-300"><strong>Réservations à venir :</strong> <%= upcoming_participations.count %></p>
       <p class="text-gray-300"><strong>Événements passés :</strong> <%= past_participations.count %></p>
       <p class="text-gray-300"><strong>Commentaires écrits :</strong> <%= user.reviews.count %></p>
+      <p class="text-gray-300"><strong>Films favoris :</strong> <%= user.favorites.count %></p>
 
       <%= button_to "📥 Télécharger mes données", data_export_users_dashboard_path(user, format: :csv), method: :get,
         class: "mt-4 inline-block bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold py-2 px-4 rounded-full transition" %>
@@ -104,6 +105,57 @@
     <% end %>
   <% else %>
     <p class="text-gray-400">Aucun événement passé.</p>
+  <% end %>
+</div>
+
+<!-- User Favorites -->
+<div class="glass-effect p-6 rounded-2xl">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-2xl font-semibold text-white">
+      <i class="fas fa-heart mr-2 text-red-400"></i>Mes favoris
+    </h3>
+    <% if user.favorites.count > 4 %>
+      <%= link_to "Voir tous mes favoris", favorites_path, class: "text-sm text-gold-400 hover:underline" %>
+    <% end %>
+  </div>
+  <% if user.favorites.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <% user.favorite_movies.limit(4).each do |movie| %>
+        <div class="bg-dark-300/30 border border-white/10 rounded-xl overflow-hidden group hover:border-red-400/30 transition-all duration-300">
+          <div class="relative h-32">
+            <% if movie.poster.attached? %>
+              <%= image_tag movie.poster, alt: "#{movie.title} poster", class: "w-full h-full object-cover" %>
+            <% else %>
+              <%= image_tag "default-poster.jpg", alt: "#{movie.title} poster", class: "w-full h-full object-cover opacity-50" %>
+            <% end %>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-2 left-2 right-2">
+              <h4 class="text-white font-semibold text-sm truncate"><%= movie.title %></h4>
+              <p class="text-gray-300 text-xs truncate"><%= movie.director %></p>
+            </div>
+          </div>
+          <div class="p-3">
+            <div class="flex justify-between items-center">
+              <%= link_to "Voir le film", movie_path(movie), class: "text-xs text-gold-400 hover:underline" %>
+              <button class="text-red-400 hover:text-red-500 transition-colors"
+                      data-controller="favorites"
+                      data-action="click->favorites#toggle"
+                      data-favorites-movie-id-value="<%= movie.id %>"
+                      data-favorites-favorited-value="true"
+                      data-favorites-favorite-id-value="<%= user.favorites.find_by(movie: movie)&.id %>">
+                <i class="fas fa-heart text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-8">
+      <i class="fas fa-heart text-4xl text-gray-500 mb-3"></i>
+      <p class="text-gray-400 mb-4">Vous n'avez encore aucun film favori.</p>
+      <%= link_to "Découvrir des films", movies_path, class: "inline-block bg-gold-500 hover:bg-gold-600 text-white px-6 py-2 rounded-full font-medium transition-colors" %>
+    </div>
   <% end %>
 </div>
 

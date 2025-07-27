@@ -281,6 +281,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :favorites, only: [ :index, :create, :destroy ]
+
   resources :reservations, only: [ :show, :create ] do
     resources :confirmations, only: [ :show ]
     resources :qr_codes, only: [ :show ]

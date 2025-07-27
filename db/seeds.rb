@@ -3,6 +3,24 @@ require 'factory_bot_rails'
 
 puts "🎬 Seeding CinéRoom database with FactoryBot & Faker..."
 
+# Production optimizations
+if Rails.env.production?
+  puts "🔧 Production mode - optimizing seed process..."
+  
+  # Disable welcome email during seeding
+  User.skip_callback(:create, :after, :send_welcome_email)
+  
+  # Disable ActionMailer deliveries during seeding
+  ActionMailer::Base.perform_deliveries = false
+  
+  # Disable ActiveJob completely during seeding
+  original_queue_adapter = ActiveJob::Base.queue_adapter
+  ActiveJob::Base.queue_adapter = :test
+  
+  # Mark as seed in progress to skip avatar attachment
+  Rails.application.config.seed_in_progress = true
+end
+
 # Clean database
 puts "🧹 Cleaning database..."
 Review.destroy_all
@@ -196,6 +214,23 @@ end
 # Inactive users (no participations or favorites)
 3.times do
   FactoryBot.create(:user)
+end
+
+# Re-enable production settings
+if Rails.env.production?
+  puts "🔄 Re-enabling production settings..."
+  
+  # Re-enable welcome email callback
+  User.set_callback(:create, :after, :send_welcome_email)
+  
+  # Re-enable ActionMailer deliveries
+  ActionMailer::Base.perform_deliveries = true
+  
+  # Restore original queue adapter
+  ActiveJob::Base.queue_adapter = original_queue_adapter
+  
+  # Remove seed in progress flag
+  Rails.application.config.seed_in_progress = false
 end
 
 puts "✅ Database seeded successfully!"

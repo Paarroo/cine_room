@@ -15,10 +15,8 @@
     <%= csp_meta_tag %>
 
     <!-- Icons -->
-
-    <link rel="icon" href="/icon.png" type="image/png">
-
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%= favicon_link_tag "icon.png", type: "image/png" %>
+    <link rel="apple-touch-icon" href="<%= asset_path('icon.png') %>">
 
     <!-- Fonts (consistent with application) -->
 

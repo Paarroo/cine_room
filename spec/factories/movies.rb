@@ -32,29 +32,8 @@ FactoryBot.define do
     after(:build) do |movie|
       movie.authorship_confirmed = "1"
 
-      # Skip poster attachment in production to avoid network dependencies
-      next if Rails.env.production?
-
-      urls = [
-        "https://source.unsplash.com/300x450/?cinema",
-        "https://source.unsplash.com/300x450/?movie-poster",
-        "https://source.unsplash.com/300x450/?film",
-        
-      ]
-
-      # Generates a random poster from Unsplash (dev/test only)
-      begin
-        file = URI.open(urls.sample)
-      rescue OpenURI::HTTPError => e
-        puts "⚠️ Poster download failed: #{e.message}"
-        file = File.open(Rails.root.join("spec/fixtures/files/test-poster.jpg")) # fallback
-      end
-
-      movie.poster.attach(
-        io: file,
-        filename: "poster.jpg",
-        content_type: "image/jpeg"
-      )
+      # Skip poster attachment to avoid network dependencies and missing fixtures
+      # Poster can be added manually through the UI when needed
     end
   end
 end

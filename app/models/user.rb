@@ -5,7 +5,6 @@ class User < ApplicationRecord
 
   before_create :skip_confirmation_for_admin
   after_create :send_welcome_email, unless: -> { Rails.env.production? }
-  after_commit :attach_default_avatar, on: [:create]
   after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
   has_many :participations, dependent: :destroy
@@ -31,6 +30,15 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
+  def avatar_url
+    if avatar.attached?
+      avatar
+    else
+      # Return default avatar URL from Cloudinary
+      "https://res.cloudinary.com/dhusbkszr/image/upload/v1753621019/ocuvyd737vat2fwwl76t0oyrbds7.png"
+    end
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     [
       "email", "first_name", "last_name", "role", "bio",
@@ -46,23 +54,9 @@ class User < ApplicationRecord
   private
 
   def attach_default_avatar
-    return if avatar.attached?
-    
-    # Skip avatar attachment in production seeds to avoid file access issues
-    return if Rails.env.production? && defined?(Rails.application.config.seed_in_progress)
-    
-    # Skip in production if seed_in_progress config is set
-    return if Rails.env.production? && Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress
-    
-    begin
-      avatar.attach(
-        io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
-        filename: "default-avatar.jpg",
-        content_type: "image/jpeg"
-      )
-    rescue Errno::ENOENT, StandardError => e
-      Rails.logger.warn "Avatar attachment failed: #{e.message}"
-    end
+    # Disable default avatar attachment to avoid registration errors
+    # Users can upload their own avatar after registration
+    return
   end
 
   def name_cannot_be_changed_after_publishing

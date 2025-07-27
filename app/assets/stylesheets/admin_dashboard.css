@@ -262,6 +262,19 @@
   color: rgb(251, 146, 60);
 }
 
+/* ===== RESPONSIVE NAVBAR CENTERING ===== */
+@media (min-width: 1024px) {
+  [data-responsive-transform] {
+    transform: translateX(-80px);
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-responsive-transform] {
+    transform: translateX(0px);
+  }
+}
+
 /* ===== MOBILE MENU ===== */
 .admin-mobile-menu {
   position: fixed !important;

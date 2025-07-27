@@ -5,7 +5,6 @@ class User < ApplicationRecord
 
   before_create :skip_confirmation_for_admin
   after_create :send_welcome_email, unless: -> { Rails.env.production? }
-  after_commit :attach_default_avatar, on: [:create]
   after_update :sync_director_name_to_movies, if: :saved_change_to_name?
 
   has_many :participations, dependent: :destroy

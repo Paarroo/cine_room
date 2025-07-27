@@ -17,6 +17,13 @@ if Rails.env.production?
     end
   end
   
+  # Temporarily disable event date validation for seeding
+  Event.class_eval do
+    def event_date_must_be_at_least_one_week_from_now
+      # Skip validation during seeding
+    end
+  end
+  
   # Disable welcome email during seeding
   User.skip_callback(:create, :after, :send_welcome_email)
   
@@ -362,6 +369,15 @@ if Rails.env.production?
     def authorship_must_be_confirmed
       if authorship_confirmed != "1"
         errors.add(:base, "Tu dois confirmer être l'auteur ou l'autrice de cette vidéo pour pouvoir la publier.")
+      end
+    end
+  end
+  
+  # Restore event date validation for live app
+  Event.class_eval do
+    def event_date_must_be_at_least_one_week_from_now
+      if event_date < 1.week.from_now
+        errors.add(:event_date, "doit être au moins une semaine après aujourd'hui")
       end
     end
   end

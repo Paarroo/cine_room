@@ -51,6 +51,22 @@ class User < ApplicationRecord
     [ "participations", "reviews", "events", "movies", "created_events" ]
   end
 
+  # Dashboard metrics methods
+  def self.export_data
+    select(:id, :email, :first_name, :last_name, :role, :created_at)
+      .limit(1000)
+      .map(&:attributes)
+  end
+
+  def self.quick_stats
+    {
+      total_users: count,
+      admin_count: where(role: :admin).count,
+      creator_count: where(role: :creator).count,
+      user_count: where(role: :user).count
+    }
+  end
+
   private
 
   def attach_default_avatar

@@ -1,10 +1,11 @@
 class Admin::Users::ExportsController < Admin::ApplicationController
-  
+  # just for exemple but not got button on website because RGPG stuff
+  #
   def show
     respond_to do |format|
       format.csv do
         csv_data = generate_users_csv
-        send_data csv_data, 
+        send_data csv_data,
                   type: 'text/csv',
                   filename: "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
       end
@@ -12,7 +13,7 @@ class Admin::Users::ExportsController < Admin::ApplicationController
         users_data = User.select(:id, :email, :first_name, :last_name, :role, :created_at)
                         .limit(1000)
                         .map(&:attributes)
-        
+
         render json: {
           success: true,
           data: users_data,
@@ -26,8 +27,8 @@ class Admin::Users::ExportsController < Admin::ApplicationController
 
   def generate_users_csv
     CSV.generate(headers: true) do |csv|
-      csv << ['ID', 'Email', 'First Name', 'Last Name', 'Role', 'Created At']
-      
+      csv << [ 'ID', 'Email', 'First Name', 'Last Name', 'Role', 'Created At' ]
+
       User.find_each do |user|
         csv << [
           user.id,

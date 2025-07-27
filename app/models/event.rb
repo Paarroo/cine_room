@@ -165,4 +165,38 @@ class Event < ApplicationRecord
   end
 
   scope :upcoming, -> { where(status: :upcoming) }
+
+  # Dashboard metrics methods
+  def self.events_status_chart_data
+    if count == 0
+      return generate_sample_events_data
+    end
+
+    group(:status).count.map do |status, count|
+      total = Event.count
+      {
+        status: status.humanize,
+        count: count,
+        percentage: total.zero? ? 0 : ((count.to_f / total) * 100).round(1)
+      }
+    end
+  end
+
+  def self.quick_stats
+    {
+      upcoming_events: where(status: :upcoming).count,
+      total_events: count
+    }
+  end
+
+  private
+
+  def self.generate_sample_events_data
+    [
+      { status: "Upcoming", count: 8, percentage: 40.0 },
+      { status: "Ongoing", count: 3, percentage: 15.0 },
+      { status: "Finished", count: 7, percentage: 35.0 },
+      { status: "Cancelled", count: 2, percentage: 10.0 }
+    ]
+  end
 end

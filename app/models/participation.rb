@@ -19,6 +19,77 @@ class Participation < ApplicationRecord
   # Scope for past events
   scope :past, -> { joins(:event).where('events.event_date < ?', Date.today).order('events.event_date DESC') }
 
+  # Dashboard metrics methods
+  def self.calculate_total_revenue
+    total_cents = includes(:event)
+                    .where(status: :confirmed)
+                    .where.not(stripe_payment_id: [nil, ''])
+                    .sum { |p| (p.event.price_cents || 0) * p.seats }
+    
+    total_cents / 100.0
+  end
+
+  def self.calculate_daily_revenue(date)
+    total_cents = includes(:event)
+                    .where(status: :confirmed)
+                    .where.not(stripe_payment_id: [nil, ''])
+                    .where(created_at: date.beginning_of_day..date.end_of_day)
+                    .sum { |p| (p.event.price_cents || 0) * p.seats }
+    
+    total_cents / 100.0
+  end
+
+  def self.revenue_chart_data
+    if where(status: :confirmed).count == 0
+      return generate_sample_revenue_data
+    end
+
+    (30.days.ago.to_date..Date.current).map do |date|
+      revenue = calculate_daily_revenue(date)
+      {
+        date: date.strftime("%d/%m"),
+        revenue: revenue,
+        formatted_revenue: ActionController::Base.helpers.number_to_currency(revenue)
+      }
+    end
+  end
+
+  def self.recent_activities
+    activities = []
+    
+    includes(:user, :event)
+      .order(created_at: :desc)
+      .limit(3)
+      .each do |participation|
+        activities << {
+          type: 'participation',
+          title: 'Nouvelle participation',
+          description: "#{participation.user&.full_name} • #{participation.event&.title}",
+          time_ago: ActionController::Base.helpers.time_ago_in_words(participation.created_at),
+          icon: 'ticket-alt',
+          color: 'primary'
+        }
+      end
+    
+    activities
+  end
+
+  private
+
+  def self.generate_sample_revenue_data
+    (30.days.ago.to_date..Date.current).map do |date|
+      base_revenue = [0, 150, 250, 400, 350, 500, 300, 200].sample
+      daily_variation = rand(-50..100)
+      revenue = [0, base_revenue + daily_variation].max
+
+      {
+        date: date.strftime("%d/%m"),
+        revenue: revenue,
+        formatted_revenue: ActionController::Base.helpers.number_to_currency(revenue)
+      }
+    end
+  end
+
   # Check if QR code has been used for entry
   def used?
     used_at.present?

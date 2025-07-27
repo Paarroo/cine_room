@@ -61,6 +61,41 @@ class Movie < ApplicationRecord
     %w[reviews events]
   end
 
+  # Dashboard metrics methods
+  def self.recent_activities
+    activities = []
+    
+    includes(:user)
+      .order(created_at: :desc)
+      .limit(2)
+      .each do |movie|
+        activities << {
+          type: 'movie',
+          title: 'Nouveau film ajouté',
+          description: "\"#{movie.title}\" par #{movie.user&.full_name}",
+          time_ago: ActionController::Base.helpers.time_ago_in_words(movie.created_at),
+          icon: 'film',
+          color: 'blue-400'
+        }
+      end
+    
+    activities
+  end
+
+  def self.quick_stats
+    {
+      pending_movies: where(validation_status: :pending).count,
+      total_movies: count
+    }
+  end
+
+  def self.export_data
+    includes(:user)
+      .select(:id, :title, :director, :year, :validation_status, :created_at)
+      .limit(1000)
+      .map(&:attributes)
+  end
+
   def favorited_by?(user)
     return false unless user
     favorites.exists?(user: user)

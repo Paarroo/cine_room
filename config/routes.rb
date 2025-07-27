@@ -101,12 +101,8 @@ Rails.application.routes.draw do
       resource :export, only: [ :show ]
     end
 
-    # Events with status and validation
+    # Events with status
     resources :events do
-      member do
-        patch :approve
-        patch :reject
-      end
       resource :status, only: [ :show, :update ]
       resource :export, only: [ :show ]
     end

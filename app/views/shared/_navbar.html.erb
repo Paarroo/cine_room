@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
       <%= link_to public_site_path, class: "flex items-center space-x-3 cursor-pointer hover:transform hover:scale-105 transition-all duration-300" do %>
-        <div class="w-10 h-10 bg-gradient-to-r from-amber-500 to-amber-500 hover:from-amber-600 hover:to-amber-300 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
+        <div class="w-10 h-10 bg-gradient-to-r from-gold-500 to-gold-500 hover:from-gold-600 hover:to-gold-300 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
           <i class="fas fa-film text-white text-lg"></i>
         </div>
         <div class="flex flex-col">
@@ -16,22 +16,22 @@
       <div class="hidden lg:flex items-center space-x-8">
         <%= link_to public_site_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Accueil
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-400 transition-all duration-300 group-hover:w-full"></span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
         <%= link_to creators_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Créateurs
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-400 transition-all duration-300 group-hover:w-full"></span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
         <%= link_to events_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
           Événements
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-400 transition-all duration-300 group-hover:w-full"></span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
         <%= link_to movies_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300" do %>
           Films
-          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-400 transition-all duration-300 group-hover:w-full"></span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
         <% end %>
 
         <%= link_to about_path, class: "group relative nav-btn text-gray-300 font-medium cursor-pointer transition duration-300 " do %>
@@ -45,25 +45,25 @@
         <% if user_signed_in? %>
           <!-- User connected -->
           <div class="flex items-center space-x-4">
-            <!-- Unified dashboard -->
+            <!-- Dashboard unifié selon le rôle -->
             <% if current_user&.admin? %>
               <%= link_to "Dashboard", admin_root_path,
                   class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
             <% else %>
-              <%= link_to "Tableau de bord", users_dashboard_path(current_user),
-                  class: "px-6 py-2 text-content rounded-full font-medium transition-all duration-200 hover:scale-105" %>
+              <%= link_to "Dashboard", users_dashboard_path(current_user),
+                  class: "text-muted hover:text-content transition-colors duration-200 font-medium" %>
             <% end %>
 
             <%= button_to "Déconnexion", destroy_user_session_path, 
                 method: :delete,
-                class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium cursor-pointer" %>
+                class: "px-4 py-2 glass-effect text-content hover:bg-white/10 rounded-xl transition-colors duration-200 font-medium" %>
           </div>
         <% else %>
           <!-- User non connected -->
           <%= link_to "Connexion", new_user_session_path,
-              class: "px-6 py-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-content rounded-full font-medium transition-all duration-200 hover:scale-105" %>
+              class: "px-4 py-2 text-muted hover:text-content transition-colors duration-200 font-medium" %>
           <%= link_to "Rejoindre", new_user_registration_path,
-              class: "px-6 py-2 bg-gradient-to-r from-amber to-amber/90 hover:from-amber/90 hover:to-amber text-content rounded-full font-medium transition-all duration-200 hover:scale-105" %>
+              class: "px-6 py-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-content rounded-full font-medium transition-all duration-200 hover:scale-105" %>
         <% end %>
       </div>
 

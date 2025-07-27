@@ -4,8 +4,6 @@ class Event < ApplicationRecord
   after_create_commit :attach_default_image
 
   belongs_to :movie
-  belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :validated_by, class_name: 'User', optional: true
   has_many :participations, dependent: :destroy
   has_many :users, through: :participations
   has_many :reviews, dependent: :destroy
@@ -28,7 +26,6 @@ class Event < ApplicationRecord
 
   
   enum :status, { upcoming: 0, sold_out: 1, ongoing: 2, finished: 3, cancelled: 4 }, default: :upcoming
-  enum :validation_status, { pending: 0, approved: 1, rejected: 2 }, default: :pending
 
   
 
@@ -56,7 +53,7 @@ class Event < ApplicationRecord
   }
 
   def self.filter_by(params)
-    approved.upcoming
+    upcoming
       .by_title(params[:q])
       .by_genre(params[:genre])
       .by_venue(params[:venue])
@@ -87,13 +84,12 @@ class Event < ApplicationRecord
     [
       "title", "description", "venue_name", "venue_address",
       "event_date", "start_time", "max_capacity", "price_cents",
-      "status", "validation_status", "latitude", "longitude", 
-      "created_at", "updated_at", "validated_at"
+      "status", "latitude", "longitude", "created_at", "updated_at"
     ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "movie", "participations", "users", "reviews", "created_by", "validated_by" ]
+    [ "movie", "participations", "users", "reviews" ]
   end
 
   private
@@ -169,7 +165,4 @@ class Event < ApplicationRecord
   end
 
   scope :upcoming, -> { where(status: :upcoming) }
-  scope :approved, -> { where(validation_status: :approved) }
-  scope :pending_validation, -> { where(validation_status: :pending) }
-  scope :rejected, -> { where(validation_status: :rejected) }
 end

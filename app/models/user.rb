@@ -48,14 +48,11 @@ class User < ApplicationRecord
   def attach_default_avatar
     return if avatar.attached?
     
-    # Skip avatar attachment in production seeds to avoid file access issues
-    return if Rails.env.production? && defined?(Rails.application.config.seed_in_progress)
-    
-    # Skip in production if seed_in_progress config is set
-    return if Rails.env.production? && Rails.application.config.respond_to?(:seed_in_progress) && Rails.application.config.seed_in_progress
+    # Skip avatar attachment completely in production to avoid file access issues
+    return if Rails.env.production?
     
     begin
-      # Skip analysis job to avoid ActiveJob issues
+      # Only attach default avatar in development/test environments
       avatar.attach(
         io: File.open(Rails.root.join("app", "assets", "images", "default-avatar.jpg")),
         filename: "default-avatar.jpg",

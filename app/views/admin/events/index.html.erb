@@ -16,9 +16,9 @@
             <%= @stats[:total] %> événements au total • <%= @stats[:upcoming] %> à venir
           </p>
         </div>
-        <div class="mt-4 lg:mt-0 lg:ml-6">
+        <div class="mt-4 lg:mt-0 lg:ml-6 flex-shrink-0">
           <%= link_to "Créer un événement", new_admin_event_path, 
-              class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg" %>
+              class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-full transition-all duration-300 hover:scale-105 shadow-lg text-sm sm:text-base whitespace-nowrap" %>
         </div>
       </div>
       </div>
@@ -71,54 +71,54 @@
 
         <div class="space-y-4">
           <% @events.each do |event| %>
-            <div class="glass-subtle rounded-xl p-6 hover:bg-white/10 transition-colors">
-              <div class="flex items-center justify-between">
-                <div class="flex-1">
-                  <h4 class="text-lg font-semibold text-white mb-2">
+            <div class="glass-subtle rounded-xl p-4 sm:p-6 hover:bg-white/10 transition-colors">
+              <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-lg font-semibold text-white mb-2 truncate">
                     <%= event.title %>
                   </h4>
-                  <div class="flex items-center space-x-4 text-sm text-gray-400">
-                    <span>
-                      <i class="fas fa-map-marker-alt mr-1"></i>
-                      <%= event.venue_name %>
+                  <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
+                    <span class="flex items-center min-w-0">
+                      <i class="fas fa-map-marker-alt mr-1 flex-shrink-0"></i>
+                      <span class="truncate max-w-[120px] sm:max-w-none"><%= event.venue_name %></span>
                       <% if event.latitude == 48.8566 && event.longitude == 2.3522 %>
-                        <span class="ml-2 px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs" title="Coordonnées par défaut (Paris) - Géocodage échoué">
-                          ⚠️ GPS
+                        <span class="ml-1 px-1 py-0.5 bg-yellow-500/20 text-yellow-300 rounded text-xs flex-shrink-0" title="Coordonnées par défaut (Paris) - Géocodage échoué">
+                          ⚠️
                         </span>
                       <% end %>
                     </span>
-                    <span>
-                      <i class="fas fa-calendar mr-1"></i>
-                      <%= event.event_date.strftime("%d/%m/%Y") %>
+                    <span class="flex items-center">
+                      <i class="fas fa-calendar mr-1 flex-shrink-0"></i>
+                      <%= event.event_date.strftime("%d/%m/%y") %>
                     </span>
-                    <span>
-                      <i class="fas fa-users mr-1"></i>
+                    <span class="flex items-center">
+                      <i class="fas fa-users mr-1 flex-shrink-0"></i>
                       <%= event.participations.where(status: :confirmed).sum(:seats) %>/<%= event.max_capacity %>
                     </span>
                     <% if event.geocoding_status.present? && event.geocoding_status != 'success' %>
-                      <span class="px-2 py-1 bg-red-500/20 text-red-300 rounded text-xs" title="Statut géocodage: <%= event.geocoding_status %>">
+                      <span class="px-2 py-1 bg-red-500/20 text-red-300 rounded text-xs flex-shrink-0" title="Statut géocodage: <%= event.geocoding_status %>">
                         🗺️ <%= event.geocoding_status %>
                       </span>
                     <% end %>
                   </div>
                 </div>
 
-                <div class="flex items-center space-x-3">
-                  <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 lg:flex-nowrap">
+                  <span class="px-2 sm:px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium whitespace-nowrap">
                     <%= event.status.humanize %>
                   </span>
                   <%= link_to admin_event_path(event),
-                      class: "px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors" do %>
-                    <i class="fas fa-eye mr-1"></i>Voir
+                      class: "px-2 sm:px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap" do %>
+                    <i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Voir</span>
                   <% end %>
                   <%= link_to edit_admin_event_path(event),
-                      class: "px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-lg text-sm transition-colors" do %>
-                    <i class="fas fa-edit mr-1"></i>Modifier
+                      class: "px-2 sm:px-3 py-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap" do %>
+                    <i class="fas fa-edit mr-1"></i><span class="hidden sm:inline">Modifier</span>
                   <% end %>
                   <%= link_to admin_event_path(event), method: :delete,
                       confirm: "Êtes-vous sûr de vouloir supprimer cet événement ?",
-                      class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors" do %>
-                    <i class="fas fa-trash mr-1"></i>Supprimer
+                      class: "px-2 sm:px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap" do %>
+                    <i class="fas fa-trash mr-1"></i><span class="hidden sm:inline">Supprimer</span>
                   <% end %>
                 </div>
               </div>

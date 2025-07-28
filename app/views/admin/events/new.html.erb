@@ -1,0 +1,123 @@
+<div class="admin-dashboard min-h-screen bg-dark-400">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="container-app">
+      <div class="welcome-section glass-effect rounded-3xl p-8 mt-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-4xl lg:text-5xl font-bold mb-3 gradient-text">
+              <i class="fas fa-plus-circle mr-4"></i>
+              Créer un Événement
+            </h1>
+            <p class="text-xl text-gray-300">
+              Organisez une nouvelle projection cinéma
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <section class="py-8">
+    <div class="container-app">
+      <div class="glass-effect rounded-3xl p-8">
+        <%= form_with model: [:admin, @event], local: true, class: "space-y-6" do |form| %>
+          <% if @event.errors.any? %>
+            <div class="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+              <h3 class="text-red-300 font-semibold mb-2">Erreurs détectées :</h3>
+              <ul class="text-red-200 text-sm space-y-1">
+                <% @event.errors.full_messages.each do |message| %>
+                  <li>• <%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Film Selection -->
+            <div>
+              <%= form.label :movie_id, "Film", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.select :movie_id, 
+                  options_from_collection_for_select(@movies, :id, :title, @event.movie_id),
+                  { prompt: "Sélectionner un film..." },
+                  { class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent" } %>
+            </div>
+
+            <!-- Event Title -->
+            <div>
+              <%= form.label :title, "Titre de l'événement", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.text_field :title, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                  placeholder: "Ex: Avant-première exclusive" %>
+            </div>
+
+            <!-- Venue Name -->
+            <div>
+              <%= form.label :venue_name, "Nom du lieu", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.text_field :venue_name, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                  placeholder: "Ex: Cinéma Rex" %>
+            </div>
+
+            <!-- Venue Address -->
+            <div>
+              <%= form.label :venue_address, "Adresse du lieu", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.text_field :venue_address, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                  placeholder: "Ex: 1 Boulevard Poissonnière, 75002 Paris" %>
+            </div>
+
+            <!-- Event Date -->
+            <div>
+              <%= form.label :event_date, "Date de l'événement", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.date_field :event_date, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent" %>
+            </div>
+
+            <!-- Start Time -->
+            <div>
+              <%= form.label :start_time, "Heure de début", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.time_field :start_time, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent" %>
+            </div>
+
+            <!-- Max Capacity -->
+            <div>
+              <%= form.label :max_capacity, "Capacité maximale", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.number_field :max_capacity, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                  placeholder: "Ex: 150", min: 1 %>
+            </div>
+
+            <!-- Price -->
+            <div>
+              <%= form.label :price_cents, "Prix (en centimes)", class: "block text-sm font-medium text-gray-300 mb-2" %>
+              <%= form.number_field :price_cents, 
+                  class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                  placeholder: "Ex: 1500 (pour 15€)", min: 0, step: 100 %>
+              <p class="text-xs text-gray-400 mt-1">Saisissez le prix en centimes (ex: 1500 pour 15€)</p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-300 mb-2" %>
+            <%= form.text_area :description, 
+                rows: 4,
+                class: "w-full px-4 py-3 bg-dark-300/50 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cinema-blue focus:border-transparent",
+                placeholder: "Description de l'événement, informations spéciales..." %>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-6">
+            <%= form.submit "Créer l'événement", 
+                class: "flex-1 sm:flex-none px-8 py-3 bg-cinema-blue hover:bg-blue-600 text-white font-semibold rounded-xl transition-colors" %>
+            <%= link_to "Annuler", admin_events_path, 
+                class: "flex-1 sm:flex-none px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl transition-colors text-center" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>

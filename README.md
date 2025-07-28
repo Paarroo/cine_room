@@ -180,28 +180,22 @@ rails db:seed
 rails server
 ```
 
-```
-
 ### Login Credentials
 
 **Development (after `rails db:seed`):**
 
 ```
-
 Admin: admin@cineroom.com / password123
 Creator: creator.test@example.com / password123
 User: user.test@example.com / password123
 Creator 2: prolific.creator@example.com / password123
-
 ```
 
 **Production:**
 
 ```
-
 Admin credentials are configured via environment variables
 Create a new user account through the registration process
-
 ```
 
 ---
@@ -354,4 +348,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 **🎬 Built with ❤️ and Rails 8.0.2 as part of THP Full-Stack Developer Bootcamp**
 
 _"Where independent cinema meets modern web development"_ ✨🍿
-```

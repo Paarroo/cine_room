@@ -1,6 +1,6 @@
 class Admin::EventsController < Admin::ApplicationController
   include EventManagement
-  before_action :set_event, only: [ :show, :update, :export_participations, :send_notification ]
+  before_action :set_event, only: [ :show, :edit, :update, :destroy, :export_participations, :send_notification ]
 
   def index
     @events_query = Event.includes(:movie, :participations, :users)
@@ -46,6 +46,32 @@ class Admin::EventsController < Admin::ApplicationController
 
     # Calculate capacity metrics
     @capacity_metrics = calculate_capacity_metrics(@event)
+  end
+
+  def new
+    @event = Event.new
+    @movies = Movie.where(validation_status: :approved).order(:title)
+  end
+
+  def create
+    @event = Event.new(event_params)
+    @event.created_by = current_user
+
+    if @event.save
+      redirect_to admin_event_path(@event), notice: 'Événement créé avec succès.'
+    else
+      @movies = Movie.where(validation_status: :approved).order(:title)
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    @movies = Movie.where(validation_status: :approved).order(:title)
+  end
+
+  def destroy
+    @event.destroy!
+    redirect_to admin_events_path, notice: 'Événement supprimé avec succès.'
   end
 
   def update
@@ -179,12 +205,6 @@ class Admin::EventsController < Admin::ApplicationController
     end
   end
 
-  def edit
-      # @event already set by before_action
-      # Prepare form data if needed
-      @movies = Movie.where(validation_status: :approved).order(:title)
-      @venues = Event.distinct.pluck(:venue_name).compact.sort
-    end
 
   # Update event attributes
   def update_event_attributes

@@ -63,17 +63,32 @@
       <!-- 📅 Events section (only for creators) -->
       <% if current_user.creator? %>
         <div class="glass-effect p-6 rounded-2xl">
-          <h3 class="text-2xl font-semibold text-white mb-4">
-            <i class="fas fa-calendar-alt mr-2 text-cinema-blue"></i>Mes événements
-          </h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-2xl font-semibold text-white">
+              <i class="fas fa-calendar-alt mr-2 text-cinema-blue"></i>Mes événements
+            </h3>
+            <%= link_to "Créer un événement", new_event_path, 
+                class: "inline-block bg-cinema-blue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105" %>
+          </div>
 
           <% if created_events.any? %>
             <div class="space-y-4">
               <% created_events.each do |event| %>
                 <div class="bg-dark-300/30 border border-white/10 p-4 rounded-xl text-gray-200">
-                  <h4 class="text-lg font-semibold text-white"><%= event.title %></h4>
-                  <p class="text-sm text-gray-300">Le <%= l(event.event_date, format: :long) %></p>
-                  <p class="text-sm text-gray-400">Film associé : <%= event.movie.title %></p>
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <h4 class="text-lg font-semibold text-white"><%= event.title %></h4>
+                      <p class="text-sm text-gray-300">Le <%= l(event.event_date, format: :long) %></p>
+                      <p class="text-sm text-gray-400">Film associé : <%= event.movie.title %></p>
+                    </div>
+                    <div class="flex space-x-2 ml-4">
+                      <%= link_to "Voir", event_path(event), class: "text-xs px-3 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition" %>
+                      <%= link_to "Modifier", edit_event_path(event), class: "text-xs px-3 py-2 bg-cinema-blue hover:bg-blue-600 rounded-full text-white transition" %>
+                      <%= link_to "Supprimer", event_path(event), method: :delete, 
+                          confirm: "Êtes-vous sûr de vouloir supprimer cet événement ?",
+                          class: "text-xs px-3 py-2 bg-red-600 hover:bg-red-700 rounded-full text-white transition" %>
+                    </div>
+                  </div>
                 </div>
               <% end %>
             </div>

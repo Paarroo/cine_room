@@ -42,10 +42,12 @@ class EventsController < ApplicationController
   end
 
   def edit
+    ensure_event_owner_or_admin!
     @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
   end
 
   def update
+    ensure_event_owner_or_admin!
     if @event.update(event_params)
       redirect_to @event, notice: 'Event was successfully updated.'
     else
@@ -55,6 +57,7 @@ class EventsController < ApplicationController
   end
 
   def destroy
+    ensure_event_owner_or_admin!
     @event.destroy!
     redirect_to events_path, notice: 'Event was successfully deleted.'
   end
@@ -63,6 +66,13 @@ class EventsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:id])
+  end
+
+  def ensure_event_owner_or_admin!
+    unless current_user&.admin? || (current_user&.creator? && @event.movie.user == current_user)
+      flash[:alert] = "Vous ne pouvez modifier que vos propres événements."
+      redirect_to root_path
+    end
   end
 
   def event_params

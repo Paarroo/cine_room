@@ -33,6 +33,16 @@
 
               <!-- Action buttons -->
               <div class="absolute top-6 right-6 flex space-x-3">
+                <% if current_user&.admin? || (current_user&.creator? && @event.movie.user == current_user) %>
+                  <%= link_to edit_event_path(@event), class: "w-12 h-12 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors" do %>
+                    <i class="fas fa-edit"></i>
+                  <% end %>
+                  <%= link_to event_path(@event), method: :delete, 
+                      confirm: "Êtes-vous sûr de vouloir supprimer cet événement ?",
+                      class: "w-12 h-12 glass-effect rounded-full flex items-center justify-center text-white hover:bg-red-500/20 transition-colors" do %>
+                    <i class="fas fa-trash"></i>
+                  <% end %>
+                <% end %>
                 <button class="w-12 h-12 glass-effect rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
                   <i class="far fa-heart"></i>
                 </button>

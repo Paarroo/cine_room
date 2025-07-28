@@ -120,45 +120,34 @@ FactoryBot.create(:movie,
   duration: 45 # Very short movie
 )
 
-# Create events for approved movies
-puts "Creating diverse events..."
+# Create events for approved movies (only upcoming to avoid validation issues)
+puts "Creating upcoming events..."
 upcoming_events = []
-finished_events = []
-ongoing_events = []
-cancelled_events = []
 
 approved_movies.each do |movie|
-  event_count = rand(1..5)
+  event_count = rand(1..3)  # Reduced count for stability
   
-  event_count.times do |i|
-    case i
-    when 0 # Always create at least one upcoming event
-      event = FactoryBot.create(:event, :upcoming, movie: movie)
-      upcoming_events << event
-    when 1 # Often create a finished event
-      if rand < 0.7
-        event = FactoryBot.create(:event, :finished, movie: movie)
-        finished_events << event
-      end
-    when 2 # Sometimes create ongoing event
-      if rand < 0.3
-        event = FactoryBot.create(:event, :ongoing, movie: movie)
-        ongoing_events << event
-      end
-    when 3 # Rarely create cancelled event
-      if rand < 0.1
-        event = FactoryBot.create(:event, :upcoming, movie: movie)
-        event.update!(status: :cancelled)
-        cancelled_events << event
-      end
-    else # Additional upcoming events
-      if rand < 0.5
-        event = FactoryBot.create(:event, :upcoming, movie: movie)
-        upcoming_events << event
-      end
-    end
+  event_count.times do
+    event = FactoryBot.create(:event, :upcoming, movie: movie)
+    upcoming_events << event
   end
 end
+
+# Create some finished events after the fact (bypass validation)
+puts "Creating finished events..."
+finished_events = []
+approved_movies.sample(approved_movies.count / 2).each do |movie|
+  event = FactoryBot.create(:event, :upcoming, movie: movie)
+  # Use update_columns to bypass validations and callbacks
+  event.update_columns(
+    status: Event.statuses[:finished],
+    event_date: rand(6.months.ago..1.week.ago).to_date
+  )
+  finished_events << event
+end
+
+ongoing_events = []
+cancelled_events = []
 
 # Create specific test events with edge cases
 puts "Creating test scenario events..."
@@ -184,13 +173,17 @@ cheap_event = FactoryBot.create(:event, :upcoming,
   venue_address: "21 Rue d'Assas, 75006 Paris"
 )
 
-# Event in the past (finished)
-old_event = FactoryBot.create(:event, :finished,
+# Event in the past (finished) - create as upcoming then update
+old_event = FactoryBot.create(:event, :upcoming,
   movie: test_movie,
   title: "Avant-première",
-  event_date: 2.months.ago,
   venue_name: "Grand Rex",
   venue_address: "1 Boulevard Poissonnière, 75002 Paris"
+)
+# Bypass validation by using update_columns
+old_event.update_columns(
+  status: Event.statuses[:finished],
+  event_date: 2.months.ago.to_date
 )
 
 # Create sold out events

@@ -36,17 +36,35 @@ FactoryBot.define do
 
     trait :completed do
       status { :finished }
-      event_date { rand(6.months.ago..1.week.ago).to_date }
+      event_date { rand(1.week.from_now..2.months.from_now).to_date }
+      
+      after(:create) do |event|
+        # Force the completed status after creation to bypass validation
+        event.update_column(:status, :finished)
+        event.update_column(:event_date, rand(6.months.ago..1.week.ago).to_date)
+      end
     end
 
     trait :finished do
       status { :finished }
-      event_date { rand(6.months.ago..1.week.ago).to_date }
+      event_date { rand(1.week.from_now..2.months.from_now).to_date }
+      
+      after(:create) do |event|
+        # Force the finished status after creation to bypass validation
+        event.update_column(:status, :finished)
+        event.update_column(:event_date, rand(6.months.ago..1.week.ago).to_date)
+      end
     end
 
     trait :ongoing do
       status { :ongoing }
-      event_date { 1.day.ago.to_date }
+      event_date { rand(1.week.from_now..2.months.from_now).to_date }
+      
+      after(:create) do |event|
+        # Force the ongoing status after creation to bypass validation
+        event.update_column(:status, :ongoing)
+        event.update_column(:event_date, 1.day.ago.to_date)
+      end
     end
 
     trait :sold_out do

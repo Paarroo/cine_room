@@ -55,7 +55,6 @@ class Admin::EventsController < Admin::ApplicationController
 
   def create
     @event = Event.new(event_params)
-    @event.created_by = current_user
 
     if @event.save
       redirect_to admin_event_path(@event), notice: 'Événement créé avec succès.'

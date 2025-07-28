@@ -189,7 +189,9 @@ rails server
 ```
 
 Admin: admin@cineroom.com / password123
-Test User: germaine@kreiger-bailey.example / password123
+Creator: creator.test@example.com / password123
+User: user.test@example.com / password123
+Creator 2: prolific.creator@example.com / password123
 
 ```
 

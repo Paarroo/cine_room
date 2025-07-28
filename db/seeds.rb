@@ -66,10 +66,10 @@ creators = FactoryBot.create_list(:user, 12, :creator)
 # Create additional test users for edge cases
 puts "Creating test users for edge cases..."
 test_users = [
-  FactoryBot.create(:user, email: 'user.test@example.com', first_name: 'User', last_name: 'Test'),
-  FactoryBot.create(:user, :creator, email: 'creator.test@example.com', first_name: 'Creator', last_name: 'Test'),
+  FactoryBot.create(:user, email: 'user.test@example.com', first_name: 'User', last_name: 'Test', confirmed_at: Time.current),
+  FactoryBot.create(:user, :creator, email: 'creator.test@example.com', first_name: 'Creator', last_name: 'Test', confirmed_at: Time.current),
   FactoryBot.create(:user, email: 'inactive.user@example.com', first_name: 'Inactive', last_name: 'User'),
-  FactoryBot.create(:user, :creator, email: 'prolific.creator@example.com', first_name: 'Prolific', last_name: 'Creator')
+  FactoryBot.create(:user, :creator, email: 'prolific.creator@example.com', first_name: 'Prolific', last_name: 'Creator', confirmed_at: Time.current)
 ]
 
 # Create approved movies for creators

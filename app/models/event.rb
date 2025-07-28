@@ -65,8 +65,11 @@ class Event < ApplicationRecord
   end
 
   def event_date_must_be_at_least_one_week_from_now
+    # Skip validation during seeding
+    return if Rails.application.config.seed_in_progress
+    
     if event_date < 1.week.from_now
-      errors.add(:event_date, "doit être au moins une semaine après aujourd’hui")
+      errors.add(:event_date, "doit être au moins une semaine après aujourd'hui")
     end
   end
 

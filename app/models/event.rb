@@ -23,6 +23,7 @@ class Event < ApplicationRecord
   validates :longitude, numericality: { in: -180..180 }
   validate :event_date_must_be_at_least_one_week_from_now
   validate :coordinates_are_reasonable
+  validate :venue_address_format
 
   
   enum :status, { upcoming: 0, sold_out: 1, ongoing: 2, finished: 3, cancelled: 4 }, default: :upcoming
@@ -175,6 +176,20 @@ class Event < ApplicationRecord
     unless latitude.between?(40, 52) && longitude.between?(-6, 11)
       Rails.logger.warn "Event #{id || 'new'} has suspicious coordinates: #{latitude}, #{longitude} for address: #{venue_address}"
       # Don't fail validation, just log warning - coordinates might be valid for international events
+    end
+  end
+  
+  def venue_address_format
+    return unless venue_address.present?
+    
+    # Basic validation for French address format
+    unless venue_address.match?(/\d+.*,\s*\d{5}\s+\w+/i)
+      errors.add(:venue_address, "doit contenir un numéro, une rue et un code postal (ex: '1 Rue de la Paix, 75001 Paris')")
+    end
+    
+    # Warn about suspicious patterns
+    if venue_address.match?(/apt\.|étage|villa|résidence/i)
+      Rails.logger.info "Event #{id || 'new'} has detailed address that might affect geocoding: #{venue_address}"
     end
   end
 

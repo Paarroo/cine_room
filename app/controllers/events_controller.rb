@@ -24,17 +24,18 @@ class EventsController < ApplicationController
 
   def create
     @event = Event.new(event_params)
+    @event.created_by = current_user
     
     # Ensure creators can only create events for their own movies
     unless current_user.admin? || current_user.movies.approved.exists?(id: @event.movie_id)
       flash[:alert] = "Vous ne pouvez créer des événements que pour vos propres films approuvés."
-      @movies = current_user.movies.approved
+      @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
       render :new, status: :unprocessable_entity
       return
     end
 
     if @event.save
-      redirect_to @event, notice: 'Event was successfully created.'
+      redirect_to @event, notice: 'Événement créé avec succès.'
     else
       @movies = current_user.admin? ? Movie.approved : current_user.movies.approved
       render :new, status: :unprocessable_entity

@@ -65,11 +65,17 @@ module ParticipationsManagement
     }
   end
 
-  # Get collections for form dropdowns - mirrors ActiveAdmin form collections
+  # Get collections for form dropdowns - optimized to prevent N+1 queries
   def get_participation_form_collections
     {
-      users: User.all.map { |u| [ u.full_name, u.id ] },
-      events: Event.all.map { |e| [ "#{e.title} - #{e.event_date}", e.id ] },
+      users: User.select(:id, :first_name, :last_name)
+                 .order(:first_name, :last_name)
+                 .limit(1000)
+                 .map { |u| [ u.full_name, u.id ] },
+      events: Event.select(:id, :title, :event_date)
+                   .order(event_date: :desc)
+                   .limit(500)
+                   .map { |e| [ "#{e.title} - #{e.event_date}", e.id ] },
       statuses: Participation.statuses.map { |key, value| [ key.humanize, key ] }
     }
   end

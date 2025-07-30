@@ -21,20 +21,20 @@ class Participation < ApplicationRecord
 
   # Dashboard metrics methods
   def self.calculate_total_revenue
-    total_cents = includes(:event)
+    total_cents = joins(:event)
                     .where(status: :confirmed)
                     .where.not(stripe_payment_id: [nil, ''])
-                    .sum { |p| (p.event.price_cents || 0) * p.seats }
+                    .sum('COALESCE(events.price_cents, 0) * participations.seats')
     
     total_cents / 100.0
   end
 
   def self.calculate_daily_revenue(date)
-    total_cents = includes(:event)
+    total_cents = joins(:event)
                     .where(status: :confirmed)
                     .where.not(stripe_payment_id: [nil, ''])
                     .where(created_at: date.beginning_of_day..date.end_of_day)
-                    .sum { |p| (p.event.price_cents || 0) * p.seats }
+                    .sum('COALESCE(events.price_cents, 0) * participations.seats')
     
     total_cents / 100.0
   end
@@ -90,45 +90,65 @@ class Participation < ApplicationRecord
       participation_id: id,
       token: qr_code_token,
       user: {
-        name: user.full_name,
-        email: user.email
+        name: user&.full_name || "Utilisateur supprimé",
+        email: user&.email || "Non disponible"
       },
       event: {
-        title: event.title,
-        date: event.event_date.strftime('%d/%m/%Y'),
-        time: event.start_time.strftime('%H:%M'),
-        venue: event.venue_name,
-        address: event.venue_address
+        title: event&.title || "Événement supprimé",
+        date: event&.event_date&.strftime('%d/%m/%Y') || "Date inconnue",
+        time: event&.start_time&.strftime('%H:%M') || "Heure inconnue",
+        venue: event&.venue_name || "Lieu non spécifié",
+        address: event&.venue_address || "Adresse non disponible"
       },
-      seats: seats,
-      status: status,
-      created_at: created_at.iso8601
+      seats: seats || 1,
+      status: status || "unknown",
+      created_at: created_at&.iso8601 || Time.current.iso8601
     }.to_json
   end
 
   # Generate QR code as PNG image data
   def qr_code_png
-    qr_code = RQRCode::QRCode.new(qr_code_data)
-    qr_code.as_png(
-      resize_gte_to: false,
-      resize_exactly_to: false,
-      fill: 'white',
-      color: 'black',
-      size: 300,
-      border_modules: 4,
-      module_px_size: 6
-    ).to_s
+    return nil unless can_generate_qr_code?
+    
+    begin
+      qr_code = RQRCode::QRCode.new(qr_code_data)
+      qr_code.as_png(
+        resize_gte_to: false,
+        resize_exactly_to: false,
+        fill: 'white',
+        color: 'black',
+        size: 300,
+        border_modules: 4,
+        module_px_size: 6
+      ).to_s
+    rescue => e
+      Rails.logger.error "Failed to generate QR code PNG for participation #{id}: #{e.message}"
+      nil
+    end
   end
 
   # Generate QR code as SVG
   def qr_code_svg
-    qr_code = RQRCode::QRCode.new(qr_code_data)
-    qr_code.as_svg(
-      color: '000',
-      shape_rendering: 'crispEdges',
-      module_size: 6,
-      standalone: true
-    )
+    return nil unless can_generate_qr_code?
+    
+    begin
+      qr_code = RQRCode::QRCode.new(qr_code_data)
+      qr_code.as_svg(
+        color: '000',
+        shape_rendering: 'crispEdges',
+        module_size: 6,
+        standalone: true
+      )
+    rescue => e
+      Rails.logger.error "Failed to generate QR code SVG for participation #{id}: #{e.message}"
+      nil
+    end
+  end
+
+  # Check if QR code can be safely generated
+  def can_generate_qr_code?
+    # Basic validation - participation must have minimum required data
+    id.present? && qr_code_token.present?
   end
 
   private

@@ -296,9 +296,10 @@ export default class extends Controller {
   }
 
   showToast(message, type = 'info') {
-    // Dispatch event for admin-flash controller
-    this.dispatch('toast', {
+    // Dispatch global event for unified flash controller
+    const event = new CustomEvent('admin-dashboard:toast', {
       detail: { message, type }
     })
+    document.dispatchEvent(event)
   }
 }

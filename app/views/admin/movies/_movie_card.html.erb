@@ -81,31 +81,35 @@
     <% end %>
 
     <!-- Action Buttons based on status -->
-    <div class="flex space-x-2">
+    <div class="flex space-x-2" data-controller="admin-actions">
       <% if safe_movie_validation_status(movie) == 'pending' %>
         <!-- Validate Button with Icon -->
-        <%= form_with url: validate_admin_movie_path(safe_id(movie)),
-            method: :patch,
-            local: true,
-            class: "inline-block" do |f| %>
-          <%= f.button type: 'submit',
-              class: "px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors flex items-center",
-              data: { confirm: "Valider ce film ?" } do %>
-            <i class="fas fa-check mr-1"></i>Valider
-          <% end %>
-        <% end %>
+        <button
+          type="button"
+          class="px-3 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg text-sm transition-colors flex items-center"
+          data-action="click->admin-actions#executeAction"
+          data-url="<%= validate_admin_movie_path(safe_id(movie)) %>"
+          data-method="PATCH"
+          data-confirm="Valider ce film ?"
+          data-success-message="Film validé avec succès"
+          data-action-type="validation"
+        >
+          <i class="fas fa-check mr-1"></i>Valider
+        </button>
 
         <!-- Reject Button with Icon -->
-        <%= form_with url: reject_admin_movie_path(safe_id(movie)),
-            method: :patch,
-            local: true,
-            class: "inline-block" do |f| %>
-          <%= f.button type: 'submit',
-              class: "px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors flex items-center",
-              data: { confirm: "Rejeter ce film ?" } do %>
-            <i class="fas fa-times mr-1"></i>Rejeter
-          <% end %>
-        <% end %>
+        <button
+          type="button"
+          class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors flex items-center"
+          data-action="click->admin-actions#executeAction"
+          data-url="<%= reject_admin_movie_path(safe_id(movie)) %>"
+          data-method="PATCH"
+          data-confirm="Rejeter ce film ?"
+          data-success-message="Film rejeté"
+          data-action-type="validation"
+        >
+          <i class="fas fa-times mr-1"></i>Rejeter
+        </button>
       <% else %>
         <!-- Already processed indicator -->
         <span class="text-xs text-gray-500 flex items-center">

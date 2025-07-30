@@ -39,10 +39,14 @@ class ParticipationManagementService
       user_email: participation.user&.email || 'N/A',
       event_title: participation.event&.title || 'N/A',
       movie_title: participation.event&.movie&.title || 'N/A',
-      event_date: participation.event&.event_date&.strftime('%d/%m/%Y') || 'N/A',
+      event_date: participation.event&.event_date || 'N/A',
+      event_date_formatted: participation.event&.event_date&.strftime('%d/%m/%Y') || 'N/A',
       seats: participation.seats,
       status: participation.status.humanize,
-      created_at: participation.created_at.strftime('%d/%m/%Y %H:%M'),
+      created_at: participation.created_at,
+      created_at_formatted: participation.created_at.strftime('%d/%m/%Y %H:%M'),
+      updated_at: participation.updated_at,
+      updated_at_formatted: participation.updated_at.strftime('%d/%m/%Y %H:%M'),
       revenue: calculate_single_participation_revenue(participation)
     }
   end

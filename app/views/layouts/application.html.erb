@@ -57,7 +57,11 @@
     <% else %>
       <%= render 'shared/navbar' %>
     <% end %>
-    <%= render 'shared/alerts' %>
+    <% if params[:controller]&.start_with?('admin/') %>
+      <%= render 'shared/admin/flash_messages' %>
+    <% else %>
+      <%= render 'shared/alerts' %>
+    <% end %>
 
     <main class="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-grow">
 

@@ -420,9 +420,11 @@ export default class extends Controller {
 
   // Toast notifications
   showToast(message, type = 'info') {
-    this.dispatch('toast', {
+    // Dispatch global event for unified flash controller
+    const event = new CustomEvent('admin-dashboard:toast', {
       detail: { message, type }
     })
+    document.dispatchEvent(event)
   }
 
   // Performance monitoring

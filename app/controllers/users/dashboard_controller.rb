@@ -38,34 +38,32 @@ class Users::DashboardController < ApplicationController
   end
 
   def export
-  user = User.find(params[:id])
-
-  respond_to do |format|
-    format.json do
-      render json: {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-        movies: user.movies.pluck(:title),
-        reviews: user.reviews.pluck(:content)
-      }
-    end
-
-    format.csv do
-      csv_data = CSV.generate(headers: true) do |csv|
-        csv << %w[Champ Valeur]
-        csv << ["Prénom", user.first_name]
-        csv << ["Nom", user.last_name]
-        csv << ["Email", user.email]
-        csv << ["Rôle", user.role]
-        csv << ["Nombre de films", user.movies.count]
-        csv << ["Nombre de critiques", user.reviews.count]
+    respond_to do |format|
+      format.json do
+        render json: {
+          first_name: @user.first_name,
+          last_name: @user.last_name,
+          email: @user.email,
+          role: @user.role,
+          movies: @user.movies.pluck(:title),
+          reviews: @user.reviews.pluck(:content)
+        }
       end
-      send_data csv_data, filename: "user_data_#{user.id}.csv"
+
+      format.csv do
+        csv_data = CSV.generate(headers: true) do |csv|
+          csv << %w[Champ Valeur]
+          csv << ["Prénom", @user.first_name]
+          csv << ["Nom", @user.last_name]
+          csv << ["Email", @user.email]
+          csv << ["Rôle", @user.role]
+          csv << ["Nombre de films", @user.movies.count]
+          csv << ["Nombre de critiques", @user.reviews.count]
+        end
+        send_data csv_data, filename: "user_data_#{@user.id}.csv"
+      end
     end
   end
-end
 
 
   private

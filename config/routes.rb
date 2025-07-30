@@ -186,6 +186,9 @@ Rails.application.routes.draw do
         get :past_participations
         get :favorite_events
         get :reviews
+      end
+      
+      collection do
         get 'data_export', to: 'dashboard#export', as: :data_export
       end
     end

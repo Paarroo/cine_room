@@ -16,6 +16,9 @@
         border-radius: 12px;
         padding: 30px;
       }
+      .brand-gold {
+        color: #fbbf24;
+      }
       .btn {
         display: inline-block;
         background-color: #fbbf24;
@@ -37,7 +40,7 @@
 
   <body>
     <div class="container">
-      <h1>Bienvenue sur <span style="color:#fbbf24;">CinéRoom</span> 👋</h1>
+      <h1>Bienvenue sur <span class="brand-gold">CinéRoom</span> 👋</h1>
       <p>Bonjour <strong><%= @user.first_name || @user.email %></strong>,</p>
       <p>Merci de nous rejoindre ! CinéRoom est la plateforme dédiée aux amoureux du cinéma indépendant.</p>
       <p>🎥 Découvrez des films uniques, rencontrez leurs créateurs et vivez des projections dans des lieux d’exception.</p>

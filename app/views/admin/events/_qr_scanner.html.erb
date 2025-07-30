@@ -9,8 +9,7 @@
     <!-- Camera Preview -->
     <div class="relative">
       <video id="qr-scanner-video" 
-             class="w-full max-w-md mx-auto rounded-xl bg-black" 
-             style="display: none;">
+             class="w-full max-w-md mx-auto rounded-xl bg-black admin-hidden-default">
       </video>
       
       <div id="qr-scanner-placeholder" 
@@ -31,8 +30,7 @@
       </button>
       
       <button id="stop-scanner" 
-              class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-colors flex items-center space-x-2" 
-              style="display: none;">
+              class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-colors flex items-center space-x-2 admin-hidden-default">
         <span>⏹️</span>
         <span>Arrêter</span>
       </button>
@@ -73,7 +71,7 @@
   </div>
 
   <!-- Results Display -->
-  <div id="scan-results" class="mt-6" style="display: none;"></div>
+  <div id="scan-results" class="mt-6 admin-hidden-default"></div>
 </div>
 
 <script>
@@ -122,10 +120,10 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       video.srcObject = stream;
-      video.style.display = 'block';
-      placeholder.style.display = 'none';
-      startBtn.style.display = 'none';
-      stopBtn.style.display = 'flex';
+      video.classList.add('admin-qr-video-active');
+      placeholder.classList.add('admin-qr-placeholder-hidden');
+      startBtn.classList.add('admin-qr-start-hidden');
+      stopBtn.classList.add('admin-qr-stop-active');
       
       scanning = true;
       scanForQRCode();
@@ -143,10 +141,10 @@ document.addEventListener('DOMContentLoaded', function() {
       video.srcObject.getTracks().forEach(track => track.stop());
     }
     
-    video.style.display = 'none';
-    placeholder.style.display = 'flex';
-    startBtn.style.display = 'flex';
-    stopBtn.style.display = 'none';
+    video.classList.remove('admin-qr-video-active');
+    placeholder.classList.remove('admin-qr-placeholder-hidden');
+    startBtn.classList.remove('admin-qr-start-hidden');
+    stopBtn.classList.remove('admin-qr-stop-active');
   }
 
   // Note: This is a simplified QR scanning - in production you'd use a library like jsQR
@@ -221,12 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
     content += '</div>';
 
     resultsDiv.innerHTML = content;
-    resultsDiv.style.display = 'block';
+    resultsDiv.classList.add('admin-qr-results-visible');
 
     // Auto-hide after 5 seconds for success messages
     if (type === 'success') {
       setTimeout(() => {
-        resultsDiv.style.display = 'none';
+        resultsDiv.classList.remove('admin-qr-results-visible');
       }, 5000);
     }
   }

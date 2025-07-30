@@ -1,91 +1,91 @@
 <div class="dashboard-header">
-  <div class="welcome-section" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
-    <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fbbf24, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+  <div class="admin-welcome-section">
+    <h1 class="admin-welcome-title">
       Bonjour Admin !
     </h1>
-    <p style="color: #9ca3af; font-size: 1.125rem;">
+    <p class="admin-welcome-subtitle">
       Tableau de bord CinéRoom - 22 juillet 2025
     </p>
     <!-- Quick Action Buttons -->
-    <div style="margin-top: 1.5rem;">
-      <a href="/admin_movies_path" style="margin-right: 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;">Nouveau Film</a>
-      <a href="/admin_events_path" style="background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none;">Nouvel Événement</a>
+    <div class="admin-welcome-actions">
+      <a href="/admin_movies_path" class="admin-welcome-btn-primary">Nouveau Film</a>
+      <a href="/admin_events_path" class="admin-welcome-btn-secondary">Nouvel Événement</a>
     </div>
   </div>
 </div>
 
 <!-- Key Metrics Section -->
 <div class="metrics-section">
-  <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; color: #f59e0b;">
+  <h2 class="admin-metrics-title">
     Métriques Clés
   </h2>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="admin-metrics-grid">
 
     <!-- Revenue Metric Card -->
-    <div class="metric-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.5rem; transition: all 0.3s ease;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(245, 158, 11, 0.1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-euro-sign" style="color: #f59e0b; font-size: 1.25rem;"></i>
+    <div class="admin-metric-card">
+      <div class="admin-metric-header">
+        <div class="admin-metric-icon admin-metric-icon-gold">
+          <i class="fas fa-euro-sign"></i>
         </div>
       </div>
 
-      <div style="font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #fbbf24, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+      <div class="admin-metric-value admin-metric-value-gradient">
         <%= number_to_currency(@metrics[:total_revenue]) %>
       </div>
-      <div style="color: #9ca3af; font-size: 0.875rem;">Revenus Total</div>
-      <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
+      <div class="admin-metric-label">Revenus Total</div>
+      <div class="admin-metric-sublabel">
         Ce mois
       </div>
     </div>
 
     <!-- Active Events Metric Card -->
-    <div class="metric-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.5rem;">
-      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(37, 99, 235, 0.1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-calendar-alt" style="color: #2563eb; font-size: 1.25rem;"></i>
+    <div class="admin-metric-card">
+      <div class="admin-metric-header-simple">
+        <div class="admin-metric-icon admin-metric-icon-blue">
+          <i class="fas fa-calendar-alt"></i>
         </div>
       </div>
 
-      <div style="font-size: 2rem; font-weight: bold; color: #2563eb; margin-bottom: 0.5rem;">
+      <div class="admin-metric-value admin-metric-value-blue">
         <%= @metrics[:upcoming_events] %>
       </div>
-      <div style="color: #9ca3af; font-size: 0.875rem;">Événements Actifs</div>
-      <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
+      <div class="admin-metric-label">Événements Actifs</div>
+      <div class="admin-metric-sublabel">
         <%= Event.where(status: :sold_out).count %> complets
       </div>
     </div>
 
     <!-- Users Metric Card -->
-    <div class="metric-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.5rem;">
-      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(34, 197, 94, 0.1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-users" style="color: #22c55e; font-size: 1.25rem;"></i>
+    <div class="admin-metric-card">
+      <div class="admin-metric-header-simple">
+        <div class="admin-metric-icon admin-metric-icon-green">
+          <i class="fas fa-users"></i>
         </div>
       </div>
 
-      <div style="font-size: 2rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">
+      <div class="admin-metric-value admin-metric-value-green">
         <%= @metrics[:total_users] %>
       </div>
-      <div style="color: #9ca3af; font-size: 0.875rem;">Utilisateurs Total</div>
-      <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
+      <div class="admin-metric-label">Utilisateurs Total</div>
+      <div class="admin-metric-sublabel">
         <%= Participation.joins(:user).distinct.count('users.id') %> actifs
       </div>
     </div>
 
     <!-- Satisfaction Metric Card -->
-    <div class="metric-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.5rem;">
-      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(245, 158, 11, 0.1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-star" style="color: #f59e0b; font-size: 1.25rem;"></i>
+    <div class="admin-metric-card">
+      <div class="admin-metric-header-simple">
+        <div class="admin-metric-icon admin-metric-icon-gold">
+          <i class="fas fa-star"></i>
         </div>
       </div>
 
-      <div style="font-size: 2rem; font-weight: bold; color: #f59e0b; margin-bottom: 0.5rem;">
+      <div class="admin-metric-value admin-metric-value-gold">
         <%= @metrics[:satisfaction] %>/5
       </div>
-      <div style="color: #9ca3af; font-size: 0.875rem;">Satisfaction</div>
-      <div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">
+      <div class="admin-metric-label">Satisfaction</div>
+      <div class="admin-metric-sublabel">
         <%= Review.count %> avis
       </div>
     </div>
@@ -94,46 +94,45 @@
 
 <!-- Management Section with Pending Movies and Recent Activity -->
 <div class="management-section">
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+  <div class="admin-content-grid">
 
     <!-- Pending Movies Panel -->
     <div class="panel">
-      <h3 style="color: #f59e0b; margin-bottom: 1rem;">Films en Attente de Validation</h3>
+      <h3 class="admin-section-title admin-section-title-gold">Films en Attente de Validation</h3>
 
       <% if @pending_movies.any? %>
-        <div style="space-y: 0.75rem;">
+        <div class="admin-pending-list">
           <% @pending_movies.each do |movie| %>
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="admin-pending-item">
               <!-- Movie Info -->
-              <div>
-                <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+              <div class="admin-pending-info">
+                <h4>
                   <%= movie.title %>
-                </div>
-                <div style="font-size: 0.875rem; color: #9ca3af;">
+                </h4>
+                <div class="director">
                   <%= movie.director %> • <%= movie.year %>
                 </div>
-                <div style="font-size: 0.75rem; color: #6b7280;">
+                <div class="date">
                   Par <%= movie.user&.full_name || 'Créateur inconnu' %>
                 </div>
               </div>
 
               <!-- Action Buttons -->
-              <div style="display: flex; gap: 0.5rem;">
-                <%= link_to "Voir", admin_movie_path(movie), class: "button",
-                    style: "padding: 0.25rem 0.75rem; background: rgba(37, 99, 235, 0.2); color: #3b82f6; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem;" %>
+              <div class="admin-pending-actions">
+                <%= link_to "Voir", admin_movie_path(movie), class: "admin-action-button" %>
               </div>
             </div>
           <% end %>
         </div>
 
-        <div style="margin-top: 1rem; text-align: center;">
+        <div class="admin-pending-more">
           <%= link_to "Voir tous les films en attente",
               admin_movies_path + "?q[validation_status_eq]=pending",
-              style: "color: #f59e0b; text-decoration: none;" %>
+              class: "text-gold-500 hover:text-gold-400 transition-colors" %>
         </div>
       <% else %>
-        <div style="text-align: center; padding: 2rem; color: #9ca3af;">
-          <i class="fas fa-check-circle" style="font-size: 3rem; color: #22c55e; margin-bottom: 1rem; display: block;"></i>
+        <div class="admin-no-pending">
+          <i class="fas fa-check-circle"></i>
           <div>Aucun film en attente de validation</div>
         </div>
       <% end %>
@@ -141,25 +140,25 @@
 
     <!-- Recent Activity Panel -->
     <div class="panel">
-      <h3 style="color: #2563eb; margin-bottom: 1rem;">Activité Récente</h3>
+      <h3 class="admin-section-title admin-section-title-blue">Activité Récente</h3>
 
-      <div style="space-y: 1rem;">
+      <div class="admin-activity-list">
         <% @recent_activities.each do |activity| %>
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 0.5rem; margin-bottom: 0.75rem;">
-            <div style="width: 2.5rem; height: 2.5rem; background: rgba(245, 158, 11, 0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
-              <i class="fas fa-<%= activity[:icon] %>" style="color: #f59e0b; font-size: 0.875rem;"></i>
+          <div class="admin-activity-item">
+            <div class="admin-activity-icon">
+              <i class="fas fa-<%= activity[:icon] %>"></i>
             </div>
 
-            <div style="flex: 1;">
-              <div style="font-size: 0.875rem; font-weight: 500; color: white; margin-bottom: 0.25rem;">
+            <div class="admin-activity-content">
+              <div class="admin-activity-text">
                 <%= activity[:title] %>
               </div>
-              <div style="font-size: 0.75rem; color: #9ca3af;">
+              <div class="admin-activity-description">
                 <%= activity[:description] %>
               </div>
             </div>
 
-            <div style="font-size: 0.75rem; color: #6b7280;">
+            <div class="admin-activity-time">
               <%= activity[:time_ago] %>
             </div>
           </div>
@@ -171,66 +170,66 @@
 
 <!-- Quick Actions Section -->
 <div class="quick-actions">
-  <h3 style="color: #f59e0b; margin-bottom: 1.5rem; font-size: 1.25rem;">Actions Rapides</h3>
+  <h3 class="admin-quick-actions-title">Actions Rapides</h3>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+  <div class="admin-quick-actions-grid">
 
     <!-- Movies Management Action -->
-    <%= link_to admin_movies_path, style: "padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; text-decoration: none; color: white; transition: all 0.3s ease; display: block;" do %>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(245, 158, 11, 0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-film" style="color: #f59e0b;"></i>
+    <%= link_to admin_movies_path, class: "admin-quick-action-link" do %>
+      <div class="admin-quick-action-item">
+        <div class="admin-quick-action-icon admin-quick-action-icon-gold">
+          <i class="fas fa-film"></i>
         </div>
-        <div>
-          <div style="font-weight: 600; margin-bottom: 0.25rem;">Gérer Films</div>
-          <div style="font-size: 0.875rem; color: #9ca3af;">
+        <div class="admin-quick-action-text">
+          <h4>Gérer Films</h4>
+          <p>
             <%= @quick_stats[:pending_movies] %> en attente
-          </div>
+          </p>
         </div>
       </div>
     <% end %>
 
     <!-- Events Management Action -->
-    <%= link_to admin_events_path, style: "padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; text-decoration: none; color: white; transition: all 0.3s ease; display: block;" do %>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(37, 99, 235, 0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-calendar-alt" style="color: #2563eb;"></i>
+    <%= link_to admin_events_path, class: "admin-quick-action-link" do %>
+      <div class="admin-quick-action-item">
+        <div class="admin-quick-action-icon admin-quick-action-icon-blue">
+          <i class="fas fa-calendar-alt"></i>
         </div>
-        <div>
-          <div style="font-weight: 600; margin-bottom: 0.25rem;">Événements</div>
-          <div style="font-size: 0.875rem; color: #9ca3af;">
+        <div class="admin-quick-action-text">
+          <h4>Événements</h4>
+          <p>
             <%= @quick_stats[:upcoming_events] %> à venir
-          </div>
+          </p>
         </div>
       </div>
     <% end %>
 
     <!-- Users Management Action -->
-    <%= link_to admin_users_path, style: "padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; text-decoration: none; color: white; transition: all 0.3s ease; display: block;" do %>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(34, 197, 94, 0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-users" style="color: #22c55e;"></i>
+    <%= link_to admin_users_path, class: "admin-quick-action-link" do %>
+      <div class="admin-quick-action-item">
+        <div class="admin-quick-action-icon admin-quick-action-icon-green">
+          <i class="fas fa-users"></i>
         </div>
-        <div>
-          <div style="font-weight: 600; margin-bottom: 0.25rem;">Utilisateurs</div>
-          <div style="font-size: 0.875rem; color: #9ca3af;">
+        <div class="admin-quick-action-text">
+          <h4>Utilisateurs</h4>
+          <p>
             <%= @quick_stats[:total_users] %> total
-          </div>
+          </p>
         </div>
       </div>
     <% end %>
 
     <!-- Participations Management Action -->
-    <%= link_to admin_participations_path, style: "padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; text-decoration: none; color: white; transition: all 0.3s ease; display: block;" do %>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="width: 3rem; height: 3rem; background: rgba(245, 158, 11, 0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-ticket-alt" style="color: #f59e0b;"></i>
+    <%= link_to admin_participations_path, class: "admin-quick-action-link" do %>
+      <div class="admin-quick-action-item">
+        <div class="admin-quick-action-icon admin-quick-action-icon-gold">
+          <i class="fas fa-ticket-alt"></i>
         </div>
-        <div>
-          <div style="font-weight: 600; margin-bottom: 0.25rem;">Participations</div>
-          <div style="font-size: 0.875rem; color: #9ca3af;">
+        <div class="admin-quick-action-text">
+          <h4>Participations</h4>
+          <p>
             <%= Participation.count %> total
-          </div>
+          </p>
         </div>
       </div>
     <% end %>

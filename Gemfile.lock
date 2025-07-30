@@ -671,7 +671,7 @@ GEM
       railties (>= 6.0.0)
     stringio (3.1.7)
     strings-ansi (0.2.0)
-    stripe (15.3.0)
+    stripe (15.4.0)
     stripe_event (2.12.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 16)
@@ -809,7 +809,7 @@ DEPENDENCIES
   noticed
   nyan-cat-formatter (~> 0.12)
   opencage-geocoder (~> 3.2)
-  pg (~> 1.1)
+  pg (~> 1.6)
   premailer-rails
   propshaft
   pry-byebug

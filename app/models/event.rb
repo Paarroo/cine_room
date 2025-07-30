@@ -3,24 +3,45 @@ class Event < ApplicationRecord
   before_save :update_status_if_sold_out
   after_create_commit :attach_default_image
 
+  # Common countries for cinema events
+  COUNTRIES = [
+    ['France', 'France'],
+    ['United States', 'United States'],
+    ['Canada', 'Canada'],
+    ['United Kingdom', 'United Kingdom'],
+    ['Germany', 'Germany'],
+    ['Spain', 'Spain'],
+    ['Italy', 'Italy'],
+    ['Belgium', 'Belgium'],
+    ['Switzerland', 'Switzerland'],
+    ['Japan', 'Japan'],
+    ['Australia', 'Australia'],
+    ['New Zealand', 'New Zealand'],
+    ['Brazil', 'Brazil'],
+    ['Argentina', 'Argentina'],
+    ['Mexico', 'Mexico'],
+    ['Other', 'Other']
+  ].freeze
+
   belongs_to :movie
   has_many :participations, dependent: :destroy
   has_many :users, through: :participations
   has_many :reviews, dependent: :destroy
   has_one_attached :image
 
-  # Geocoding for venue address
-  geocoded_by :venue_address
+  # Geocoding for venue address with country context
+  geocoded_by :full_address
   after_validation :geocode, if: :should_geocode?
   
   before_save :ensure_geocoded_coordinates
 
   validates :title, :venue_name, :venue_address, :event_date, :start_time, :max_capacity, :price_cents, presence: true
+  validates :country, presence: { message: "doit être spécifié pour améliorer le géocodage" }
   validates :max_capacity, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :price_cents, numericality: { greater_than: 0 }
-  validates :latitude, :longitude, presence: true, numericality: true
-  validates :latitude, numericality: { in: -90..90 }
-  validates :longitude, numericality: { in: -180..180 }
+  validates :latitude, :longitude, presence: { message: "sont requises. Vérifiez que l'adresse peut être géocodée." }, numericality: true
+  validates :latitude, numericality: { in: -90..90, message: "doit être entre -90 et 90 degrés" }
+  validates :longitude, numericality: { in: -180..180, message: "doit être entre -180 et 180 degrés" }
   validate :event_date_must_be_at_least_one_week_from_now
   validate :coordinates_are_reasonable
   validate :venue_address_format
@@ -86,14 +107,93 @@ class Event < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     [
-      "title", "description", "venue_name", "venue_address",
+      "title", "description", "venue_name", "venue_address", "country",
       "event_date", "start_time", "max_capacity", "price_cents",
-      "status", "latitude", "longitude", "created_at", "updated_at"
+      "status", "latitude", "longitude", "geocoding_status", "geocoding_confidence",
+      "coordinates_verified", "created_at", "updated_at"
     ]
   end
 
   def self.ransackable_associations(auth_object = nil)
     [ "movie", "participations", "users", "reviews" ]
+  end
+
+  # Business logic methods - moved from controllers
+  
+  # Get analytics service for this event
+  def analytics
+    @analytics ||= EventAnalyticsService.new(self)
+  end
+
+  # Get export service for this event
+  def export_service
+    @export_service ||= EventExportService.new(self)
+  end
+
+  # Calculate revenue using service
+  def calculate_revenue
+    analytics.calculate_revenue
+  end
+
+  # Get booking analytics
+  def booking_analytics
+    analytics.calculate_booking_analytics
+  end
+
+  # Get capacity metrics
+  def capacity_metrics
+    analytics.calculate_capacity_metrics
+  end
+
+  # Get recent activities
+  def recent_activities(limit: 5)
+    analytics.get_recent_activities(limit: limit)
+  end
+
+  # Complete event with proper status management
+  def complete!
+    update!(status: :completed, updated_at: Time.current)
+  end
+
+  # Cancel event and handle participations
+  def cancel!
+    transaction do
+      update!(status: :cancelled, updated_at: Time.current)
+      participations.where(status: :pending).update_all(status: :cancelled)
+    end
+  end
+
+  # Reopen cancelled event
+  def reopen!
+    update!(status: :upcoming, updated_at: Time.current)
+  end
+
+  # Check if event can be cancelled
+  def can_be_cancelled?
+    upcoming? && event_date > 1.day.from_now
+  end
+
+  # Check if event can be completed
+  def can_be_completed?
+    upcoming? && event_date < Time.current
+  end
+
+  # Get confirmed participations
+  def confirmed_participations
+    participations.where(status: [:confirmed, :attended])
+  end
+
+  # Calculate occupancy rate
+  def occupancy_rate
+    return 0 if max_capacity.zero?
+    
+    confirmed_seats = confirmed_participations.sum(:seats)
+    (confirmed_seats.to_f / max_capacity * 100).round(1)
+  end
+
+  # Check if event is nearly sold out (>90% capacity)
+  def nearly_sold_out?
+    occupancy_rate >= 90
   end
 
   private
@@ -117,53 +217,52 @@ class Event < ApplicationRecord
     end
   end
 
+  # Create full address with country context for better geocoding
+  def full_address
+    return venue_address unless country.present?
+    "#{venue_address}, #{country}"
+  end
+
   def should_geocode?
-    venue_address_changed? || (latitude.blank? || longitude.blank?)
+    venue_address_changed? || country_changed? || (latitude.blank? || longitude.blank?)
   end
 
   def ensure_geocoded_coordinates
     if venue_address.present? && (latitude.blank? || longitude.blank?)
-      Rails.logger.info "🌍 Starting geocoding for event #{id || 'new'}: '#{venue_address}'"
+      # Use OpenCage geocoding service for much better accuracy
+      geocoding_service = OpenCageGeocodingService.new(
+        address: venue_address,
+        country: country,
+        venue_name: venue_name
+      )
       
-      begin
-        # Test geocoding service availability first
-        test_result = Geocoder.search("Paris, France").first
-        if test_result.nil?
-          Rails.logger.error "🚨 Geocoding service unavailable - test query failed"
-          self.latitude = 48.8566
-          self.longitude = 2.3522
-          self.geocoding_status = "service_unavailable"
-          return
-        end
+      result = geocoding_service.geocode_with_quality_control
+      
+      if result[:success]
+        self.latitude = result[:latitude]
+        self.longitude = result[:longitude]
+        self.geocoding_confidence = result[:confidence]
+        self.coordinates_verified = result[:verified] || false
+        self.geocoding_status = "success"
         
-        # Retry geocoding with better error handling
-        Rails.logger.info "🔍 Geocoding address: #{venue_address}"
-        geocode
+        Rails.logger.info "✅ OpenCage geocoding succeeded for event #{id || 'new'}: #{result[:formatted_address]} -> #{latitude}, #{longitude} (confidence: #{geocoding_confidence}%)"
         
-        # If geocoding fails, set default coordinates for Paris
-        if latitude.blank? || longitude.blank?
-          Rails.logger.warn "❌ Geocoding failed for event #{id || 'new'}: #{venue_address}. Using Paris coordinates."
-          Rails.logger.warn "📊 Geocoder lookup: #{Geocoder.config.lookup}, timeout: #{Geocoder.config.timeout}"
-          self.latitude = 48.8566
-          self.longitude = 2.3522
-          self.geocoding_status = "failed"
-        else
-          Rails.logger.info "✅ Successfully geocoded event #{id || 'new'}: #{venue_address} -> #{latitude}, #{longitude}"
-          self.geocoding_status = "success"
+        # Add warnings to errors if verification failed (but don't prevent saving)
+        if result[:warnings]&.any?
+          result[:warnings].each do |warning|
+            Rails.logger.warn "⚠️  #{warning} for event #{id || 'new'}"
+          end
         end
-      rescue Geocoder::Error => e
-        Rails.logger.error "🚨 Geocoding error for event #{id || 'new'}: #{e.class} - #{e.message}. Using Paris coordinates."
-        Rails.logger.error "🔧 Geocoder config: lookup=#{Geocoder.config.lookup}, timeout=#{Geocoder.config.timeout}, use_https=#{Geocoder.config.use_https}"
-        self.latitude = 48.8566
-        self.longitude = 2.3522
-        self.geocoding_status = "error"
-      rescue => e
-        Rails.logger.error "💥 Unexpected geocoding error for event #{id || 'new'}: #{e.class} - #{e.message}. Using Paris coordinates."
-        Rails.logger.error "📍 Address was: #{venue_address}"
-        Rails.logger.error "🔍 Backtrace: #{e.backtrace.first(3).join(', ')}"
-        self.latitude = 48.8566
-        self.longitude = 2.3522
-        self.geocoding_status = "unexpected_error"
+      else
+        self.geocoding_status = "failed"
+        Rails.logger.error "❌ OpenCage geocoding failed for event #{id || 'new'}: #{result[:error]}"
+        
+        # Add helpful error message with suggestions
+        error_message = "Geocoding failed: #{result[:error]}"
+        if result[:suggestions]&.any?
+          error_message += ". Suggestions: #{result[:suggestions].join(', ')}"
+        end
+        errors.add(:venue_address, error_message)
       end
     elsif latitude.present? && longitude.present?
       self.geocoding_status = "existing_coordinates"
@@ -174,24 +273,34 @@ class Event < ApplicationRecord
   def coordinates_are_reasonable
     return unless latitude.present? && longitude.present?
     
-    # Check if coordinates are in France (roughly)
-    # France bounds: lat 41-51, lng -5 to 10
-    unless latitude.between?(40, 52) && longitude.between?(-6, 11)
-      Rails.logger.warn "Event #{id || 'new'} has suspicious coordinates: #{latitude}, #{longitude} for address: #{venue_address}"
-      # Don't fail validation, just log warning - coordinates might be valid for international events
+    # Basic sanity check for valid coordinates (worldwide)
+    if latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180
+      errors.add(:latitude, "must be between -90 and 90") if latitude < -90 || latitude > 90
+      errors.add(:longitude, "must be between -180 and 180") if longitude < -180 || longitude > 180
+      Rails.logger.error "Event #{id || 'new'} has invalid coordinates: #{latitude}, #{longitude}"
+    end
+    
+    # Log extreme coordinates for manual review (but don't fail validation)
+    if latitude.abs > 85 || longitude.abs > 175
+      Rails.logger.warn "Event #{id || 'new'} has extreme coordinates: #{latitude}, #{longitude} for address: #{venue_address}"
     end
   end
   
   def venue_address_format
     return unless venue_address.present?
     
-    # Basic validation for French address format
-    unless venue_address.match?(/\d+.*,\s*\d{5}\s+\w+/i)
-      errors.add(:venue_address, "doit contenir un numéro, une rue et un code postal (ex: '1 Rue de la Paix, 75001 Paris')")
+    # Basic validation for international address format - must have some structure
+    if venue_address.length < 10
+      errors.add(:venue_address, "doit être plus détaillée pour un géocodage précis")
     end
     
-    # Warn about suspicious patterns
-    if venue_address.match?(/apt\.|étage|villa|résidence/i)
+    # Recommend including city and country for better geocoding
+    unless venue_address.match?(/,.*\w/i)  # At least one comma separator
+      Rails.logger.warn "Event #{id || 'new'} address might benefit from city/country: #{venue_address}"
+    end
+    
+    # Warn about detailed address parts that might affect geocoding
+    if venue_address.match?(/apt\.|suite|floor|étage|villa|résidence|building|bloc/i)
       Rails.logger.info "Event #{id || 'new'} has detailed address that might affect geocoding: #{venue_address}"
     end
   end

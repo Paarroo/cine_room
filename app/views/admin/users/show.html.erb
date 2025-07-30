@@ -136,8 +136,8 @@
                     <span class="text-primary font-semibold"><%= @profile_completion[:percentage] %>%</span>
                   </div>
                   <div class="w-full bg-gray-700 rounded-full h-3">
-                    <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300"
-                         style="width: <%= @profile_completion[:percentage] %>%"></div>
+                    <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300 admin-progress-dynamic"
+                         style="--progress-width: <%= @profile_completion[:percentage] %>%"></div>
                   </div>
                   <div class="text-sm text-gray-400 mt-2">
                     <%= @profile_completion[:completed_fields] %>/<%= @profile_completion[:total_fields] %> champs remplis

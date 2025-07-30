@@ -1,243 +1,144 @@
 class Admin::UsersController < Admin::ApplicationController
   include UserManagement
 
-  before_action :set_user, only: [ :show, :update, :toggle_role, :reset_password ]
+  before_action :set_user, only: [:show, :update, :toggle_role, :reset_password]
 
   def index
     @users_query = User.includes(:movies, :participations, :reviews)
-
-    # Apply filters using concern method
     @users = filter_users(params).limit(50).to_a
 
-    # Calculate stats using concern method
-    @stats = calculate_user_stats
-
-    # Get filter options for form
-    @filter_options = get_user_filter_options
+    view_service = UserViewService.new
+    view_data = view_service.prepare_index_data(@users)
+    
+    @stats = view_data[:stats]
+    @filter_options = view_data[:filter_options]
   end
 
   def show
-    @user_activity = user_activity_summary(@user)
-    @profile_completion = profile_completion_status(@user)
-    @recent_movies = @user.movies.order(created_at: :desc).limit(5)
-    @recent_participations = @user.participations
-                                  .includes(:event)
-                                  .order(created_at: :desc)
-                                  .limit(10)
-    @recent_reviews = @user.reviews
-                           .includes(:movie, :event)
-                           .order(created_at: :desc)
-                           .limit(10)
+    view_service = UserViewService.new
+    view_data = view_service.prepare_show_data(@user)
+    
+    @user_activity = view_data[:user_activity]
+    @profile_completion = view_data[:profile_completion]
+    @recent_movies = view_data[:recent_movies]
+    @recent_participations = view_data[:recent_participations]
+    @recent_reviews = view_data[:recent_reviews]
   end
 
   def update
     if @user.update(user_params)
       log_user_action('updated', @user, user_params.to_h)
-
-      respond_to do |format|
-        format.json { render json: { status: 'success', message: 'Utilisateur mis à jour' } }
-        format.html { redirect_to admin_user_path(@user), notice: 'Utilisateur mis à jour avec succès' }
-      end
+      respond_to(&standard_success_response('Utilisateur mis à jour'))
     else
-      respond_to do |format|
-        format.json { render json: { status: 'error', errors: @user.errors } }
-        format.html { render :show, alert: 'Erreur lors de la mise à jour' }
-      end
+      respond_to(&standard_error_response(@user.errors))
     end
   end
 
-  # Role management actions
   def toggle_role
-    return unless can_modify_user?(@user)
+    service = UserManagementService.new
+    return unless service.can_modify_user?(current_user, @user)
 
     old_role = @user.role
-    toggle_role_action(@user)
-    log_user_action('role_changed', @user, { from: old_role, to: @user.role })
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', new_role: @user.role.humanize } }
-      format.html { redirect_to admin_user_path(@user), notice: "Rôle changé vers #{@user.role.humanize}" }
-    end
+    new_role = service.toggle_user_role(@user)
+    log_user_action('role_changed', @user, { from: old_role, to: new_role })
+    respond_to(&role_change_success_response(new_role))
   rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors du changement de rôle' }
-    end
+    respond_to(&error_response(e, 'du changement de rôle'))
   end
 
   def promote_to_admin
-    return unless can_modify_user?(@user)
+    service = UserManagementService.new
+    return unless service.can_modify_user?(current_user, @user)
 
-    promote_to_admin_action(@user)
+    service.promote_to_admin(@user)
     log_user_action('promoted_to_admin', @user)
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Utilisateur promu administrateur' } }
-      format.html { redirect_to admin_user_path(@user), notice: 'Utilisateur promu administrateur' }
-    end
+    respond_to(&standard_success_response('Utilisateur promu administrateur'))
   rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la promotion' }
-    end
+    respond_to(&error_response(e, 'de la promotion'))
   end
 
   def demote_to_user
-    return unless can_modify_user?(@user)
+    service = UserManagementService.new
+    return unless service.can_modify_user?(current_user, @user)
 
-    demote_to_user_action(@user)
+    service.demote_to_user(@user)
     log_user_action('demoted_to_user', @user)
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Utilisateur rétrogradé' } }
-      format.html { redirect_to admin_user_path(@user), notice: 'Utilisateur rétrogradé vers utilisateur standard' }
-    end
+    respond_to(&demote_success_response)
   rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la rétrogradation' }
-    end
+    respond_to(&error_response(e, 'de la rétrogradation'))
   end
 
   def reset_password
-    return unless can_modify_user?(@user)
+    service = UserManagementService.new
+    return unless service.can_modify_user?(current_user, @user)
 
-    new_password = reset_password_action(@user)
+    new_password = service.reset_user_password(@user)
     log_user_action('password_reset', @user)
-
-    respond_to do |format|
-      format.json do
-        render json: {
-          status: 'success',
-          message: 'Mot de passe réinitialisé',
-          new_password: new_password
-        }
-      end
-      format.html do
-        redirect_to admin_user_path(@user),
-                    notice: "Mot de passe réinitialisé. Nouveau mot de passe: #{new_password}"
-      end
-    end
+    respond_to(&password_reset_success_response(new_password))
   rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_user_path(@user), alert: 'Erreur lors de la réinitialisation' }
-    end
+    respond_to(&error_response(e, 'de la réinitialisation'))
   end
 
-  # Bulk operations
   def bulk_promote
     user_ids = params[:user_ids]
     return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
 
-    users_to_promote = User.where(id: user_ids)
-    return redirect_to admin_users_path, alert: 'Utilisateurs non trouvés' if users_to_promote.empty?
-
-    # Check permissions for each user
-    unauthorized_users = users_to_promote.reject { |user| can_modify_user?(user) }
-    if unauthorized_users.any?
-      return redirect_to admin_users_path,
-                        alert: "Vous n'avez pas les permissions pour modifier certains utilisateurs"
+    view_service = UserViewService.new
+    permission_check = view_service.check_bulk_permissions(current_user, user_ids)
+    
+    if permission_check[:error]
+      return redirect_to admin_users_path, alert: permission_check[:error]
     end
 
-    bulk_promote_users(user_ids)
+    result = permission_check[:service].bulk_promote_users(user_ids)
     log_user_action('bulk_promoted', nil, { count: user_ids.count, ids: user_ids })
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs promus" } }
-      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs promus administrateurs" }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la promotion en masse' }
-    end
+    respond_to(&bulk_operation_response(result))
   end
 
   def bulk_demote
     user_ids = params[:user_ids]
     return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
 
-    users_to_demote = User.where(id: user_ids)
-    return redirect_to admin_users_path, alert: 'Utilisateurs non trouvés' if users_to_demote.empty?
-
-    # Check permissions
-    unauthorized_users = users_to_demote.reject { |user| can_modify_user?(user) }
-    if unauthorized_users.any?
-      return redirect_to admin_users_path,
-                        alert: "Vous n'avez pas les permissions pour modifier certains utilisateurs"
+    view_service = UserViewService.new
+    permission_check = view_service.check_bulk_permissions(current_user, user_ids)
+    
+    if permission_check[:error]
+      return redirect_to admin_users_path, alert: permission_check[:error]
     end
 
-    bulk_demote_users(user_ids)
+    result = permission_check[:service].bulk_demote_users(user_ids)
     log_user_action('bulk_demoted', nil, { count: user_ids.count, ids: user_ids })
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs rétrogradés" } }
-      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs rétrogradés" }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la rétrogradation en masse' }
-    end
+    respond_to(&bulk_operation_response(result))
   end
 
   def bulk_promote_to_creator
     user_ids = params[:user_ids]
     return redirect_to admin_users_path, alert: 'Aucun utilisateur sélectionné' if user_ids.blank?
 
-    bulk_promote_to_creator(user_ids)
+    service = UserManagementService.new
+    result = service.bulk_promote_to_creator(user_ids)
     log_user_action('bulk_promoted_to_creator', nil, { count: user_ids.count, ids: user_ids })
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: "#{user_ids.count} utilisateurs promus créateurs" } }
-      format.html { redirect_to admin_users_path, notice: "#{user_ids.count} utilisateurs promus créateurs" }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_users_path, alert: 'Erreur lors de la promotion en masse' }
-    end
+    respond_to(&bulk_operation_response(result))
   end
 
-  # Export functionality
   def export
     users_scope = filter_users(params)
-    @export_data = export_users_data(users_scope)
+    view_service = UserViewService.new
+    export_data = view_service.prepare_export_data(users_scope)
+    filename = "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
 
     respond_to do |format|
-      format.json do
-        render json: {
-          success: true,
-          data: @export_data,
-          filename: "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
-        }
-      end
-      format.csv do
-        send_data generate_csv(@export_data),
-                  filename: "users_export_#{Date.current.strftime('%Y%m%d')}.csv"
-      end
+      format.json { render json: { success: true, data: export_data, filename: filename } }
+      format.csv { send_data generate_csv(export_data), filename: filename }
     end
   rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_users_path, alert: 'Erreur lors de l\'export' }
-    end
+    respond_to(&export_error_response(e))
   end
 
-  # Statistics endpoint
   def stats
-    respond_to do |format|
-      format.json do
-        render json: {
-          stats: calculate_user_stats,
-          recent_signups: User.where(created_at: 1.week.ago..Time.current).count,
-          active_this_month: User.joins(:participations)
-                                 .where(participations: { created_at: 1.month.ago..Time.current })
-                                 .distinct.count
-        }
-      end
-    end
+    view_service = UserViewService.new
+    stats_data = view_service.prepare_stats_data
+    respond_to(&stats_response(stats_data))
   end
 
   private
@@ -247,16 +148,15 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(
-      :email, :first_name, :last_name, :role, :bio,
-      :password, :password_confirmation
-    )
+    params.require(:user).permit(:email, :first_name, :last_name, :role, :bio, :password, :password_confirmation)
   end
 
-  # Generate CSV from export data
+  def log_user_action(action, target_user, details = {})
+    Rails.logger.info "Admin User Management: #{current_user.email} #{action} #{target_user&.email || 'multiple users'} - #{details}"
+  end
+
   def generate_csv(data)
     return '' if data.empty?
-
     headers = data.first.keys
     CSV.generate(headers: true) do |csv|
       csv << headers
@@ -264,29 +164,71 @@ class Admin::UsersController < Admin::ApplicationController
     end
   end
 
-  # Override permission check to include context
-  def can_modify_user?(target_user)
-    return true if current_user.admin?
-    return false if target_user.admin?
-    return false if target_user == current_user # Can't modify self through admin
-
-    current_user.creator? && target_user.user?
+  # Response helpers
+  def standard_success_response(message)
+    proc do |format|
+      format.json { render json: { status: 'success', message: message } }
+      format.html { redirect_to admin_user_path(@user), notice: "#{message} avec succès" }
+    end
   end
 
-  # Enhanced logging with admin context
-  def log_user_action(action, target_user, details = {})
-    Rails.logger.info "Admin User Management: #{current_user.email} #{action} #{target_user&.email || 'multiple users'} - #{details}"
+  def standard_error_response(errors)
+    proc do |format|
+      format.json { render json: { status: 'error', errors: errors } }
+      format.html { render :show, alert: 'Erreur lors de la mise à jour' }
+    end
+  end
 
+  def error_response(error, action_name)
+    proc do |format|
+      format.json { render json: { status: 'error', message: error.message } }
+      format.html { redirect_to admin_user_path(@user), alert: "Erreur lors #{action_name}" }
+    end
+  end
 
-    # GDPR compliance requirement
-    # In production, you might want to store this in an audit log table
-    # AuditLog.create(
-    #   admin_user: current_user,
-    #   action: action,
-    #   target_user: target_user,
-    #   details: details,
-    #   ip_address: request.remote_ip,
-    #   user_agent: request.user_agent
-    # )
+  def role_change_success_response(new_role)
+    proc do |format|
+      format.json { render json: { status: 'success', new_role: new_role.humanize } }
+      format.html { redirect_to admin_user_path(@user), notice: "Rôle changé vers #{new_role.humanize}" }
+    end
+  end
+
+  def demote_success_response
+    proc do |format|
+      format.json { render json: { status: 'success', message: 'Utilisateur rétrogradé' } }
+      format.html { redirect_to admin_user_path(@user), notice: 'Utilisateur rétrogradé vers utilisateur standard' }
+    end
+  end
+
+  def password_reset_success_response(new_password)
+    proc do |format|
+      format.json { render json: { status: 'success', message: 'Mot de passe réinitialisé', new_password: new_password } }
+      format.html { redirect_to admin_user_path(@user), notice: "Mot de passe réinitialisé. Nouveau mot de passe: #{new_password}" }
+    end
+  end
+
+  def bulk_operation_response(result)
+    proc do |format|
+      if result[:success]
+        format.json { render json: { status: 'success', message: result[:message] } }
+        format.html { redirect_to admin_users_path, notice: result[:message] }
+      else
+        format.json { render json: { status: 'error', message: result[:error] } }
+        format.html { redirect_to admin_users_path, alert: result[:error] }
+      end
+    end
+  end
+
+  def export_error_response(error)
+    proc do |format|
+      format.json { render json: { status: 'error', message: error.message } }
+      format.html { redirect_to admin_users_path, alert: 'Erreur lors de l\'export' }
+    end
+  end
+
+  def stats_response(data)
+    proc do |format|
+      format.json { render json: data }
+    end
   end
 end

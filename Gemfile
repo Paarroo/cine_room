@@ -33,6 +33,7 @@ gem 'activestorage-cloudinary-service'
 gem "premailer-rails"
 gem "nokogiri"
 gem "geocoder"
+gem "opencage-geocoder", "~> 3.2"
 # gem "leaflet-rails" # Using CDN instead
 gem "valid_email2"
 gem "rqrcode"

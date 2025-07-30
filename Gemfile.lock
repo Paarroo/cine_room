@@ -421,6 +421,7 @@ GEM
       shellany (~> 0.0)
     nyan-cat-formatter (0.12.0)
       rspec (>= 2.99, >= 2.14.2, < 4)
+    opencage-geocoder (3.2.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
     parallel (1.27.0)
@@ -807,7 +808,8 @@ DEPENDENCIES
   nokogiri
   noticed
   nyan-cat-formatter (~> 0.12)
-  pg (~> 1.6)
+  opencage-geocoder (~> 3.2)
+  pg (~> 1.1)
   premailer-rails
   propshaft
   pry-byebug

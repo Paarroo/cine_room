@@ -36,9 +36,9 @@ class Admin::MoviesController < Admin::ApplicationController
   def update
     case params[:status]
     when 'approved'
-      validate_movie_action
+      validate
     when 'rejected'
-      reject_movie_action
+      reject
     else
       # Regular movie update
       update_movie_attributes
@@ -89,41 +89,7 @@ class Admin::MoviesController < Admin::ApplicationController
     @movie = Movie.find(params[:id])
   end
 
-  def validate_movie_action
-    @movie.update!(
-      validation_status: :approved,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
 
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Film validé avec succès' } }
-      format.html { redirect_to admin_movies_path, notice: 'Film validé avec succès' }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_movies_path, alert: 'Erreur lors de la validation' }
-    end
-  end
-
-  def reject_movie_action
-    @movie.update!(
-      validation_status: :rejected,
-      validated_by: current_user,
-      validated_at: Time.current
-    )
-
-    respond_to do |format|
-      format.json { render json: { status: 'success', message: 'Film rejeté' } }
-      format.html { redirect_to admin_movies_path, notice: 'Film rejeté' }
-    end
-  rescue StandardError => e
-    respond_to do |format|
-      format.json { render json: { status: 'error', message: e.message } }
-      format.html { redirect_to admin_movies_path, alert: 'Erreur lors du rejet' }
-    end
-  end
 
   def update_movie_attributes
     if @movie.update(movie_params)

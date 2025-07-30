@@ -54,10 +54,9 @@
     %>
 
     <div
-      class="<%= base_classes %> <%= type_classes %>"
+      class="<%= base_classes %> <%= type_classes %> flash-slide-in"
       data-unified-flash-target="message"
       data-flash-type="<%= mapped_type %>"
-      style="animation: slideInRight 0.3s ease-out"
     >
       <div class="flex items-start space-x-3">
         <!-- Icon -->
@@ -91,9 +90,8 @@
       <% if mapped_type != 'error' %>
         <div class="progress-bar mt-3 h-1 bg-white/10 rounded-full overflow-hidden">
           <div
-            class="progress-fill h-full bg-current rounded-full transition-all duration-linear"
+            class="progress-fill h-full bg-current rounded-full transition-all duration-linear flash-progress-animation"
             data-unified-flash-target="progressBar"
-            style="animation: progressShrink 5s linear"
           ></div>
         </div>
       <% end %>
@@ -101,40 +99,3 @@
   <% end %>
 </div>
 
-<!-- Custom CSS for animations -->
-<style>
-  @keyframes slideInRight {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideOutRight {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-
-  @keyframes progressShrink {
-    from {
-      width: 100%;
-    }
-    to {
-      width: 0%;
-    }
-  }
-
-  .flash-message.dismissing {
-    animation: slideOutRight 0.3s ease-in forwards;
-  }
-</style>

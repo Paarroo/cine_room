@@ -38,34 +38,67 @@ class Users::DashboardController < ApplicationController
   end
 
   def export
-  user = User.find(params[:id])
-
-  respond_to do |format|
-    format.json do
-      render json: {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-        movies: user.movies.pluck(:title),
-        reviews: user.reviews.pluck(:content)
-      }
-    end
-
-    format.csv do
-      csv_data = CSV.generate(headers: true) do |csv|
-        csv << %w[Champ Valeur]
-        csv << ["Prénom", user.first_name]
-        csv << ["Nom", user.last_name]
-        csv << ["Email", user.email]
-        csv << ["Rôle", user.role]
-        csv << ["Nombre de films", user.movies.count]
-        csv << ["Nombre de critiques", user.reviews.count]
+    respond_to do |format|
+      format.json do
+        render json: {
+          first_name: @user.first_name,
+          last_name: @user.last_name,
+          email: @user.email,
+          role: @user.role,
+          movies: @user.movies.pluck(:title),
+          reviews: @user.reviews.pluck(:content)
+        }
       end
-      send_data csv_data, filename: "user_data_#{user.id}.csv"
+
+      format.csv do
+        csv_data = CSV.generate(headers: true) do |csv|
+          csv << %w[Champ Valeur]
+          csv << ["Prénom", @user.first_name]
+          csv << ["Nom", @user.last_name]
+          csv << ["Email", @user.email]
+          csv << ["Rôle", @user.role]
+          csv << ["Bio", @user.bio]
+          csv << ["Date d'inscription", @user.created_at.strftime("%d/%m/%Y")]
+          csv << ["Nombre de films", @user.movies.count]
+          csv << ["Nombre de critiques", @user.reviews.count]
+          csv << ["Nombre de participations", @user.participations.count]
+          csv << ["Nombre de favoris", @user.favorites.count]
+          
+          # Add participation details
+          if @user.participations.any?
+            csv << ["", ""] # Empty row for separation
+            csv << ["PARTICIPATIONS", ""]
+            csv << ["Événement", "Date", "Film", "Places", "Statut"]
+            @user.participations.includes(:event => :movie).each do |participation|
+              csv << [
+                participation.event.title,
+                participation.event.event_date.strftime("%d/%m/%Y"),
+                participation.event.movie.title,
+                participation.seats,
+                participation.status
+              ]
+            end
+          end
+          
+          # Add reviews details
+          if @user.reviews.any?
+            csv << ["", ""] # Empty row for separation
+            csv << ["AVIS ET CRITIQUES", ""]
+            csv << ["Film", "Note", "Commentaire", "Date"]
+            @user.reviews.includes(:movie).each do |review|
+              csv << [
+                review.movie.title,
+                review.rating,
+                review.comment,
+                review.created_at.strftime("%d/%m/%Y")
+              ]
+            end
+          end
+        end
+        send_data csv_data, filename: "mes_donnees_cineroom_#{Date.current.strftime('%Y%m%d')}.csv"
+      end
     end
   end
-end
 
 
   private

@@ -63,8 +63,8 @@
           </span>
         </div>
         <div class="w-full bg-gray-700 rounded-full h-3">
-          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300"
-               style="width: <%= ((@participations.where(status: :confirmed).sum(:seats).to_f / @event.max_capacity) * 100).round(1) %>%"></div>
+          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-300 admin-progress-dynamic"
+               style="--progress-width: <%= ((@participations.where(status: :confirmed).sum(:seats).to_f / @event.max_capacity) * 100).round(1) %>%"></div>
         </div>
       </div>
     </div>

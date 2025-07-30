@@ -66,6 +66,7 @@ class Admin::EventsController < Admin::ApplicationController
 
   def edit
     @movies = Movie.where(validation_status: :approved).order(:title)
+    @venues = Event.distinct.pluck(:venue_name).compact.sort
   end
 
   def destroy
@@ -367,9 +368,9 @@ class Admin::EventsController < Admin::ApplicationController
   # Strong parameters for event updates
   def event_params
     params.require(:event).permit(
-      :title, :description, :venue_name, :venue_address,
+      :title, :description, :venue_name, :venue_address, :country,
       :event_date, :start_time, :max_capacity, :price_cents,
-      :status, :movie_id
+      :status, :movie_id, :coordinates_verified
     )
   end
 end

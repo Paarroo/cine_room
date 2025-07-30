@@ -181,7 +181,7 @@
               Lieu de l'événement
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <!-- Venue Name -->
               <div class="form-group">
                 <%= form.label :venue_name, "Nom du lieu", class: "form-label" %>
@@ -196,13 +196,28 @@
                 </datalist>
               </div>
 
-              <!-- Venue Address -->
+              <!-- Country -->
               <div class="form-group">
+                <%= form.label :country, "Pays", class: "form-label" %>
+                <%= form.select :country,
+                    options_for_select(Event::COUNTRIES, @event.country),
+                    { prompt: "Sélectionner un pays..." },
+                    { class: "form-input", required: true } %>
+                <div class="text-sm text-gray-400 mt-1">
+                  Requis pour un géocodage précis
+                </div>
+              </div>
+
+              <!-- Venue Address -->
+              <div class="form-group md:col-span-1">
                 <%= form.label :venue_address, "Adresse complète", class: "form-label" %>
                 <%= form.text_area :venue_address,
                     class: "form-input",
                     rows: 3,
                     placeholder: "Adresse complète du lieu..." %>
+                <div class="text-sm text-gray-400 mt-1">
+                  Incluez la ville pour de meilleurs résultats
+                </div>
               </div>
             </div>
           </div>

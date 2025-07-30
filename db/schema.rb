@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_27_210324) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_30_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,8 +62,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_210324) do
     t.bigint "validated_by_id"
     t.datetime "validated_at"
     t.string "geocoding_status", default: "pending"
+    t.string "country"
+    t.decimal "geocoding_confidence", precision: 5, scale: 2
+    t.boolean "coordinates_verified", default: false, null: false
+    t.index ["coordinates_verified"], name: "index_events_on_coordinates_verified"
+    t.index ["country"], name: "index_events_on_country"
     t.index ["created_by_id"], name: "index_events_on_created_by_id"
     t.index ["event_date"], name: "index_events_on_event_date"
+    t.index ["geocoding_confidence"], name: "index_events_on_geocoding_confidence"
     t.index ["geocoding_status"], name: "index_events_on_geocoding_status"
     t.index ["latitude", "longitude"], name: "index_events_on_latitude_and_longitude"
     t.index ["movie_id"], name: "index_events_on_movie_id"

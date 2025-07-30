@@ -97,7 +97,7 @@ class ActivityAggregationService
   end
 
   def event_activities
-    Event.includes(:movie, :user)
+    Event.includes(movie: :user)
          .order(created_at: :desc)
          .limit(@limit)
          .map do |event|
@@ -106,7 +106,7 @@ class ActivityAggregationService
         id: event.id,
         title: "Nouvel événement - #{event.title}",
         description: "Événement créé pour #{event.movie&.title}",
-        user: event.user&.full_name,
+        user: event.movie&.user&.full_name,
         created_at: event.created_at,
         time_ago: time_ago_in_words(event.created_at),
         status: event.status,

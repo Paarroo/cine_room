@@ -7,8 +7,14 @@ class Admin::EventsController < Admin::ApplicationController
     @events_query = apply_filters(@events_query, params)
     @events = @events_query.order(event_date: :desc).limit(50).to_a
 
-    @analytics_service = EventAnalyticsService.new(Event.all)
-    @stats = @analytics_service.calculate_statistics
+    # Calculate aggregate statistics for all events
+    @stats = {
+      total_events: @events.count,
+      upcoming_events: @events.select { |e| e.event_date >= Date.current }.count,
+      past_events: @events.select { |e| e.event_date < Date.current }.count,
+      total_capacity: @events.sum(&:max_capacity),
+      total_revenue: calculate_total_events_revenue(@events)
+    }
     @venues = Event.distinct.pluck(:venue_name).compact.sort
     @genres = Movie.joins(:events).distinct.pluck(:genre).compact.sort
   end
@@ -111,6 +117,13 @@ class Admin::EventsController < Admin::ApplicationController
 
   def set_event
     @event = Event.find(params[:id])
+  end
+
+  def calculate_total_events_revenue(events)
+    events.sum do |event|
+      event.participations.where(status: [:confirmed, :attended])
+           .sum { |p| (event.price_cents || 0) * p.seats }
+    end / 100.0
   end
 
   # Complete event action with logging

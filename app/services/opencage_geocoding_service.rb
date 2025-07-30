@@ -24,6 +24,13 @@ class OpenCageGeocodingService
     if result[:success]
       verification = verify_coordinates(result[:latitude], result[:longitude])
       result.merge!(verification)
+      
+      # If verification fails (coordinates outside country), mark as failed
+      unless verification[:verified]
+        Rails.logger.error "❌ Geocoding result failed verification: #{verification[:warnings].join(', ')}"
+        result = create_failed_result("Geocoding failed verification: #{verification[:warnings].first}")
+        result[:suggestions] = verification[:warnings][1..-1] if verification[:warnings].length > 1
+      end
     end
     
     log_result(result)
@@ -202,7 +209,7 @@ class OpenCageGeocodingService
       return verification
     end
     
-    # Country boundary check (simplified)
+    # Strict country boundary check
     if country.present? && COUNTRY_BOUNDS.key?(country)
       bounds = COUNTRY_BOUNDS[country]
       
@@ -210,9 +217,17 @@ class OpenCageGeocodingService
       lng_in_bounds = longitude.between?(bounds[:lng][0], bounds[:lng][1])
       
       unless lat_in_bounds && lng_in_bounds
+        verification[:verified] = false
         verification[:country_match] = false
-        verification[:warnings] << "Coordinates may be outside expected country bounds"
-        # Don't mark as unverified for country mismatch - OpenCage is usually right
+        verification[:warnings] << "Coordinates are outside #{country} bounds (lat: #{latitude}, lng: #{longitude})"
+        
+        Rails.logger.error "🚨 GEOCODING BUG DETECTED: Address '#{address}' in #{country} geocoded to coordinates outside country bounds: #{latitude}, #{longitude}"
+        
+        # Add specific suggestions based on which country was expected
+        if country == 'France'
+          verification[:warnings] << "Expected coordinates in France (41-52°N, -5-10°E) but got coordinates possibly in Africa or elsewhere"
+          verification[:warnings] << "This may be caused by postal code confusion (e.g., 84xxx vs 91xxx for Évry-Courcouronnes)"
+        end
       end
     end
     

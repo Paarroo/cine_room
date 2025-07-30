@@ -66,6 +66,11 @@ class EventAnalyticsService
     }
   end
 
+  # Alias for admin controller compatibility
+  def calculate_statistics
+    calculate_all_metrics
+  end
+
   private
 
   def confirmed_participations
@@ -85,7 +90,7 @@ class EventAnalyticsService
     confirmed_participations
       .group("DATE(created_at)")
       .count
-      .transform_keys { |date| date.strftime('%d/%m') }
+      .transform_keys { |date| Date.parse(date.to_s).strftime('%d/%m') }
   end
 
   def occupancy_rate(confirmed_seats)

@@ -18,29 +18,36 @@ class StripeCheckoutController < ApplicationController
       redirect_to root_path, alert: "Le paiement n'a pas été confirmé." and return
     end
 
-    # Check if participation already exists (created by webhook)
-    participation = current_user.participations.find_by(
-      event: @event,
-      stripe_payment_id: session_id
-    )
-
-    # If not created by webhook, create it now (fallback)
-    unless participation
-      if current_user.participations.exists?(event: @event)
-        redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
-      end
-
-      participation = current_user.participations.create!(
+    # Use transaction with locking to prevent race conditions
+    participation = nil
+    User.transaction do
+      # Lock the user record to prevent concurrent participation creation
+      locked_user = User.lock.find(current_user.id)
+      
+      # Check if participation already exists (created by webhook)
+      participation = locked_user.participations.find_by(
         event: @event,
-        seats: seats,
-        stripe_payment_id: session_id,
-        status: :confirmed
+        stripe_payment_id: session_id
       )
 
-      TicketMailer.ticket_confirmation(participation).deliver_now
-      Rails.logger.info "Participation created via success redirect (webhook missed): #{participation.id}"
-    else
-      Rails.logger.info "Participation already exists from webhook: #{participation.id}"
+      # If not created by webhook, create it now (fallback)
+      unless participation
+        if locked_user.participations.exists?(event: @event)
+          redirect_to @event, alert: "Tu as déjà réservé une place pour cet événement." and return
+        end
+
+        participation = locked_user.participations.create!(
+          event: @event,
+          seats: seats,
+          stripe_payment_id: session_id,
+          status: :confirmed
+        )
+
+        TicketMailer.ticket_confirmation(participation).deliver_now
+        Rails.logger.info "Participation created via success redirect (webhook missed): #{participation.id}"
+      else
+        Rails.logger.info "Participation already exists from webhook: #{participation.id}"
+      end
     end
 
     redirect_to reservation_success_path(participation_id: participation.id)

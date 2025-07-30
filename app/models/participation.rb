@@ -74,6 +74,16 @@ class Participation < ApplicationRecord
     activities
   end
 
+  # Check if QR code has been used for entry
+  def used?
+    used_at.present?
+  end
+
+  # Mark QR code as used for entry
+  def mark_as_used!
+    update!(used_at: Time.current)
+  end
+
   private
 
   def self.generate_sample_revenue_data
@@ -88,16 +98,6 @@ class Participation < ApplicationRecord
         formatted_revenue: ActionController::Base.helpers.number_to_currency(revenue)
       }
     end
-  end
-
-  # Check if QR code has been used for entry
-  def used?
-    used_at.present?
-  end
-
-  # Mark QR code as used for entry
-  def mark_as_used!
-    update!(used_at: Time.current)
   end
 
   # Generate QR code data as JSON

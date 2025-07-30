@@ -1,9 +1,10 @@
 task :quick_geocode => :environment do
   puts "Geocoding events..."
   
-  Event.all.each do |event|
-    if event.latitude.blank? || event.longitude.blank?
-      puts "Geocoding: #{event.title}"
+  Event.where("latitude IS NULL OR longitude IS NULL")
+       .select(:id, :title, :venue_name, :latitude, :longitude)
+       .find_each(batch_size: 100) do |event|
+    puts "Geocoding: #{event.title}"
       
       # Simple geocoding fallback - set to Paris locations
       case event.venue_name
@@ -19,9 +20,6 @@ task :quick_geocode => :environment do
       end
       
       puts "✓ Set coordinates: #{event.latitude}, #{event.longitude}"
-    else
-      puts "✓ #{event.title} already has coordinates"
-    end
   end
   
   puts "Done!"

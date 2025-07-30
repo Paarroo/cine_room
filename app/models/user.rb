@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_one_attached :avatar
 
   validate :name_cannot_be_changed_after_publishing, on: :update
+  validate :avatar_format
   validates :email, format: { with: /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/, message: "doit être une adresse email valide" }
   validate :validate_email_domain, on: [:create, :update]
 
@@ -98,6 +99,20 @@ class User < ApplicationRecord
   def skip_confirmation_for_admin
     if admin?
       skip_confirmation!
+    end
+  end
+
+  def avatar_format
+    return unless avatar.attached?
+
+    # Check file type
+    unless avatar.content_type.in?(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+      errors.add(:avatar, 'doit être un fichier JPEG, PNG, GIF ou WebP')
+    end
+
+    # Check file size (max 5MB)
+    if avatar.blob.byte_size > 5.megabytes
+      errors.add(:avatar, 'doit faire moins de 5MB')
     end
   end
 

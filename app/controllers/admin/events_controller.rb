@@ -4,29 +4,17 @@ class Admin::EventsController < Admin::ApplicationController
 
   def index
     @events_query = Event.includes(:movie, :participations, :users)
-
-    # Apply filters
-    @events_query = @events_query.where(status: params[:status]) if params[:status].present?
-    @events_query = @events_query.where(venue_name: params[:venue]) if params[:venue].present?
-    @events_query = @events_query.joins(:movie).where(movies: { genre: params[:genre] }) if params[:genre].present?
-
-    # Search functionality
-    if params[:q].present?
-      @events_query = @events_query.where("title ILIKE ? OR venue_name ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%")
-    end
-
+    @events_query = apply_filters(@events_query, params)
     @events = @events_query.order(event_date: :desc).limit(50).to_a
 
-    # Calculate comprehensive stats
+    # Calculate aggregate statistics for all events
     @stats = {
-      total: Event.count,
-      upcoming: Event.where(status: :upcoming).count,
-      completed: Event.where(status: :completed).count,
-      sold_out: Event.where(status: :sold_out).count,
-      cancelled: Event.where(status: :cancelled).count
+      total_events: @events.count,
+      upcoming_events: @events.select { |e| e.event_date >= Date.current }.count,
+      past_events: @events.select { |e| e.event_date < Date.current }.count,
+      total_capacity: @events.sum(&:max_capacity),
+      total_revenue: calculate_total_events_revenue(@events)
     }
-
-    # Get filter options for dropdowns
     @venues = Event.distinct.pluck(:venue_name).compact.sort
     @genres = Movie.joins(:events).distinct.pluck(:genre).compact.sort
   end
@@ -35,17 +23,11 @@ class Admin::EventsController < Admin::ApplicationController
     # Load participations with user information
     @participations = @event.participations.includes(:user).order(created_at: :desc)
 
-    # Calculate event revenue
-    @revenue = calculate_event_revenue(@event)
-
-    # Calculate booking analytics
-    @booking_analytics = calculate_booking_analytics(@event)
-
-    # Get recent activities for this event
-    @recent_activities = get_event_activities(@event)
-
-    # Calculate capacity metrics
-    @capacity_metrics = calculate_capacity_metrics(@event)
+    # Use event model methods for analytics (delegated to services)
+    @revenue = @event.calculate_revenue
+    @booking_analytics = @event.booking_analytics
+    @recent_activities = @event.recent_activities
+    @capacity_metrics = @event.capacity_metrics
   end
 
   def new
@@ -55,7 +37,6 @@ class Admin::EventsController < Admin::ApplicationController
 
   def create
     @event = Event.new(event_params)
-    @event.created_by = current_user
 
     if @event.save
       redirect_to admin_event_path(@event), notice: 'Événement créé avec succès.'
@@ -67,6 +48,7 @@ class Admin::EventsController < Admin::ApplicationController
 
   def edit
     @movies = Movie.where(validation_status: :approved).order(:title)
+    @venues = Event.distinct.pluck(:venue_name).compact.sort
   end
 
   def destroy
@@ -90,20 +72,15 @@ class Admin::EventsController < Admin::ApplicationController
 
   # Export participations to CSV
   def export_participations
-    @export_data = export_event_participations(@event)
+    export_service = @event.export_service
 
     respond_to do |format|
       format.json do
-        render json: {
-          success: true,
-          data: @export_data,
-          filename: "event_#{@event.id}_participations_#{Date.current.strftime('%Y%m%d')}.csv",
-          download_url: admin_event_export_participations_path(@event, format: :csv)
-        }
+        render json: export_service.export_response_data(format: :json)
       end
       format.csv do
-        send_data generate_participations_csv(@export_data),
-                  filename: "event_#{@event.id}_participations_#{Date.current.strftime('%Y%m%d')}.csv"
+        send_data export_service.generate_participations_csv,
+                  filename: export_service.generate_export_filename
       end
     end
   rescue StandardError => e
@@ -113,9 +90,9 @@ class Admin::EventsController < Admin::ApplicationController
     end
   end
 
-  # Send notification to all event participants
   def send_notification
-    notification_result = send_event_notification(@event)
+    notification_service = EventNotificationService.new(@event)
+    notification_result = notification_service.send_event_notification
 
     respond_to do |format|
       format.json do
@@ -142,13 +119,16 @@ class Admin::EventsController < Admin::ApplicationController
     @event = Event.find(params[:id])
   end
 
+  def calculate_total_events_revenue(events)
+    events.sum do |event|
+      event.participations.where(status: [:confirmed, :attended])
+           .sum { |p| (event.price_cents || 0) * p.seats }
+    end / 100.0
+  end
+
   # Complete event action with logging
   def complete_event_action
-    @event.update!(
-      status: :completed,
-      updated_at: Time.current
-    )
-
+    @event.complete!
     log_event_action('completed', @event)
 
     respond_to do |format|
@@ -164,14 +144,7 @@ class Admin::EventsController < Admin::ApplicationController
 
   # Cancel event action with logging
   def cancel_event_action
-    @event.update!(
-      status: :cancelled,
-      updated_at: Time.current
-    )
-
-    # Cancel all pending participations
-    @event.participations.where(status: :pending).update_all(status: :cancelled)
-
+    @event.cancel!
     log_event_action('cancelled', @event)
 
     respond_to do |format|
@@ -187,11 +160,7 @@ class Admin::EventsController < Admin::ApplicationController
 
   # Reopen cancelled event
   def reopen_event_action
-    @event.update!(
-      status: :upcoming,
-      updated_at: Time.current
-    )
-
+    @event.reopen!
     log_event_action('reopened', @event)
 
     respond_to do |format|
@@ -216,138 +185,8 @@ class Admin::EventsController < Admin::ApplicationController
     end
   end
 
-  # Calculate event revenue from confirmed participations
-  def calculate_event_revenue(event)
-    event.participations.where(status: [ :confirmed, :attended ])
-         .sum("#{event.price_cents} * participations.seats") / 100.0
-  end
 
-  # Calculate booking analytics for event
-  def calculate_booking_analytics(event)
-    participations = event.participations.where(status: [ :confirmed, :attended ])
 
-    {
-      total_bookings: participations.count,
-      total_seats_sold: participations.sum(:seats),
-      average_booking_size: participations.average(:seats)&.round(1) || 0,
-      booking_conversion_rate: calculate_booking_conversion_rate(event),
-      daily_bookings: calculate_daily_bookings(event)
-    }
-  end
-
-  # Get recent activities for event
-  def get_event_activities(event)
-    activities = []
-
-    # Recent participations
-    event.participations.includes(:user)
-         .order(created_at: :desc)
-         .limit(5)
-         .each do |participation|
-      activities << {
-        type: 'participation',
-        title: 'Nouvelle participation',
-        description: "#{participation.user&.full_name} - #{participation.seats} place(s)",
-        status: participation.status,
-        created_at: participation.created_at
-      }
-    end
-
-    activities.sort_by { |a| a[:created_at] }.reverse
-  end
-
-  # Calculate capacity metrics
-  def calculate_capacity_metrics(event)
-    confirmed_seats = event.participations.where(status: [ :confirmed, :attended ]).sum(:seats)
-
-    {
-      total_capacity: event.max_capacity,
-      seats_sold: confirmed_seats,
-      seats_available: event.max_capacity - confirmed_seats,
-      occupancy_rate: event.max_capacity > 0 ? (confirmed_seats.to_f / event.max_capacity * 100).round(1) : 0,
-      is_sold_out: confirmed_seats >= event.max_capacity
-    }
-  end
-
-  # Export event participations data
-  def export_event_participations(event)
-    event.participations.includes(:user).map do |participation|
-      {
-        id: participation.id,
-        user_name: participation.user&.full_name,
-        user_email: participation.user&.email,
-        seats: participation.seats,
-        total_price: (event.price_cents * participation.seats) / 100.0,
-        status: participation.status.humanize,
-        payment_id: participation.stripe_payment_id,
-        booking_date: participation.created_at.strftime('%d/%m/%Y %H:%M'),
-        user_phone: participation.user&.phone,
-        special_requirements: participation.special_requirements
-      }
-    end
-  end
-
-  # Generate CSV for participations export
-  def generate_participations_csv(data)
-    return '' if data.empty?
-
-    headers = data.first.keys
-    CSV.generate(headers: true) do |csv|
-      csv << headers.map(&:to_s).map(&:humanize)
-      data.each { |row| csv << headers.map { |h| row[h] } }
-    end
-  end
-
-  # Send notification to event participants
-  def send_event_notification(event)
-    participants = event.participations.where(status: [ :confirmed, :attended ])
-                       .includes(:user)
-
-    sent_count = 0
-    errors = []
-
-    participants.find_each do |participation|
-      begin
-        # Send email notification
-        EventMailer.event_notification(participation).deliver_now
-        sent_count += 1
-      rescue StandardError => e
-        errors << "Failed to send to #{participation.user&.email}: #{e.message}"
-      end
-    end
-
-    if errors.empty?
-      {
-        success: true,
-        message: "Notifications envoyées avec succès à #{sent_count} participants",
-        sent_count: sent_count
-      }
-    else
-      {
-        success: false,
-        error: "Erreurs lors de l'envoi: #{errors.join(', ')}",
-        sent_count: sent_count
-      }
-    end
-  end
-
-  # Calculate booking conversion rate
-  def calculate_booking_conversion_rate(event)
-    total_users = User.count
-    total_bookings = event.participations.where(status: [ :confirmed, :attended ]).count
-
-    return 0 if total_users.zero?
-
-    (total_bookings.to_f / total_users * 100).round(2)
-  end
-
-  # Calculate daily bookings pattern
-  def calculate_daily_bookings(event)
-    event.participations.where(status: [ :confirmed, :attended ])
-         .group("DATE(created_at)")
-         .count
-         .transform_keys { |date| date.strftime('%d/%m') }
-  end
 
   # Enhanced logging with admin context
   def log_event_action(action, event, details = {})
@@ -365,12 +204,23 @@ class Admin::EventsController < Admin::ApplicationController
     # )
   end
 
-  # Strong parameters for event updates
+  def apply_filters(query, params)
+    query = query.where(status: params[:status]) if params[:status].present?
+    query = query.where(venue_name: params[:venue]) if params[:venue].present?
+    query = query.joins(:movie).where(movies: { genre: params[:genre] }) if params[:genre].present?
+    
+    if params[:q].present?
+      query = query.where("title ILIKE ? OR venue_name ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%")
+    end
+    
+    query
+  end
+
   def event_params
     params.require(:event).permit(
-      :title, :description, :venue_name, :venue_address,
+      :title, :description, :venue_name, :venue_address, :country,
       :event_date, :start_time, :max_capacity, :price_cents,
-      :status, :movie_id
+      :status, :movie_id, :coordinates_verified
     )
   end
 end

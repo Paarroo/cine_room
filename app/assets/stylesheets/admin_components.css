@@ -1,0 +1,379 @@
+/* ===== ADMIN COMPONENTS STYLES ===== */
+
+/* Admin Metric Cards */
+.admin-metric-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.admin-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.admin-metric-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #60a5fa;
+  line-height: 1;
+}
+
+.admin-metric-label {
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.admin-metric-trend {
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+}
+
+.admin-metric-trend.positive {
+  color: #34d399;
+}
+
+.admin-metric-trend.negative {
+  color: #f87171;
+}
+
+/* Admin Progress Bars */
+.admin-progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.admin-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  border-radius: 9999px;
+  transition: width 0.6s ease-in-out;
+}
+
+/* QR Scanner Styles */
+.qr-scanner-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.qr-scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid #f59e0b;
+  border-radius: 0.5rem;
+  pointer-events: none;
+}
+
+.qr-scanner-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f59e0b;
+}
+
+.qr-scanner-corner.top-left {
+  top: -3px;
+  left: -3px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.qr-scanner-corner.top-right {
+  top: -3px;
+  right: -3px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.qr-scanner-corner.bottom-left {
+  bottom: -3px;
+  left: -3px;
+  border-right: none;
+  border-top: none;
+}
+
+.qr-scanner-corner.bottom-right {
+  bottom: -3px;
+  right: -3px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Admin Actions */
+.admin-action-button {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-action-button:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-action-button.secondary {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.admin-action-button.secondary:hover {
+  background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+.admin-action-button.danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.admin-action-button.danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* ===== ADMIN FORM STYLES ===== */
+.form-label {
+  @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors;
+}
+
+.form-section {
+  @apply bg-white/5 rounded-2xl p-8;
+}
+
+.form-group {
+  @apply space-y-2;
+}
+
+/* ===== ADMIN METRIC CARDS ANIMATIONS ===== */
+.metric-card.refreshing .metric-loading {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.metric-card .value-updated {
+  animation: valueUpdate 1.5s ease-out;
+}
+
+.metric-card .trend-updated {
+  animation: trendPulse 2s ease-out;
+}
+
+@keyframes valueUpdate {
+  0% {
+    background-color: rgba(245, 158, 11, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    background-color: rgba(245, 158, 11, 0.3);
+    transform: scale(1.05);
+  }
+  100% {
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+@keyframes trendPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 1.875rem;
+  }
+
+  .metric-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .metric-icon i {
+    font-size: 1rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .metric-card {
+    border-width: 2px;
+  }
+
+  .metric-trend {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .metric-card,
+  .metric-icon,
+  .metric-value,
+  .metric-loading {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .metric-card:hover {
+    transform: none !important;
+  }
+}
+
+/* Admin Dashboard Icon Containers */
+.admin-icon-container {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-icon-container.gold {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.admin-icon-container.blue {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.admin-icon-container.green {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.admin-icon-container.purple {
+  background: rgba(147, 51, 234, 0.1);
+}
+
+/* Admin Metric Text */
+.admin-metric-large {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.admin-metric-large.gold {
+  color: #f59e0b;
+}
+
+.admin-metric-large.blue {
+  color: #2563eb;
+}
+
+.admin-metric-large.green {
+  color: #22c55e;
+}
+
+.admin-metric-large.purple {
+  color: #9333ea;
+}
+
+.admin-metric-label {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.admin-metric-sub {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Admin Icon Colors */
+.admin-icon.gold {
+  color: #f59e0b;
+  font-size: 1.25rem;
+}
+
+.admin-icon.blue {
+  color: #2563eb;
+  font-size: 1.25rem;
+}
+
+.admin-icon.green {
+  color: #22c55e;
+  font-size: 1.25rem;
+}
+
+.admin-icon.purple {
+  color: #9333ea;
+  font-size: 1.25rem;
+}
+
+/* Admin Hidden Elements */
+.admin-hidden-default {
+  display: none;
+}
+
+/* Admin Progress Bars - Dynamic Width */
+.admin-progress-dynamic {
+  width: var(--progress-width, 0%);
+}
+
+/* Admin QR Scanner Display States */
+.admin-qr-video-active {
+  display: block !important;
+}
+
+.admin-qr-placeholder-hidden {
+  display: none !important;
+}
+
+.admin-qr-start-hidden {
+  display: none !important;
+}
+
+.admin-qr-stop-active {
+  display: flex !important;
+}
+
+.admin-qr-results-visible {
+  display: block !important;
+}
+
+/* Admin Background Patterns */
+.admin-dot-pattern {
+  background-image: radial-gradient(circle at 50% 50%, white 1px, transparent 1px);
+  background-size: 20px 20px;
+  width: 100%;
+  height: 100%;
+}
+
+/* General Progress Bars - Dynamic Width (for non-admin pages using admin classes) */
+.progress-dynamic {
+  width: var(--progress-width, 0%);
+}
+
+/* Map Container Minimum Height */
+.map-container-min {
+  min-height: 160px;
+}

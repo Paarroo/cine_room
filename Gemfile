@@ -3,7 +3,7 @@ ruby "3.4.2"
 
 # Production and Development gems
 gem "rails", "~> 8.0.2"
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.6"
 gem "puma", ">= 5.0"
 gem "solid_cache"
 gem "solid_queue"
@@ -33,6 +33,7 @@ gem 'activestorage-cloudinary-service'
 gem "premailer-rails"
 gem "nokogiri"
 gem "geocoder"
+gem "opencage-geocoder", "~> 3.2"
 # gem "leaflet-rails" # Using CDN instead
 gem "valid_email2"
 gem "rqrcode"

@@ -12,10 +12,12 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log("Admin actions controller connected")
   }
 
   // Universal action handler for all admin operations
   async executeAction(event) {
+    console.log("Execute action called")
     const button = event.currentTarget
     const url = button.dataset.url
     const method = button.dataset.method || 'PATCH'
@@ -23,6 +25,9 @@ export default class extends Controller {
     const successMessage = button.dataset.successMessage
     const errorMessage = button.dataset.errorMessage
     const params = button.dataset.params ? JSON.parse(button.dataset.params) : {}
+    
+    const csrfToken = this.getCSRFToken()
+    console.log("Action details:", { url, method, confirmMessage, successMessage, csrfToken })
 
     // Confirm if required
     if (confirmMessage && !confirm(confirmMessage)) {
@@ -39,16 +44,19 @@ export default class extends Controller {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-Token': this.getCSRFToken()
+          'X-CSRF-Token': csrfToken
         },
         body: Object.keys(params).length > 0 ? JSON.stringify(params) : null
       })
 
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Server response error:', errorText)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
+      console.log('Server response:', result)
 
       if (result.status === 'success') {
         this.showToast(successMessage || result.message || 'Action réussie', 'success')
@@ -170,15 +178,16 @@ export default class extends Controller {
 
   // Helper methods
   getCSRFToken() {
-    const token = document.querySelector('[name="csrf-token"]')
-    return token ? token.content : ''
+    const token = document.querySelector('meta[name="csrf-token"]')
+    return token ? token.getAttribute('content') : ''
   }
 
   showToast(message, type = 'info') {
-    // Dispatch event for admin-flash controller
-    this.dispatch('toast', {
+    // Dispatch global event for unified flash controller
+    const event = new CustomEvent('admin-dashboard:toast', {
       detail: { message, type }
     })
+    document.dispatchEvent(event)
   }
 
   getStatusText(status) {

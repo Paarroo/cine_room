@@ -80,13 +80,13 @@
         <div class="flex items-center justify-between mb-3">
           <span class="text-sm text-gray-400">Progression mensuelle</span>
           <span class="text-sm text-primary font-medium">
-            <%= number_to_percentage((@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), precision: 1) %>
+            <%= @revenue_data[:total_revenue] > 0 ? number_to_percentage((@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), precision: 1) : "0%" %>
           </span>
         </div>
 
         <div class="w-full bg-white/10 rounded-full h-3">
-          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-500"
-               style="width: <%= [(@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), 100].min %>%">
+          <div class="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-500 admin-progress-dynamic"
+               style="--progress-width: <%= @revenue_data[:total_revenue] > 0 ? [[(@revenue_data[:monthly_revenue] / @revenue_data[:total_revenue] * 100), 100].min, 0].max : 0 %>%">
           </div>
         </div>
 

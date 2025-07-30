@@ -45,14 +45,21 @@ export default class extends Controller {
     }
 
 
-    // Use provided coordinates or default to Paris
-    const lat = this.latitudeValue || 48.8566
-    const lng = this.longitudeValue || 2.3522
+    // Check if coordinates are provided
+    const lat = this.latitudeValue
+    const lng = this.longitudeValue
+    
+    // If no coordinates, show fallback immediately
+    if (!lat || !lng) {
+      console.warn("❌ No coordinates provided for map")
+      this.showFallback("Aucune coordonnée disponible - adresse non géocodée")
+      return
+    }
 
     // Validate coordinates
     if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      console.warn("❌ Invalid coordinates:", lat, lng, "- using Paris default")
-      this.showFallback("Coordonnées invalides - position par défaut")
+      console.warn("❌ Invalid coordinates:", lat, lng)
+      this.showFallback("Coordonnées invalides")
       return
     }
 
@@ -206,8 +213,13 @@ export default class extends Controller {
         const userLng = position.coords.longitude
         
         // Destination coordinates
-        const destLat = this.latitudeValue || 48.8566
-        const destLng = this.longitudeValue || 2.3522
+        const destLat = this.latitudeValue
+        const destLng = this.longitudeValue
+        
+        if (!destLat || !destLng) {
+          alert("Impossible d'ouvrir le GPS : coordonnées de destination non disponibles")
+          return
+        }
         const address = this.venueAddressValue || this.venueNameValue || 'Destination'
         
         // Open GPS app with route
@@ -230,8 +242,14 @@ export default class extends Controller {
 
   openGpsWithoutUserLocation() {
     // Destination coordinates only
-    const lat = this.latitudeValue || 48.8566
-    const lng = this.longitudeValue || 2.3522
+    const lat = this.latitudeValue
+    const lng = this.longitudeValue
+    
+    if (!lat || !lng) {
+      alert("Impossible d'ouvrir le GPS : coordonnées de destination non disponibles")
+      return
+    }
+    
     const address = this.venueAddressValue || this.venueNameValue || 'Destination'
     
     // Detect platform and open appropriate GPS app
@@ -465,8 +483,13 @@ export default class extends Controller {
       return
     }
 
-    const lat = this.latitudeValue || 48.8566
-    const lng = this.longitudeValue || 2.3522
+    const lat = this.latitudeValue
+    const lng = this.longitudeValue
+    
+    if (!lat || !lng) {
+      console.error("Cannot initialize fullscreen map: no coordinates available")
+      return
+    }
 
     try {
       // Create fullscreen map

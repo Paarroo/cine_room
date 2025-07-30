@@ -53,21 +53,34 @@ class Webhooks::StripeController < ApplicationController
 
     return unless event && user
 
-    # Check if participation already exists (avoid duplicates)
-    existing_participation = user.participations.find_by(
-      event: event,
-      stripe_payment_id: session['id']
-    )
+    # Use transaction with locking to prevent race conditions
+    participation = nil
+    User.transaction do
+      # Lock the user record to prevent concurrent participation creation
+      locked_user = User.lock.find(user.id)
+      
+      # Check if participation already exists (avoid duplicates)
+      existing_participation = locked_user.participations.find_by(
+        event: event,
+        stripe_payment_id: session['id']
+      )
 
-    return if existing_participation
+      return if existing_participation
 
-    # Create confirmed participation
-    participation = user.participations.create!(
-      event: event,
-      seats: seats,
-      stripe_payment_id: session['id'],
-      status: :confirmed
-    )
+      # Also check for any existing participation for this event (one per user per event)
+      if locked_user.participations.exists?(event: event)
+        Rails.logger.warn "User #{user.id} already has participation for event #{event.id}, skipping webhook creation"
+        return
+      end
+
+      # Create confirmed participation
+      participation = locked_user.participations.create!(
+        event: event,
+        seats: seats,
+        stripe_payment_id: session['id'],
+        status: :confirmed
+      )
+    end
 
     # Send ticket with QR code
     TicketMailer.ticket_confirmation(participation).deliver_now

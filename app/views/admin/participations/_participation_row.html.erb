@@ -55,7 +55,7 @@
 
   <!-- Date -->
   <td class="py-3 px-1 w-16">
-    <% if data[:event_date] %>
+    <% if data[:event_date] && data[:event_date] != 'N/A' %>
       <div class="text-white text-xs">
         <%= data[:event_date].strftime("%d/%m") %>
       </div>

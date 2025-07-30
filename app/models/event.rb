@@ -118,6 +118,84 @@ class Event < ApplicationRecord
     [ "movie", "participations", "users", "reviews" ]
   end
 
+  # Business logic methods - moved from controllers
+  
+  # Get analytics service for this event
+  def analytics
+    @analytics ||= EventAnalyticsService.new(self)
+  end
+
+  # Get export service for this event
+  def export_service
+    @export_service ||= EventExportService.new(self)
+  end
+
+  # Calculate revenue using service
+  def calculate_revenue
+    analytics.calculate_revenue
+  end
+
+  # Get booking analytics
+  def booking_analytics
+    analytics.calculate_booking_analytics
+  end
+
+  # Get capacity metrics
+  def capacity_metrics
+    analytics.calculate_capacity_metrics
+  end
+
+  # Get recent activities
+  def recent_activities(limit: 5)
+    analytics.get_recent_activities(limit: limit)
+  end
+
+  # Complete event with proper status management
+  def complete!
+    update!(status: :completed, updated_at: Time.current)
+  end
+
+  # Cancel event and handle participations
+  def cancel!
+    transaction do
+      update!(status: :cancelled, updated_at: Time.current)
+      participations.where(status: :pending).update_all(status: :cancelled)
+    end
+  end
+
+  # Reopen cancelled event
+  def reopen!
+    update!(status: :upcoming, updated_at: Time.current)
+  end
+
+  # Check if event can be cancelled
+  def can_be_cancelled?
+    upcoming? && event_date > 1.day.from_now
+  end
+
+  # Check if event can be completed
+  def can_be_completed?
+    upcoming? && event_date < Time.current
+  end
+
+  # Get confirmed participations
+  def confirmed_participations
+    participations.where(status: [:confirmed, :attended])
+  end
+
+  # Calculate occupancy rate
+  def occupancy_rate
+    return 0 if max_capacity.zero?
+    
+    confirmed_seats = confirmed_participations.sum(:seats)
+    (confirmed_seats.to_f / max_capacity * 100).round(1)
+  end
+
+  # Check if event is nearly sold out (>90% capacity)
+  def nearly_sold_out?
+    occupancy_rate >= 90
+  end
+
   private
 
   def attach_default_image

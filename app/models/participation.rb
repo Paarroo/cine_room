@@ -84,22 +84,6 @@ class Participation < ApplicationRecord
     update!(used_at: Time.current)
   end
 
-  private
-
-  def self.generate_sample_revenue_data
-    (30.days.ago.to_date..Date.current).map do |date|
-      base_revenue = [0, 150, 250, 400, 350, 500, 300, 200].sample
-      daily_variation = rand(-50..100)
-      revenue = [0, base_revenue + daily_variation].max
-
-      {
-        date: date.strftime("%d/%m"),
-        revenue: revenue,
-        formatted_revenue: ActionController::Base.helpers.number_to_currency(revenue)
-      }
-    end
-  end
-
   # Generate QR code data as JSON
   def qr_code_data
     {
@@ -148,6 +132,20 @@ class Participation < ApplicationRecord
   end
 
   private
+
+  def self.generate_sample_revenue_data
+    (30.days.ago.to_date..Date.current).map do |date|
+      base_revenue = [0, 150, 250, 400, 350, 500, 300, 200].sample
+      daily_variation = rand(-50..100)
+      revenue = [0, base_revenue + daily_variation].max
+
+      {
+        date: date.strftime("%d/%m"),
+        revenue: revenue,
+        formatted_revenue: ActionController::Base.helpers.number_to_currency(revenue)
+      }
+    end
+  end
 
   def generate_qr_code_token
     self.qr_code_token = SecureRandom.urlsafe_base64(32)
